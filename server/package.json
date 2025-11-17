@@ -1,0 +1,32 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.22.0",
+  "dependencies": {
+    "@prisma/client": "^6.19.0",
+    "bullmq": "^5.63.2",
+    "dotenv": "^17.2.3",
+    "fastify": "^5.6.2",
+    "fastify-cors": "^6.1.0",
+    "fastify-jwt": "^4.2.0",
+    "fastify-plugin": "^5.1.0",
+    "ioredis": "^5.8.2",
+    "ts-morph": "^27.0.2",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@types/dotenv": "^8.2.3",
+    "@types/supertest": "^6.0.3",
+    "prisma": "^6.19.0",
+    "supertest": "^7.1.4",
+    "vitest": "^4.0.10"
+  }
+}
