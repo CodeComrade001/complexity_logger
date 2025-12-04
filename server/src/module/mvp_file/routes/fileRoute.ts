@@ -9,8 +9,7 @@ import { PostgresFileRepository } from "../adapters/repositories/PostgresFileRep
  */
 export default async function fileRoute(
   fastify: FastifyInstance,
-  _opts: FastifyPluginOptions,
-  done: () => void
+  _opts: FastifyPluginOptions
 ) {
   // gather infra from fastify decorators (set at bootstrap)
   const pgPool = (fastify as any).pgPool;       // typed in composition root
@@ -33,5 +32,4 @@ export default async function fileRoute(
   fastify.post("/patches/apply", controller.getFilePatchApply.bind(controller));
   fastify.get("/user/me", controller.getUser.bind(controller));
 
-  done();
 }
