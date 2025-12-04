@@ -1,0 +1,44 @@
+# compose_db.yaml (Fixed)
+name: ai_log_complexity_postgres_db_databases
+services:
+  postgres_db:
+    image: postgres:16-alpine
+    container_name: ai_log_complexity_postgres_db
+    # restart: unless-stopped
+    environment:
+      # Set environment variables for the PostgreSQL container
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: ${POSTGRES_PORT}
+    volumes:
+      # Persist data using a named volume - ADDED HYPHEN HERE
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      # Map container port 5432 to host port 5432
+      - "5432:5432"
+    networks:
+      - app-network
+
+  mongo_db:
+    image: mongo:4.4
+    container_name: ai_log_complexity_mongo_db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_APP_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_APP_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DB}
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+  mongo_data:
+
+networks:
+  app-network:
+    driver: bridge
