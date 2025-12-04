@@ -1,20 +1,41 @@
 // import type { Model } from "mongoose";
-import { IFileRepository } from "../../ports/IFileRepository";
+import { IMongoRepository } from "../../ports/IMongoRepository";
+import { Mongoose } from "mongoose";
 
-export class MongoFileRepository implements IFileRepository {
+export class MongoFileRepository implements IMongoRepository {
+
   public async getCompilerResult(): Promise<{ status: boolean; message: string; data: any; }> {
     throw new Error("Method not implemented.");
   }
-  // constructor(private model: Model<any>) { }
+  constructor(private mongo: Mongoose) { }
 
   public async getHealth() {
     try {
-      // await this.model.db.admin().ping();
-      return { status: "OK", message: "Mongo reachable", timestamp: new Date().toISOString() };
+      const conn = this.mongo.connection;
+      if (!conn || !conn.db) {
+        throw new Error("Mongo connection not ready");
+      }
+
+      const admin = conn.db.admin();
+      await admin.ping();
+
+      return {
+        status: "OK",
+        dependency: "mongo",
+        message: "Mongo reachable",
+        timestamp: new Date().toISOString()
+      };
     } catch (err) {
-      return { status: "ERROR", message: "Mongo unreachable", timestamp: new Date().toISOString() };
+      return {
+        status: "ERROR",
+        dependency: "mongo",
+        message: "Mongo unreachable",
+        timestamp: new Date().toISOString()
+      };
     }
   }
+
+
 
   public async findById() {
     // const doc = await this.model.findById(fileId).lean().exec();
