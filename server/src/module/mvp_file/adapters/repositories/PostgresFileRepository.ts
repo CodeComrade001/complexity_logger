@@ -8,15 +8,25 @@ export class PostgresFileRepository implements IFileRepository {
   }
 
   public async getHealth() {
-    // lightweight check example
-    // DO NOT embed complex business logic here
     try {
       await this.pool.query("SELECT 1");
-      return { status: "OK", message: "Postgres reachable", timestamp: new Date().toISOString() };
+
+      return {
+        status: "OK",
+        dependency: "postgres",
+        message: "Postgres reachable",
+        timestamp: new Date().toISOString()
+      };
     } catch (err) {
-      return { status: "ERROR", message: "Postgres unreachable", timestamp: new Date().toISOString() };
+      return {
+        status: "ERROR",
+        dependency: "postgres",
+        message: "Postgres unreachable",
+        timestamp: new Date().toISOString()
+      };
     }
   }
+
 
   public async findById(fileId: string) {
     const { rows } = await this.pool.query("SELECT id, data FROM files WHERE id = $1 LIMIT 1", [fileId]);
