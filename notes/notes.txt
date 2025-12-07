@@ -1,0 +1,427 @@
+steps 
+
+remove noise by cleaning data and check for only condition that will fit 
+creating some form  of fuzz testing that involves to know if the function will perform 
+return {space_complexity ,space_complexity_reason, log_complexity, log_complexity_reason }
+
+Server running at http://localhost:4000
+Turbo Log  ~ GetFileAnalyzer ~ execute ~ rawAnalysis: {
+  success: true,
+  data: {
+    functions: [],
+    classes: [ [ClassDeclaration] ],
+    variables: [],
+    arrows: [ [ArrowFunction], [ArrowFunction] ],
+    methods: [
+      [MethodDeclaration],
+      [MethodDeclaration],
+      [MethodDeclaration],
+      [MethodDeclaration],
+      [MethodDeclaration],
+      [MethodDeclaration],
+      [MethodDeclaration],
+      [MethodDeclaration],
+      [MethodDeclaration],
+      [MethodDeclaration],
+      [MethodDeclaration]
+    ],
+    interfaces: [],
+    enums: [],
+    imports: [],
+    exports: []
+  }
+}
+Turbo Log  ~ GetFileAnalyzer ~ execute ~ serialized: {
+  functions: [],
+  classes: [
+    {
+      kind: 'class',
+      name: 'ComplexityShowcase',
+      methods: [Array],
+      properties: [],
+      text: 'export class ComplexityShowcase {\r\n' +
+        '\r\n' +
+        '  /**\r\n' +
+        '   * O(1) Time — Constant\r\n' +
+        '   * O(1) Space — Constant\r\n' +
+        '   */\r\n' +
+        '  constantOperation(): number {\r\n' +
+        '    return 1 + 1;\r\n' +
+        '  }\r\n' +
+        '\r\n' +
+        '\r\n' +
+        '  /**\r\n' +
+        '   * O(log n) Time — Logarithmic\r\n' +
+        '   * O(1) Space — Constant\r\n' +
+        '   * Example: Binary Search\r\n' +
+        '   */\r\n' +
+        '  logarithmicSearch(arr: number[], target: number): number {\r\n' +
+        '    let left = 0, right = arr.length - 1;\r\n' +
+        '\r\n' +
+        '    while (left <= right) {\r\n' +
+        '      let mid = Math.floor((left + right) / 2);\r\n' +
+        '      if (arr[mid] === target) return mid;\r\n' +
+        '      if (arr[mid] < target) left = mid + 1;\r\n' +
+        '      else right = mid - 1;\r\n' +
+        '    }\r\n' +
+        '\r\n' +
+        '    return -1;\r\n' +
+        '  }\r\n' +
+        '\r\n' +
+        '\r\n' +
+        '  /**\r\n' +
+        '   * O(n) Time — Linear\r\n' +
+        '   * O(1) Space — Constant\r\n' +
+        '   */\r\n' +
+        '  linearSearch(arr: number[], target: number): number {\r\n' +
+        '    for (let i = 0; i < arr.length; i++) {\r\n' +
+        '      if (arr[i] === target) return i;\r\n' +
+        '    }\r\n' +
+        '    return -1;\r\n' +
+        '  }\r\n' +
+        '\r\n' +
+        '\r\n' +
+        '  /**\r\n' +
+        '   * O(n log n) Time — Linearithmic\r\n' +
+        '   * O(log n) Space — Recursion stack\r\n' +
+        '   * Example: Merge Sort (showing structure only)\r\n' +
+        '   */\r\n' +
+        '  nLogNExample(arr: number[]): number[] {\r\n' +
+        '    if (arr.length <= 1) return arr;\r\n' +
+        '\r\n' +
+        '    const mid = Math.floor(arr.length / 2);\r\n' +
+        '    const left = this.nLogNExample(arr.slice(0, mid));\r\n' +
+        '    const right = this.nLogNExample(arr.slice(mid));\r\n' +
+        '\r\n' +
+        '    return [...left, ...right].sort((a, b) => a - b);\r\n' +
+        '  }\r\n' +
+        '\r\n' +
+        '\r\n' +
+        '  /**\r\n' +
+        '   * O(n²) Time — Quadratic\r\n' +
+        '   * O(1) Space — Constant\r\n' +
+        '   */\r\n' +
+        '  quadraticPairs(arr: number[]): number[][] {\r\n' +
+        '    const pairs: number[][] = [];\r\n' +
+        '\r\n' +
+        '    for (let i = 0; i < arr.length; i++) {\r\n' +
+        '      for (let j = 0; j < arr.length; j++) {\r\n' +
+        '        pairs.push([arr[i], arr[j]]);\r\n' +
+        '      }\r\n' +
+        '    }\r\n' +
+        '\r\n' +
+        '    return pairs;\r\n' +
+        '  }\r\n' +
+        '\r\n' +
+        '\r\n' +
+        '  /**\r\n' +
+        '   * O(n³) Time — Cubic\r\n' +
+        '   * O(1) Space — Constant\r\n' +
+        '   */\r\n' +
+        '  cubicLoop(n: number): number {\r\n' +
+        '    let count = 0;\r\n' +
+        '    for (let i = 0; i < n; i++) {\r\n' +
+        '      for (let j = 0; j < n; j++) {\r\n' +
+        '        for (let k = 0; k < n; k++) {\r\n' +
+        '          count++;\r\n' +
+        '        }\r\n' +
+        '      }\r\n' +
+        '    }\r\n' +
+        '    return count;\r\n' +
+        '  }\r\n' +
+        '\r\n' +
+        '\r\n' +
+        '  /**\r\n' +
+        '   * O(2ⁿ) Time — Exponential\r\n' +
+        '   * O(n) Space — Call stack grows with depth\r\n' +
+        '   * Example: Fibonacci (naive recursion)\r\n' +
+        '   */\r\n' +
+        '  exponentialFibonacci(n: number): number {\r\n' +
+        '    if (n <= 1) return n;\r\n' +
+        '    return this.exponentialFibonacci(n - 1) + this.exponentialFibonacci(n - 2);\r\n' +
+        '  }\r\n' +
+        '\r\n' +
+        '\r\n' +
+        '  /**\r\n' +
+        '   * O(n!) Time — Factorial\r\n' +
+        '   * O(n) Space — Recursion depth\r\n' +
+        '   * Example: Generate all permutations\r\n' +
+        '   */\r\n' +
+        '  factorialPermutations(arr: number[]): number[][] {\r\n' +
+        '    if (arr.length === 0) return [[]];\r\n' +
+        '\r\n' +
+        '    const result: number[][] = [];\r\n' +
+        '\r\n' +
+        '    for (let i = 0; i < arr.length; i++) {\r\n' +
+        '      const current = arr[i];\r\n' +
+        '      const remaining = arr.filter((_, idx) => idx !== i);\r\n' +
+        '      const perms = this.factorialPermutations(remaining);\r\n' +
+        '\r\n' +
+        '      for (const perm of perms) {\r\n' +
+        '        result.push([current, ...perm]);\r\n' +
+        '      }\r\n' +
+        '    }\r\n' +
+        '\r\n' +
+        '    return result;\r\n' +
+        '  }\r\n' +
+        '\r\n' +
+        '\r\n' +
+        '  /**\r\n' +
+        '   * O(n) Space — Linear\r\n' +
+        '   * Creates a new array of size n\r\n' +
+        '   */\r\n' +
+        '  linearSpace(n: number): number[] {\r\n' +
+        '    return new Array(n).fill(0);\r\n' +
+        '  }\r\n' +
+        '\r\n' +
+        '\r\n' +
+        '  /**\r\n' +
+        '   * O(n²) Space — Quadratic\r\n' +
+        '   * Creates a 2D grid\r\n' +
+        '   */\r\n' +
+        '  quadraticSpace(n: number): number[][] {\r\n' +
+        '    const grid: number[][] = [];\r\n' +
+        '    for (let i = 0; i < n; i++) {\r\n' +
+        '      const row = new Array(n).fill(0);\r\n' +
+        '      grid.push(row);\r\n' +
+        '    }\r\n' +
+        '    return grid;\r\n' +
+        '  }\r\n' +
+        '\r\n' +
+        '\r\n' +
+        '  /**\r\n' +
+        '   * Summary method to show your students all complexities at once\r\n' +
+        '   */\r\n' +
+        '  getAllComplexities() {\r\n' +
+        '    return {\r\n' +
+        '      constant: "O(1)",\r\n' +
+        '      logarithmic: "O(log n)",\r\n' +
+        '      linear: "O(n)",\r\n' +
+        '      linearithmic: "O(n log n)",\r\n' +
+        '      quadratic: "O(n²)",\r\n' +
+        '      cubic: "O(n³)",\r\n' +
+        '      exponential: "O(2ⁿ)",\r\n' +
+        '      factorial: "O(n!)",\r\n' +
+        '      space_linear: "O(n)",\r\n' +
+        '      space_quadratic: "O(n²)"\r\n' +
+        '    };\r\n' +
+        '  }\r\n' +
+        '}'
+    }
+  ],
+  variables: [],
+  arrows: [
+    {
+      kind: 'arrow',
+      params: [Array],
+      returnType: 'number',
+      text: '(a, b) => a - b'
+    },
+    {
+      kind: 'arrow',
+      params: [Array],
+      returnType: 'boolean',
+      text: '(_, idx) => idx !== i'
+    }
+  ],
+  methods: [
+    {
+      kind: 'method',
+      name: 'constantOperation',
+      params: [],
+      returnType: 'number',
+      isAsync: false,
+      text: 'constantOperation(): number {\r\n    return 1 + 1;\r\n  }'
+    },
+    {
+      kind: 'method',
+      name: 'logarithmicSearch',
+      params: [Array],
+      returnType: 'number',
+      isAsync: false,
+      text: 'logarithmicSearch(arr: number[], target: number): number {\r\n' +
+        '    let left = 0, right = arr.length - 1;\r\n' +
+        '\r\n' +
+        '    while (left <= right) {\r\n' +
+        '      let mid = Math.floor((left + right) / 2);\r\n' +
+        '      if (arr[mid] === target) return mid;\r\n' +
+        '      if (arr[mid] < target) left = mid + 1;\r\n' +
+        '      else right = mid - 1;\r\n' +
+        '    }\r\n' +
+        '\r\n' +
+        '    return -1;\r\n' +
+        '  }'
+    },
+    {
+      kind: 'method',
+      name: 'linearSearch',
+      params: [Array],
+      returnType: 'number',
+      isAsync: false,
+      text: 'linearSearch(arr: number[], target: number): number {\r\n' +
+        '    for (let i = 0; i < arr.length; i++) {\r\n' +
+        '      if (arr[i] === target) return i;\r\n' +
+        '    }\r\n' +
+        '    return -1;\r\n' +
+        '  }'
+    },
+    {
+      kind: 'method',
+      name: 'nLogNExample',
+      params: [Array],
+      returnType: 'number[]',
+      isAsync: false,
+      text: 'nLogNExample(arr: number[]): number[] {\r\n' +
+        '    if (arr.length <= 1) return arr;\r\n' +
+        '\r\n' +
+        '    const mid = Math.floor(arr.length / 2);\r\n' +
+        '    const left = this.nLogNExample(arr.slice(0, mid));\r\n' +
+        '    const right = this.nLogNExample(arr.slice(mid));\r\n' +
+        '\r\n' +
+        '    return [...left, ...right].sort((a, b) => a - b);\r\n' +
+        '  }'
+    },
+    {
+      kind: 'method',
+      name: 'quadraticPairs',
+      params: [Array],
+      returnType: 'number[][]',
+      isAsync: false,
+      text: 'quadraticPairs(arr: number[]): number[][] {\r\n' +
+        '    const pairs: number[][] = [];\r\n' +
+        '\r\n' +
+        '    for (let i = 0; i < arr.length; i++) {\r\n' +
+        '      for (let j = 0; j < arr.length; j++) {\r\n' +
+        '        pairs.push([arr[i], arr[j]]);\r\n' +
+        '      }\r\n' +
+        '    }\r\n' +
+        '\r\n' +
+        '    return pairs;\r\n' +
+        '  }'
+    },
+    {
+      kind: 'method',
+      name: 'cubicLoop',
+      params: [Array],
+      returnType: 'number',
+      isAsync: false,
+      text: 'cubicLoop(n: number): number {\r\n' +
+        '    let count = 0;\r\n' +
+        '    for (let i = 0; i < n; i++) {\r\n' +
+        '      for (let j = 0; j < n; j++) {\r\n' +
+        '        for (let k = 0; k < n; k++) {\r\n' +
+        '          count++;\r\n' +
+        '        }\r\n' +
+        '      }\r\n' +
+        '    }\r\n' +
+        '    return count;\r\n' +
+        '  }'
+    },
+    {
+      kind: 'method',
+      name: 'exponentialFibonacci',
+      params: [Array],
+      returnType: 'number',
+      isAsync: false,
+      text: 'exponentialFibonacci(n: number): number {\r\n' +
+        '    if (n <= 1) return n;\r\n' +
+        '    return this.exponentialFibonacci(n - 1) + this.exponentialFibonacci(n - 2);\r\n' +
+        '  }'
+    },
+    {
+      kind: 'method',
+      name: 'factorialPermutations',
+      params: [Array],
+      returnType: 'number[][]',
+      isAsync: false,
+      text: 'factorialPermutations(arr: number[]): number[][] {\r\n' +
+        '    if (arr.length === 0) return [[]];\r\n' +
+        '\r\n' +
+        '    const result: number[][] = [];\r\n' +
+        '\r\n' +
+        '    for (let i = 0; i < arr.length; i++) {\r\n' +
+        '      const current = arr[i];\r\n' +
+        '      const remaining = arr.filter((_, idx) => idx !== i);\r\n' +
+        '      const perms = this.factorialPermutations(remaining);\r\n' +
+        '\r\n' +
+        '      for (const perm of perms) {\r\n' +
+        '        result.push([current, ...perm]);\r\n' +
+        '      }\r\n' +
+        '    }\r\n' +
+        '\r\n' +
+        '    return result;\r\n' +
+        '  }'
+    },
+    {
+      kind: 'method',
+      name: 'linearSpace',
+      params: [Array],
+      returnType: 'number[]',
+      isAsync: false,
+      text: 'linearSpace(n: number): number[] {\r\n' +
+        '    return new Array(n).fill(0);\r\n' +
+        '  }'
+    },
+    {
+      kind: 'method',
+      name: 'quadraticSpace',
+      params: [Array],
+      returnType: 'number[][]',
+      isAsync: false,
+      text: 'quadraticSpace(n: number): number[][] {\r\n' +
+        '    const grid: number[][] = [];\r\n' +
+        '    for (let i = 0; i < n; i++) {\r\n' +
+        '      const row = new Array(n).fill(0);\r\n' +
+        '      grid.push(row);\r\n' +
+        '    }\r\n' +
+        '    return grid;\r\n' +
+        '  }'
+    },
+    {
+      kind: 'method',
+      name: 'getAllComplexities',
+      params: [],
+      returnType: '{ constant: string; logarithmic: string; linear: string; linearithmic: string; quadratic: string; cubic: string; exponential: string; factorial: string; space_linear: string; space_quadratic: string; }',
+      isAsync: false,
+      text: 'getAllComplexities() {\r\n' +
+        '    return {\r\n' +
+        '      constant: "O(1)",\r\n' +
+        '      logarithmic: "O(log n)",\r\n' +
+        '      linear: "O(n)",\r\n' +
+        '      linearithmic: "O(n log n)",\r\n' +
+        '      quadratic: "O(n²)",\r\n' +
+        '      cubic: "O(n³)",\r\n' +
+        '      exponential: "O(2ⁿ)",\r\n' +
+        '      factorial: "O(n!)",\r\n' +
+        '      space_linear: "O(n)",\r\n' +
+        '      space_quadratic: "O(n²)"\r\n' +
+        '    };\r\n' +
+        '  }'
+    }
+  ],
+  interfaces: [],
+  enums: [],
+  imports: [],
+  exports: []
+}
+Turbo Log  ~ FileController ~ getFileAnalyzer ~ result: {
+  success: true,
+  data: {
+    functions: [],
+    classes: [ [Object] ],
+    variables: [],
+    arrows: [ [Object], [Object] ],
+    methods: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object]
+    ],
+    interfaces: [],
+    enums: [],
+    imports: [],
+    exports: []
+  }
+}
