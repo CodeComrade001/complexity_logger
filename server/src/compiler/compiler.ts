@@ -1,10 +1,9 @@
-import { compilerProps_v1 } from "./inteerface/compilerProps_v1"
 import { CancelRunningTask } from "./modules/cancelTask";
 import { GetCodeChanges } from "./modules/codeChange";
 import { GetComplexityGenerator } from "./modules/complexityGenerator";
 import { GetUnitPartOfCode } from "./modules/fetchPartOfCode";
 
-export default class Compiler implements compilerProps_v1 {
+export default class Compiler {
   private getUnitPartOfCode: GetUnitPartOfCode;
   private getIfCodeChange: GetCodeChanges;
   private cancelRunningTask: CancelRunningTask;
@@ -23,30 +22,40 @@ export default class Compiler implements compilerProps_v1 {
   }
 
 
-  async fetchPartOfCode(partOfCodeTOfetch: string) {
+  private async fetchPartOfCode() {
     const fetchedPart = await this.getUnitPartOfCode.extract({
-      filePath: partOfCodeTOfetch,
-      targets: ["functions", "classes", "variables"] // Example targets
+      targets: ["functions", "classes", "variables", "arrows", "methods", "variables", "classes", "interfaces", "enums", "imports", "exports"] // Example targets
     });
     return fetchedPart;
   }
 
-  async complexityGenerator() {
-    const result = await this.getComplexityGenerator.execute();
+  private async complexityGenerator(fetchPartOfCodeResult: any) {
+    const result = await this.getComplexityGenerator.execute(fetchPartOfCodeResult);
     return result;
   }
 
-  async codeChange() {
+  private async _codeChange() {
     return this.getIfCodeChange.hasCodeChanged("", "");
   }
 
-  async cancelFileTask() {
+  private async _cancelFileTask() {
     return this.cancelRunningTask.pause();
   }
 
-  public async run() {
 
+  public async execute() {
+    const { success, data } = await this.fetchPartOfCode();
+    if (!success)
+      return { success: false, message: "parse tree generator failed" };
+
+    const complexityReport = await this.complexityGenerator(data);
+
+    console.log(
+      "Turbo Log  ~ Compiler ~ execute ~ complexityReport:",
+      complexityReport
+    );
   }
+
 
 }
 

@@ -5,7 +5,7 @@ import compiler_plugin from "../../compiler/plugins/compiler_plugin";
 import fileRoute from "../../module/mvp_file";
 
 export async function createApp() {
-  const app = fastify({ logger: true });
+  const app = fastify({ logger: false });
 
   // ---------- INFRA ----------
   const pgPool = await createPostgresPool();

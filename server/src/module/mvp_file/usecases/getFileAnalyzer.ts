@@ -1,5 +1,6 @@
 
 import Compiler from "../../../compiler/compiler";
+import { Serializer } from "../../../compiler/utils/seralize";
 import { IFileRepository } from "../ports/IFileRepository";
 
 export class GetFileAnalyzer {
@@ -10,13 +11,15 @@ export class GetFileAnalyzer {
   }
 
   public async execute() {
+    const rawAnalysis = await this.compiler.execute();
+    // console.log("Turbo Log  ~ GetFileAnalyzer ~ execute ~ rawAnalysis:", rawAnalysis);
 
-    const passFile = await this.compiler.fetchPartOfCode("server/src/module/download/download.ts");
-    console.log("Turbo Log  ~ GetFileAnalyzer ~ execute ~ passFile:", passFile);
-    if (!passFile) return { status: 404, message: "Compiler Result Not found" };
-    const result = await this.repo.getFileAnalyzer();
-    if (!result) return { status: 404, message: "getFileAnalyzer() Not found" };
-    // business-level mapping if needed
-    return { success: true, data: result };
+    const serialized = Serializer.serializeAnalysis(rawAnalysis.data);
+    // console.log("Turbo Log  ~ GetFileAnalyzer ~ execute ~ serialized:", serialized);
+
+    return {
+      success: true,
+      data: serialized
+    };
   }
 }

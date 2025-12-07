@@ -1,5 +1,4 @@
 export interface FetchUnitPartOfCodeProps {
-  filePath: string; // path to the file
   targets: Array<
     | "functions"
     | "arrows"

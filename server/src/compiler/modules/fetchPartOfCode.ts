@@ -1,6 +1,8 @@
 import { Project } from "ts-morph";
-import { FetchUnitPartOfCodeProps } from "../inteerface/fetchUnitPartOfCodeProps";
+import { FetchUnitPartOfCodeProps } from "../interfaces/fetchUnitPartOfCodeProps";
 import { extractors } from "../utils/extractor";
+import path from "path";
+
 
 export class GetUnitPartOfCode {
   private project: Project;
@@ -10,7 +12,11 @@ export class GetUnitPartOfCode {
   }
 
   public extract(props: FetchUnitPartOfCodeProps) {
-    const source = this.project.addSourceFileAtPath(props.filePath);
+
+    const filePath = path.join(__dirname, "../../module/download/download.ts");
+
+    const source = this.project.addSourceFileAtPath(filePath);
+
     const result: any = {};
 
     for (const target of props.targets) {
@@ -25,6 +31,4 @@ export class GetUnitPartOfCode {
 
     return { success: true, data: result };
   }
-
-
 }

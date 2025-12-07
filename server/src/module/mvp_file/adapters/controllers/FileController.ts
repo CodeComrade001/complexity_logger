@@ -80,6 +80,7 @@ export class FileController {
 
   public async getFileAnalyzer(request: any, reply: any) {
     const result = await this.getFileAnalyzerUsecase.execute();
+    console.log("Turbo Log  ~ FileController ~ getFileAnalyzer ~ result:", result);
     return reply.code(200).send(result);
   }
 
