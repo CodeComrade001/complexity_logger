@@ -17,27 +17,42 @@ export class GetComplexityGenerator {
     return [x];
   }
 
-  private serializeData(data: any) {
-    const newData: any[] = [];
-    data.map((item: any) => {
-      const formatDataToArray = this.ensureArray(item);
-      if (formatDataToArray.length !== 0) {
-        newData.push(...formatDataToArray);
+  /**
+ * Filters input data to retain only non-empty arrays for specific keys (methods, arrows, functions).
+ * @param data The raw input object from fetchPartOfCodeResult.
+ * @returns An object containing only valid, non-empty data subsets.
+ */
+  private filterAndCleanCodeParts(data: any): { success: boolean, data: { [key: string]: any[] } } {
+    const cleanedData: { [key: string]: any[] } = {};
+    const relevantKeys = ['methods', 'arrows', 'functions'];
+
+    if (!data || typeof data !== 'object') {
+      return ({ success: false, data: cleanedData }); // Return empty if input is invalid
+    }
+
+    for (const key of relevantKeys) {
+      // Use your existing helper to ensure we always deal with an array
+      const valueArray = this.ensureArray(data[key]);
+
+      // Only add to the result if the array has content
+      if (valueArray.length > 0) {
+        cleanedData[key] = valueArray;
       }
+    }
 
-    })
-    if (newData.length === 0) return { success: false, message: "No valid data to serialize", data: null };
-
-    return { success: true, message: "Data serialization complete", data: newData };
+    return ({ success: true, data: cleanedData });
   }
 
   // main public API
   public async execute(fetchPartOfCodeResult: any) {
     // expected keys: methods, arrows, functions
-    const { data, success } = await this.serializeData(fetchPartOfCodeResult);
+    const { data, success } = await this.filterAndCleanCodeParts(fetchPartOfCodeResult);
+
     if (!success) return { success: false, message: "Data serialization failed" };
+
     const freeComplexityReport = await this.complexityEngineGenerator.executeFreeTier(data);
     console.log("Turbo Log  ~ GetComplexityGenerator ~ execute ~ freeComplexityReport:", freeComplexityReport);
+
     const paidComplexityReport = await this.complexityEngineGenerator.executeFreeTier(data);
     console.log("Turbo Log  ~ GetComplexityGenerator ~ execute ~ paidComplexityReport:", paidComplexityReport);
 

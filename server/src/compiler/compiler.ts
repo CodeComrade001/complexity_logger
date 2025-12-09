@@ -54,6 +54,8 @@ export default class Compiler {
       "Turbo Log  ~ Compiler ~ execute ~ complexityReport:",
       complexityReport
     );
+
+    return { success: true, data: complexityReport }
   }
 
 
