@@ -11,15 +11,17 @@ export class GetFileAnalyzer {
   }
 
   public async execute() {
+    console.log("Turbo Log  ~ GetFileAnalyzer ~ execute ~ execute has started");
     const rawAnalysis = await this.compiler.execute();
-    // console.log("Turbo Log  ~ GetFileAnalyzer ~ execute ~ rawAnalysis:", rawAnalysis);
-
+    console.log("Turbo Log  ~ GetFileAnalyzer ~ execute ~ rawAnalysis:", rawAnalysis);
+    const reposResult = this.repo.getFileAnalyzer()
+    console.log("Turbo Log  ~ GetFileAnalyzer ~ execute ~ reposResult:", reposResult);
     const serialized = Serializer.serializeAnalysis(rawAnalysis.data);
-    // console.log("Turbo Log  ~ GetFileAnalyzer ~ execute ~ serialized:", serialized);
+    console.log("Turbo Log  ~ GetFileAnalyzer ~ execute ~ serialized:", serialized);
 
     return {
       success: true,
-      data: serialized
+      data: { serialized, rawAnalysis }
     };
   }
 }
