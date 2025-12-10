@@ -13,11 +13,10 @@ export class GetFileAnalyzer {
   public async execute() {
     const rawAnalysis = await this.compiler.execute();
     const reposResult = await this.repo.getFileAnalyzer()
-    const serialized = await Serializer.serializeAnalysis(rawAnalysis.data);
 
     return {
       success: true,
-      data: { serialized, rawAnalysis }
+      data: { reposResult, rawAnalysis }
     };
   }
 }
