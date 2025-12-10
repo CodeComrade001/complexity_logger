@@ -82,7 +82,7 @@ export class GetComplexityGenerator {
     const { data: paidComplexityReport, success: paidTierConfirmation } = await this.generatePaidTierReport(data);
     if (!paidTierConfirmation) return { success: false, message: "Paid tier complexity analysis failed" };
     return {
-      success: true, message: "Complexity analysis complete", data: { paidComplexityReport }
+      success: true, message: "Complexity analysis complete", data: { paidComplexityReport, freeComplexityReport }
     }
   }
 }
