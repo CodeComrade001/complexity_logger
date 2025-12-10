@@ -26,6 +26,7 @@ export interface ComplexityResult {
   name: string | null;
   startLine: number;
   endLine?: number;
+  text: string;
 
   timeComplexity: ComplexityNotation;
   spaceComplexity: ComplexityNotation;

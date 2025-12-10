@@ -43,12 +43,8 @@ export class EnhancedComplexityGenerator_v1 {
    * Accuracy: 70-80%, Speed: <100ms
    */
   private async analyzeFast(fetchPartOfCodeResult: any): Promise<AnalysisSummary> {
-    console.log("Turbo Log  ~ EnhancedComplexityGenerator_v1 ~ analyzeFast ~ fetchPartOfCodeResult:", fetchPartOfCodeResult);
 
     const { methods, arrows, functions } = fetchPartOfCodeResult;
-    console.log("Turbo Log  ~ EnhancedComplexityGenerator_v1 ~ analyzeFast ~ functions:", functions);
-    console.log("Turbo Log  ~ EnhancedComplexityGenerator_v1 ~ analyzeFast ~ arrows:", arrows);
-    console.log("Turbo Log  ~ EnhancedComplexityGenerator_v1 ~ analyzeFast ~ methods:", methods);
 
 
     const methodResults = this.ensureArray(methods).map((m: any) =>
@@ -71,11 +67,7 @@ export class EnhancedComplexityGenerator_v1 {
    * Accuracy: 95%+, Speed: <500ms
    */
   private async analyzeDeep(fetchPartOfCodeResult: any): Promise<AnalysisSummary> {
-    console.log("Turbo Log  ~ EnhancedComplexityGenerator_v1 ~ analyzeDeep ~ fetchPartOfCodeResult:", fetchPartOfCodeResult);
     const { methods, arrows, functions } = fetchPartOfCodeResult;
-    console.log("Turbo Log  ~ EnhancedComplexityGenerator_v1 ~ analyzeDeep ~ functions:", functions);
-    console.log("Turbo Log  ~ EnhancedComplexityGenerator_v1 ~ analyzeDeep ~ arrows:", arrows);
-    console.log("Turbo Log  ~ EnhancedComplexityGenerator_v1 ~ analyzeDeep ~ methods:", methods);
 
     const methodResults = this.ensureArray(methods).map((m: any) =>
       this.analyzeDeepNode(m, "method")
@@ -97,7 +89,6 @@ export class EnhancedComplexityGenerator_v1 {
    * Defaults to DEEP analysis for paid tier
    */
   public async executePaidTier(fetchPartOfCodeResult: any): Promise<AnalysisSummary> {
-    console.log("Turbo Log  ~ EnhancedComplexityGenerator_v1 ~ executePaidTier ~ fetchPartOfCodeResult:", fetchPartOfCodeResult);
     return this.analyzeDeep(fetchPartOfCodeResult);
   }
 
@@ -106,7 +97,6 @@ export class EnhancedComplexityGenerator_v1 {
    * Defaults to fast analysis for free tier
    */
   public async executeFreeTier(fetchPartOfCodeResult: any): Promise<AnalysisSummary> {
-    console.log("Turbo Log  ~ EnhancedComplexityGenerator_v1 ~ executeFreeTier ~ fetchPartOfCodeResult:", fetchPartOfCodeResult);
     return this.analyzeFast(fetchPartOfCodeResult);
   }
 
@@ -136,7 +126,7 @@ export class EnhancedComplexityGenerator_v1 {
       name,
       startLine,
       endLine,
-      // text,
+      text,
       timeComplexity: fastResult.timeComplexity!,
       spaceComplexity: fastResult.spaceComplexity!,
       timeScore: fastResult.timeScore!,
@@ -400,15 +390,11 @@ export class EnhancedComplexityGenerator_v1 {
     );
 
     const totalScore = Math.round(timeScore + spaceScore);
-    console.log("Turbo Log  ~ EnhancedComplexityGenerator_v1 ~ analyzeDeepNode ~ totalScore:", totalScore);
     const riskLevel = ComplexityCalculator.determineRiskLevel(totalScore);
-    console.log("Turbo Log  ~ EnhancedComplexityGenerator_v1 ~ analyzeDeepNode ~ riskLevel:", riskLevel);
     const confidence = ComplexityCalculator.calculateOverallConfidence(reasons);
-    console.log("Turbo Log  ~ EnhancedComplexityGenerator_v1 ~ analyzeDeepNode ~ confidence:", confidence);
 
     // Deduplicate keywords
     const uniqueKeywords = Array.from(new Set(matchedKeywords));
-    console.log("Turbo Log  ~ EnhancedComplexityGenerator_v1 ~ analyzeDeepNode ~ uniqueKeywords:", uniqueKeywords);
 
     return {
       id: `${name || "anon"}:${startLine}`,
@@ -416,7 +402,7 @@ export class EnhancedComplexityGenerator_v1 {
       name,
       startLine,
       endLine,
-      // text,
+      text,
       timeComplexity,
       spaceComplexity,
       timeScore: Math.round(timeScore),

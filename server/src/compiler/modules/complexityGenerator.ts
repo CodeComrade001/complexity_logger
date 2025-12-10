@@ -1,3 +1,4 @@
+import { AnalysisSummary } from "../interfaces/complexityGeneratorInterface";
 import { EnhancedComplexityGenerator_v1 } from "./complexityGenerator_v1/enhanced_analyzer";
 
 
@@ -15,6 +16,31 @@ export class GetComplexityGenerator {
     if (!x) return [];
     if (Array.isArray(x)) return x;
     return [x];
+  }
+
+  private async generateFreeTierReport(data: any): Promise<{ success: boolean, message: string, data?: AnalysisSummary }> {
+    try {
+
+      const freeComplexityReport = await this.complexityEngineGenerator.executeFreeTier(data);
+      console.log("Turbo Log  ~ GetComplexityGenerator ~ execute ~ freeComplexityReport:", freeComplexityReport);
+
+      return ({ success: true, message: "Free  tier report generation successful", data: freeComplexityReport });
+    } catch (error) {
+      console.log("Turbo Log  ~ GetComplexityGenerator ~ generateFreeTierReport ~ error:", error);
+      return { success: false, message: "internal server error" }
+    }
+  }
+
+  private async generatePaidTierReport(data: any): Promise<{ success: boolean, message: string, data?: AnalysisSummary }> {
+    try {
+
+      const paidComplexityReport = await this.complexityEngineGenerator.executeFreeTier(data);
+      console.log("Turbo Log  ~ GetComplexityGenerator ~ execute ~ paidComplexityReport:", paidComplexityReport);
+      return { success: true, message: "Paid  tier report generation successful", data: paidComplexityReport };
+    } catch (error) {
+      console.log("Turbo Log  ~ GetComplexityGenerator ~ generateFreeTierReport ~ error:", error);
+      return { success: false, message: "internal server error" }
+    }
   }
 
   /**
@@ -50,14 +76,13 @@ export class GetComplexityGenerator {
 
     if (!success) return { success: false, message: "Data serialization failed" };
 
-    const freeComplexityReport = await this.complexityEngineGenerator.executeFreeTier(data);
-    console.log("Turbo Log  ~ GetComplexityGenerator ~ execute ~ freeComplexityReport:", freeComplexityReport);
+    const { data: freeComplexityReport, success: freeTierSuccess } = await this.generateFreeTierReport(data);
+    if (!freeTierSuccess) return { success: false, message: "Free tier complexity analysis failed" };
 
-    const paidComplexityReport = await this.complexityEngineGenerator.executeFreeTier(data);
-    console.log("Turbo Log  ~ GetComplexityGenerator ~ execute ~ paidComplexityReport:", paidComplexityReport);
-
+    const { data: paidComplexityReport, success: paidTierConfirmation } = await this.generatePaidTierReport(data);
+    if (!paidTierConfirmation) return { success: false, message: "Paid tier complexity analysis failed" };
     return {
-      success: true, message: "Complexity analysis complete", data: { freeComplexityReport, paidComplexityReport }
+      success: true, message: "Complexity analysis complete", data: { paidComplexityReport }
     }
   }
 }
