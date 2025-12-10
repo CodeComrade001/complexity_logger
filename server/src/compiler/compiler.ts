@@ -50,10 +50,6 @@ export default class Compiler {
 
     const complexityReport = await this.complexityGenerator(data);
 
-    console.log(
-      "Turbo Log  ~ Compiler ~ execute ~ complexityReport:",
-      complexityReport
-    );
 
     return { success: true, data: complexityReport }
   }
