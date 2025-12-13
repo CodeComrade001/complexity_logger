@@ -1,68 +1,217 @@
+@import "tailwindcss";
+@plugin "tailwindcss-animate";
+
+/* =========================================================
+   TAILWIND v4 THEME – PROFESSIONAL DEV TOOL (MVP)
+   Dark-first · Industrial · Dense · No UI fluff
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   DESIGN TOKENS
+   --------------------------------------------------------- */
+@theme inline {
+  --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo,
+    Consolas, monospace;
+
+  --radius-sm: 0.125rem;
+  --radius-md: 0.25rem;
+  --radius-lg: 0.5rem;
+}
+
+/* ---------------------------------------------------------
+   LIGHT MODE – TECHNICAL / DRAWING BOARD
+   --------------------------------------------------------- */
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  --background: 210 20% 98%;
+  --foreground: 220 15% 10%;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  --card: 0 0% 100%;
+  --card-foreground: 220 15% 10%;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+  --popover: 0 0% 100%;
+  --popover-foreground: 220 15% 10%;
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
+  /* Primary = structural emphasis (not flashy) */
+  --primary: 220 15% 25%;
+  --primary-foreground: 210 20% 98%;
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
+  --secondary: 210 10% 90%;
+  --secondary-foreground: 220 15% 10%;
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
+  --muted: 210 10% 92%;
+  --muted-foreground: 215 10% 45%;
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  --accent: 210 15% 94%;
+  --accent-foreground: 220 15% 10%;
+
+  --destructive: 0 65% 50%;
+  --destructive-foreground: 210 20% 98%;
+
+  --border: 220 10% 85%;
+  --input: 220 10% 85%;
+  --ring: 220 15% 25%;
+
+  /* Charts – restrained, readable */
+  --chart-1: 220 70% 50%;
+  --chart-2: 160 60% 45%;
+  --chart-3: 30 80% 55%;
+  --chart-4: 270 60% 60%;
+  --chart-5: 340 70% 55%;
+
+  /* Sidebar */
+  --sidebar: 210 20% 96%;
+  --sidebar-foreground: 220 15% 10%;
+  --sidebar-primary: 220 15% 25%;
+  --sidebar-primary-foreground: 210 20% 98%;
+  --sidebar-accent: 210 15% 92%;
+  --sidebar-accent-foreground: 220 15% 10%;
+  --sidebar-border: 220 10% 88%;
+  --sidebar-ring: 220 15% 25%;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+/* ---------------------------------------------------------
+   DARK MODE – GRAPHITE / METALLIC (DEFAULT)
+   --------------------------------------------------------- */
+.dark {
+  --background: 225 10% 8%;
+  --foreground: 220 15% 88%;
+
+  --card: 225 10% 11%;
+  --card-foreground: 220 15% 88%;
+
+  --popover: 225 10% 11%;
+  --popover-foreground: 220 15% 88%;
+
+  /* Primary = metallic light, NOT pure white */
+  --primary: 220 15% 72%;
+  --primary-foreground: 225 10% 8%;
+
+  --secondary: 220 10% 18%;
+  --secondary-foreground: 220 15% 88%;
+
+  --muted: 220 10% 15%;
+  --muted-foreground: 215 10% 60%;
+
+  --accent: 220 10% 16%;
+  --accent-foreground: 220 15% 88%;
+
+  --destructive: 0 60% 42%;
+  --destructive-foreground: 210 20% 98%;
+
+  --border: 220 10% 18%;
+  --input: 220 10% 18%;
+  --ring: 220 15% 45%;
+
+  /* Charts – controlled glow */
+  --chart-1: 220 70% 60%;
+  --chart-2: 150 60% 50%;
+  --chart-3: 30 80% 60%;
+  --chart-4: 270 60% 65%;
+  --chart-5: 340 70% 60%;
+
+  /* Sidebar – clearly separated */
+  --sidebar: 225 10% 11%;
+  --sidebar-foreground: 220 15% 88%;
+  --sidebar-primary: 220 70% 60%;
+  --sidebar-primary-foreground: 210 20% 98%;
+  --sidebar-accent: 220 10% 14%;
+  --sidebar-accent-foreground: 220 15% 88%;
+  --sidebar-border: 220 10% 16%;
+  --sidebar-ring: 220 15% 45%;
+}
+
+/* ---------------------------------------------------------
+   BASE STYLES – DENSE, READABLE
+   --------------------------------------------------------- */
+@layer base {
+  html {
+    font-size: 14px;
   }
-  a:hover {
-    color: #747bff;
+
+  @media (max-width: 768px) {
+    html {
+      font-size: 13px;
+    }
   }
-  button {
-    background-color: #f9f9f9;
+
+  body {
+    @apply bg-background text-foreground antialiased font-sans;
+    line-height: 1.55;
+  }
+
+  code,
+  pre {
+    @apply font-mono;
+  }
+
+  ::selection {
+    background: hsl(var(--primary) / 0.25);
+  }
+
+  /* Scrollbar – subtle, industrial */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground));
+  }
+}
+
+/* ---------------------------------------------------------
+   UTILITIES – TOOL-ONLY, NO FLUFF
+   --------------------------------------------------------- */
+@layer utilities {
+  .panel {
+    @apply rounded-md border border-border bg-card text-card-foreground;
+  }
+
+  .panel-muted {
+    @apply bg-secondary;
+  }
+
+  .tech-outline {
+    @apply relative border border-border;
+  }
+
+  .tech-outline::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border: 1px solid hsl(var(--primary) / 0.35);
+    pointer-events: none;
+  }
+
+  .text-muted {
+    color: hsl(var(--muted-foreground));
+  }
+
+  .status-success {
+    color: hsl(150 60% 45%);
+  }
+
+  .status-warning {
+    color: hsl(35 80% 55%);
+  }
+
+  .status-error {
+    color: hsl(0 65% 55%);
+  }
+}
+
+@layer utilities {
+
+  /* Add this to existing utilities */
+  .sidebar-width {
+    width: 240px;
   }
 }
