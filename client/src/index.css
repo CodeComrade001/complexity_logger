@@ -6,6 +6,8 @@
    Dark-first · Industrial · Dense · No UI fluff
    ========================================================= */
 
+
+
 /* ---------------------------------------------------------
    DESIGN TOKENS
    --------------------------------------------------------- */
@@ -142,13 +144,14 @@
   }
 
   body {
-    @apply bg-background text-foreground antialiased font-sans;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
     line-height: 1.55;
   }
 
   code,
   pre {
-    @apply font-mono;
+    font: mono;
   }
 
   ::selection {
@@ -177,15 +180,19 @@
    --------------------------------------------------------- */
 @layer utilities {
   .panel {
-    @apply rounded-md border border-border bg-card text-card-foreground;
+    border-radius: 0.25rem;
+    border: 1px solid hsl(var(--border));
+    background-color: hsl(var(--card));
+    color: hsl(var(--card-foreground));
   }
 
   .panel-muted {
-    @apply bg-secondary;
+    background-color: hsl(var(--secondary));
   }
 
   .tech-outline {
-    @apply relative border border-border;
+    position: relative;
+    border: 1px solid hsl(var(--border));
   }
 
   .tech-outline::after {
@@ -220,15 +227,19 @@
    --------------------------------------------------------- */
 @layer utilities {
   .panel {
-    @apply rounded-md border border-border bg-card text-card-foreground;
+    border-radius: 0.25rem;
+    border: 1px solid hsl(var(--border));
+    background-color: hsl(var(--card));
+    color: hsl(var(--card-foreground));
   }
 
   .panel-muted {
-    @apply bg-secondary;
+    background-color: hsl(var(--secondary));
   }
 
   .tech-outline {
-    @apply relative border border-border;
+    position: relative;
+    border: 1px solid hsl(var(--border));
   }
 
   .tech-outline::after {

@@ -100,8 +100,17 @@ export default function LoginPage() {
       </div>
 
       {/* Right Panel - Visual */}
-      <div className="hidden lg:flex flex-col justify-center items-center p-12 bg-muted/10 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--primary-foreground)_0%,_transparent_50%)] opacity-20" />
+      <div className="hidden  lg:flex flex-col justify-center items-center p-12 bg-muted/10 relative overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <img
+            src="/generated_images/login background.png"
+            alt="Technical Background"
+            className="w-full h-full object-cover opacity-95 dark:opacity-30 mix-blend-luminosity"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/50 to-background" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_var(--background)_100%)]" />
+        </div>
+        {/* <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--primary-foreground)_0%,_transparent_50%)] opacity-20" /> */}
 
         <div className="glass-panel max-w-lg w-full p-8 rounded-lg border border-border shadow-2xl relative z-10 rotate-1 hover:rotate-0 transition-transform duration-500">
           <div className="flex items-center gap-2 mb-6 border-b border-border pb-4">
