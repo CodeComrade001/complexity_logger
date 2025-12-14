@@ -25,6 +25,7 @@
    LIGHT MODE – TECHNICAL / DRAWING BOARD
    --------------------------------------------------------- */
 :root {
+  /* BACKGROUND: Very light gray/off-white */
   --background: 210 20% 98%;
   --foreground: 220 15% 10%;
 
@@ -34,8 +35,8 @@
   --popover: 0 0% 100%;
   --popover-foreground: 220 15% 10%;
 
-  /* Primary = structural emphasis (not flashy) */
-  --primary: 220 15% 25%;
+  /* Primary = Structural Navy Blue */
+  --primary: 210 50% 25%;
   --primary-foreground: 210 20% 98%;
 
   --secondary: 210 10% 90%;
@@ -47,12 +48,13 @@
   --accent: 210 15% 94%;
   --accent-foreground: 220 15% 10%;
 
+  /* DESTRUCTIVE: Safety Red */
   --destructive: 0 65% 50%;
   --destructive-foreground: 210 20% 98%;
 
   --border: 220 10% 85%;
   --input: 220 10% 85%;
-  --ring: 220 15% 25%;
+  --ring: 210 50% 25%;
 
   /* Charts – restrained, readable */
   --chart-1: 220 70% 50%;
@@ -64,18 +66,19 @@
   /* Sidebar */
   --sidebar: 210 20% 96%;
   --sidebar-foreground: 220 15% 10%;
-  --sidebar-primary: 220 15% 25%;
+  --sidebar-primary: 210 50% 25%;
   --sidebar-primary-foreground: 210 20% 98%;
   --sidebar-accent: 210 15% 92%;
   --sidebar-accent-foreground: 220 15% 10%;
   --sidebar-border: 220 10% 88%;
-  --sidebar-ring: 220 15% 25%;
+  --sidebar-ring: 210 50% 25%;
 }
 
 /* ---------------------------------------------------------
    DARK MODE – GRAPHITE / METALLIC (DEFAULT)
    --------------------------------------------------------- */
 .dark {
+  /* BACKGROUND: Deep Graphite/Near Black */
   --background: 225 10% 8%;
   --foreground: 220 15% 88%;
 
@@ -85,8 +88,8 @@
   --popover: 225 10% 11%;
   --popover-foreground: 220 15% 88%;
 
-  /* Primary = metallic light, NOT pure white */
-  --primary: 220 15% 72%;
+  /* Primary = High-Visibility Orange (The complementary accent) */
+  --primary: 30 85% 50%;
   --primary-foreground: 225 10% 8%;
 
   --secondary: 220 10% 18%;
@@ -98,12 +101,13 @@
   --accent: 220 10% 16%;
   --accent-foreground: 220 15% 88%;
 
+  /* DESTRUCTIVE: Safety Red (Muted for dark mode) */
   --destructive: 0 60% 42%;
   --destructive-foreground: 210 20% 98%;
 
   --border: 220 10% 18%;
   --input: 220 10% 18%;
-  --ring: 220 15% 45%;
+  --ring: 30 85% 50%;
 
   /* Charts – controlled glow */
   --chart-1: 220 70% 60%;
@@ -112,15 +116,15 @@
   --chart-4: 270 60% 65%;
   --chart-5: 340 70% 60%;
 
-  /* Sidebar – clearly separated */
-  --sidebar: 225 10% 11%;
+  /* Sidebar – clearly separated (Deep Navy) */
+  --sidebar: 210 50% 18%;
   --sidebar-foreground: 220 15% 88%;
-  --sidebar-primary: 220 70% 60%;
+  --sidebar-primary: 30 85% 50%;
   --sidebar-primary-foreground: 210 20% 98%;
   --sidebar-accent: 220 10% 14%;
   --sidebar-accent-foreground: 220 15% 88%;
   --sidebar-border: 220 10% 16%;
-  --sidebar-ring: 220 15% 45%;
+  --sidebar-ring: 30 85% 50%;
 }
 
 /* ---------------------------------------------------------
@@ -148,6 +152,7 @@
   }
 
   ::selection {
+    /* Selection color uses the new primary color for highlight */
     background: hsl(var(--primary) / 0.25);
   }
 
@@ -164,6 +169,49 @@
 
   ::-webkit-scrollbar-thumb:hover {
     background: hsl(var(--muted-foreground));
+  }
+}
+
+/* ---------------------------------------------------------
+   UTILITIES – TOOL-ONLY, NO FLUFF
+   --------------------------------------------------------- */
+@layer utilities {
+  .panel {
+    @apply rounded-md border border-border bg-card text-card-foreground;
+  }
+
+  .panel-muted {
+    @apply bg-secondary;
+  }
+
+  .tech-outline {
+    @apply relative border border-border;
+  }
+
+  .tech-outline::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    /* Outline uses the new primary color (orange/blue) */
+    border: 1px solid hsl(var(--primary) / 0.35);
+    pointer-events: none;
+  }
+
+  .text-muted {
+    color: hsl(var(--muted-foreground));
+  }
+
+  .status-success {
+    /* Adjusted status colors to fit the new vibrant scheme */
+    color: hsl(140 70% 50%);
+  }
+
+  .status-warning {
+    color: hsl(35 90% 50%);
+  }
+
+  .status-error {
+    color: hsl(0 75% 55%);
   }
 }
 
