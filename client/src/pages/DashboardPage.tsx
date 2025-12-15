@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import {
   Folder, FileCode, Plus, Play, Settings, ChevronRight, Github,
@@ -13,6 +12,8 @@ import { Slider } from "../components/ui/slider";
 import { CodeEditor } from "../components/dashboard/CodeEditor";
 import { cn } from "../lib/utils";
 import { ComplexityChart } from "../components/dashboard/ComplexityChart";
+import { useNotification } from "../context/useNotification";
+import { DATASETS, IGNORED_FILES, IGNORED_PATHS } from "../types/fileUploadInterface";
 
 // Mock Data Structure
 const MOCK_ANALYSIS = {
@@ -30,51 +31,29 @@ const MOCK_ANALYSIS = {
   ]
 };
 
-const MOCK_FILES = [
-  {
-    id: "1", name: "src", type: "folder", children: [
-      {
-        id: "2", name: "components", type: "folder", children: [
-          { id: "3", name: "Header.tsx", type: "file", risk: "Low" },
-          { id: "4", name: "Sidebar.tsx", type: "file", risk: "Low" },
-        ]
-      },
-      {
-        id: "5", name: "utils", type: "folder", children: [
-          { id: "6", name: "parser.ts", type: "file", risk: "High" },
-          { id: "7", name: "helpers.ts", type: "file", risk: "Medium" },
-        ]
-      },
-      { id: "8", name: "App.tsx", type: "file", risk: "Low" },
-    ]
-  },
-  { id: "9", name: "package.json", type: "file", risk: "Low" },
-];
+const MOCK_CODE = ``;
 
-const MOCK_CODE = `// Heavy recursive operation detected
-function recursiveTreeWalk(node: Node): number {
-  if (!node) return 0;
-  
-  // Complexity spike here
-  let sum = 0;
-  for (let i = 0; i < node.children.length; i++) {
-    for (let j = 0; j < node.children.length; j++) {
-       sum += recursiveTreeWalk(node.children[i]);
-    }
-  }
-  
-  return sum + node.value;
+// Type definitions for file tree
+interface FileNode {
+  id: string;
+  name: string;
+  type: 'file' | 'folder';
+  children?: FileNode[];
+  language?: string;
+  size?: number;
+  dir?: string;
+  file?: File;
+  risk?: string;
 }
 
-// Low complexity helper
-function validateInput(input: string): boolean {
-  return input.length > 0;
-}`;
-
 export default function DashboardPage() {
-  const [selectedFile, setSelectedFile] = useState<string | null>("parser.ts");
+  const [selectedFileRoute, setSelectedFileRoute] = useState<string[]>([]);
+  const [selectedFile, setSelectedFile] = useState<string>("");
   const [threshold, setThreshold] = useState([15]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [files, setFiles] = useState<FileNode[]>([]);
+  const [datasetKey, setDatasetKey] = useState("typescript");
+  const { notify } = useNotification();
 
   const handleAnalyze = () => {
     setIsAnalyzing(true);
@@ -91,26 +70,155 @@ export default function DashboardPage() {
     }
   };
 
+  const importUserFileFolder = async () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.webkitdirectory = true;
+    input.accept = "*/*";
+
+    input.onchange = async (e: Event) => {
+      const target = e.target as HTMLInputElement | null;
+      if (!target || !target.files) return;
+
+      const tree = await processFiles(target.files);
+      setFiles(tree);
+    };
+
+    input.click();
+  };
+
+  const processFiles = async (fileList: FileList): Promise<FileNode[]> => {
+    try {
+      // Validate dataset exists
+      if (!DATASETS[datasetKey as keyof typeof DATASETS]) {
+        notify("Invalid dataset selected", "error");
+        return [];
+      }
+
+      const allowedPatterns = DATASETS[datasetKey as keyof typeof DATASETS];
+      const root: FileNode[] = [];
+
+      const getOrCreateFolder = (children: FileNode[], name: string): FileNode => {
+        let folder = children.find((c) => c.type === "folder" && c.name === name);
+        if (!folder) {
+          folder = {
+            id: crypto.randomUUID(),
+            name,
+            type: "folder",
+            children: [],
+          };
+          children.push(folder);
+        }
+        return folder;
+      };
+
+      Array.from(fileList).forEach((file) => {
+        const relativePath = file.webkitRelativePath;
+
+        // 1️⃣ Ignore specific paths (node_modules, etc)
+        if (Array.isArray(IGNORED_PATHS) && IGNORED_PATHS.some((p) => relativePath.includes(p))) {
+          return;
+        }
+
+        // 2️⃣ Ignore specific files (package.json, etc)
+        if (Array.isArray(IGNORED_FILES) && IGNORED_FILES.includes(file.name)) {
+          return;
+        }
+
+        // 3️⃣ Enforce dataset rules (only process allowed file types)
+        if (Array.isArray(allowedPatterns) && !allowedPatterns.some((rx: RegExp) => rx.test(file.name))) {
+          return;
+        }
+
+        const parts = relativePath.split("/");
+        let currentLevel = root;
+
+        // Build folder tree
+        for (let i = 0; i < parts.length - 1; i++) {
+          const folder = getOrCreateFolder(currentLevel, parts[i]);
+          currentLevel = folder.children || [];
+        }
+
+        // Add file node
+        currentLevel.push({
+          id: crypto.randomUUID(),
+          name: file.name,
+          type: "file",
+          language: datasetKey,
+          size: file.size,
+          dir: file.webkitRelativePath,
+          file, // raw File object for later parsing
+        });
+      });
+
+      if (root.length > 0) {
+        notify("Files imported successfully!", "success");
+      } else {
+        notify("No valid files found in selected folder", "warning");
+      }
+
+      return root;
+    } catch (error) {
+      console.error("Error processing files:", error);
+      notify("Failed to import files. Please try again.", "error");
+      return [];
+    }
+  };
+
+  const handleFileTransferAndRouteGeneration = (file: FileNode) => {
+    console.log("Turbo Log  ~ handleFileTransferAndRouteGeneration ~ file:", file);
+    console.log("Turbo Log  ~ handleFileTransferAndRouteGeneration ~ file:", file.id);
+    try {
+      if (!file.dir) {
+        return notify("File has no directory information", "error");
+      }
+
+      const directoryParts = file.dir.split("/");
+
+      setSelectedFileRoute(directoryParts.slice(0, -1)); // folders only
+      setSelectedFile(file.name); // exact file
+    } catch (error) {
+      console.error("Error handling file selection:", error);
+      notify("Failed to load file. Please try again.", "error");
+    }
+  };
+
+
   return (
     <Layout>
-      <div className="flex-1 flex overflow-hidden h-[calc(100vh-4rem)]">
+      <div className="flex-1 flex overflow-hidden h-full">
         {/* LEFT SIDEBAR - File Explorer & Config */}
-        <aside className="w-64 border-r border-border bg-sidebar flex flex-col">
+        <aside className="w-64 border-r border-border bg-sidebar overflow-none flex flex-col">
 
           {/* Section: Explorer */}
           <div className="p-4 border-b border-border flex items-center justify-between">
             <span className="font-mono text-xs font-bold text-muted-foreground uppercase tracking-wider">Explorer</span>
             <div className="flex gap-1">
-              <Button variant="ghost" size="icon" className="h-6 w-6"><Plus className="h-3 w-3" /></Button>
-              <Button variant="ghost" size="icon" className="h-6 w-6"><Settings className="h-3 w-3" /></Button>
+              <Button onClick={importUserFileFolder} variant="ghost" size="icon" className="h-6 w-6">
+                <Plus className="h-3 w-3" />
+              </Button>
+              <Button variant="ghost" size="icon" className="h-6 w-6">
+                <Settings className="h-3 w-3" />
+              </Button>
             </div>
           </div>
 
           <ScrollArea className="flex-1 p-2">
             <div className="space-y-1">
-              {MOCK_FILES.map((file) => (
-                <FileTreeItem key={file.id} node={file} selected={selectedFile} onSelect={setSelectedFile} />
-              ))}
+              {files.length === 0 ? (
+                <div className="text-xs text-muted-foreground p-4 text-center">
+                  No files loaded. Click + to import.
+                </div>
+              ) : (
+                files.map((file: FileNode) => (
+                  <FileTreeItem
+                    key={file.id}
+                    node={file}
+                    selected={selectedFile}
+                    onSelect={() => handleFileTransferAndRouteGeneration(file)}
+                  />
+                ))
+              )}
             </div>
           </ScrollArea>
 
@@ -147,23 +255,30 @@ export default function DashboardPage() {
               <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
               <span className="text-xs font-mono text-muted-foreground">VS Code Connected</span>
             </div>
-            <div className="flex items-center gap-2 px-3 py-2 rounded border border-border bg-background hover:border-primary/50 transition-colors cursor-pointer group">
+            <button
+              type="button"
+              className="w-full flex items-center gap-2 px-3 py-2 rounded border border-border bg-background hover:border-primary/50 transition-colors group"
+            >
               <Github className="h-4 w-4 group-hover:text-primary transition-colors" />
               <span className="text-xs font-medium">main branch</span>
               <span className="ml-auto text-[10px] text-muted-foreground font-mono">7h ago</span>
-            </div>
+            </button>
           </div>
         </aside>
 
         {/* MAIN CONTENT */}
-        <div className="flex-1 flex flex-col min-w-0 bg-background overflow-hidden">
+        <div className="flex-1 flex flex-col min-w-0 bg-background">
           {/* Toolbar */}
           <header className="h-14 border-b border-border flex items-center justify-between px-6 bg-background/50 backdrop-blur-sm shrink-0">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Folder className="h-4 w-4" />
-              <span>src</span>
-              <ChevronRight className="h-3 w-3" />
-              <span>utils</span>
+              {selectedFileRoute.length !== 0 && selectedFileRoute.map((part: string, index: number) => (
+
+                <div key={index} className="flex items-center gap-1">
+                  <Folder className="h-4 w-4" />
+                  <span>{part}</span>
+                  <ChevronRight className="h-3 w-3" />
+                </div>
+              ))}
               <ChevronRight className="h-3 w-3" />
               <span className="text-foreground font-medium">{selectedFile || "Overview"}</span>
             </div>
@@ -180,44 +295,8 @@ export default function DashboardPage() {
             </div>
           </header>
 
-          <ScrollArea className="flex-1 p-6 h-full">
+          <ScrollArea className="flex-1 p-6 h-full overflow-auto">
             <div className="max-w-6xl mx-auto space-y-6 pb-20">
-
-              {/* Summary Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <Card className="bg-muted/5 border-border">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">Risk Score</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold font-mono">{MOCK_ANALYSIS.summary.riskScore}</div>
-                  </CardContent>
-                </Card>
-                <Card className="bg-muted/5 border-border">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">Avg Complexity</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold font-mono">{MOCK_ANALYSIS.summary.averageComplexity}</div>
-                  </CardContent>
-                </Card>
-                <Card className="bg-muted/5 border-border border-l-4 border-l-destructive">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">Critical Hotspots</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold font-mono text-destructive">{MOCK_ANALYSIS.summary.criticalHotspots}</div>
-                  </CardContent>
-                </Card>
-                <Card className="bg-muted/5 border-border">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">Total Lines</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold font-mono">{MOCK_ANALYSIS.summary.totalLines}</div>
-                  </CardContent>
-                </Card>
-              </div>
 
               {/* Main Content Area: Split View */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -273,8 +352,12 @@ export default function DashboardPage() {
                     <CardContent className="p-0">
                       <div className="divide-y divide-border">
                         {MOCK_ANALYSIS.methods.map((method, i) => (
-                          <div key={i} className="p-3 hover:bg-muted/30 transition-colors flex items-center justify-between group cursor-pointer">
-                            <div>
+                          <button
+                            key={i}
+                            type="button"
+                            className="w-full p-3 hover:bg-muted/30 transition-colors flex items-center justify-between group cursor-pointer"
+                          >
+                            <div className="text-left">
                               <div className="font-mono text-xs font-bold">{method.name}()</div>
                               <div className="text-xs text-muted-foreground mt-1">Line {method.line}</div>
                             </div>
@@ -284,7 +367,7 @@ export default function DashboardPage() {
                               </Badge>
                               <div className="text-xs font-bold">{method.complexity}</div>
                             </div>
-                          </div>
+                          </button>
                         ))}
                       </div>
                     </CardContent>
@@ -313,21 +396,31 @@ export default function DashboardPage() {
 }
 
 // Simple recursive file tree component
-function FileTreeItem({ node, level = 0, selected, onSelect }: any) {
+interface FileTreeItemProps {
+  node: FileNode;
+  level?: number;
+  selected: string | null;
+  onSelect: (node: FileNode) => void;
+}
+
+function FileTreeItem({ node, level = 0, selected, onSelect }: FileTreeItemProps) {
   const [isOpen, setIsOpen] = useState(true);
   const isSelected = selected === node.name && node.type === "file";
 
   return (
     <div>
-      <div
+      <button
+        type="button"
         className={cn(
-          "flex items-center gap-2 px-2 py-1.5 rounded-sm cursor-pointer text-sm font-mono hover:bg-muted/50 transition-colors select-none",
+          "w-full flex items-center gap-2 px-2 py-1.5 rounded-sm text-sm font-mono hover:bg-muted/50 transition-colors select-none",
           isSelected && "bg-primary/10 text-primary hover:bg-primary/15"
         )}
         style={{ paddingLeft: `${level * 12 + 8}px` }}
         onClick={() => {
-          if (node.type === "folder") setIsOpen(!isOpen);
-          else onSelect(node.name);
+          if (node.type === "folder") {
+            setIsOpen(!isOpen);
+          }
+          onSelect(node);
         }}
       >
         {node.type === "folder" ? (
@@ -335,13 +428,13 @@ function FileTreeItem({ node, level = 0, selected, onSelect }: any) {
         ) : (
           <FileCode className="h-3 w-3 text-muted-foreground" />
         )}
-        <span className="truncate flex-1">{node.name}</span>
+        <span className="truncate flex-1 text-left">{node.name}</span>
         {node.risk === "High" && <div className="h-1.5 w-1.5 rounded-full bg-orange-500" />}
         {node.risk === "Critical" && <div className="h-1.5 w-1.5 rounded-full bg-red-500" />}
-      </div>
-      {isOpen && node.children && (
+      </button>
+      {isOpen && node.children && node.children.length > 0 && (
         <div>
-          {node.children.map((child: any) => (
+          {node.children.map((child: FileNode) => (
             <FileTreeItem key={child.id} node={child} level={level + 1} selected={selected} onSelect={onSelect} />
           ))}
         </div>

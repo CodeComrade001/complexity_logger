@@ -5,6 +5,7 @@ import DashboardPage from "./pages/DashboardPage";
 import NotFound from "./pages/not-found";
 import { TooltipProvider } from "./components/ui/tooltip";
 import { Toaster } from "./components/ui/toaster";
+import { NotificationProvider } from "./context/notificationContext";
 
 function Router() {
   return (
@@ -23,10 +24,12 @@ function Router() {
 
 function App() {
   return (
-    <TooltipProvider>
-      <Toaster />
-      <Router />
-    </TooltipProvider>
+    <NotificationProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Router />
+      </TooltipProvider>
+    </NotificationProvider>
   );
 }
 
