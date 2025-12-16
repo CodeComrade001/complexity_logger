@@ -1,4 +1,5 @@
-import { useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useCallback, useEffect, useState } from "react";
 import {
   Folder, FileCode, Plus, Play, Settings, ChevronRight, Github,
   Activity, Zap, Server, AppWindow
@@ -13,25 +14,8 @@ import { CodeEditor } from "../components/dashboard/CodeEditor";
 import { cn } from "../lib/utils";
 import { ComplexityChart } from "../components/dashboard/ComplexityChart";
 import { useNotification } from "../context/useNotification";
-import { DATASETS, IGNORED_FILES, IGNORED_PATHS } from "../types/fileUploadInterface";
-
-// Mock Data Structure
-const MOCK_ANALYSIS = {
-  summary: {
-    totalFiles: 142,
-    totalLines: 12500,
-    averageComplexity: 4.2,
-    criticalHotspots: 3,
-    riskScore: "B+"
-  },
-  methods: [
-    { name: "processUserData", line: 45, complexity: 18, risk: "Medium", type: "O(n²)" },
-    { name: "recursiveTreeWalk", line: 12, complexity: 42, risk: "High", type: "O(2^n)" },
-    { name: "validateInput", line: 88, complexity: 2, risk: "Low", type: "O(1)" },
-  ]
-};
-
-const MOCK_CODE = ``;
+import { BACKEND_LANGUAGES, DATASETS, IGNORED_FILES, IGNORED_PATHS, type BackendLanguageKey, type MethodPreview } from "../types/fileUploadInterface";
+import { MOCK_METHOD_COMPLEXITY } from "../services/fakeDataset";
 
 // Type definitions for file tree
 interface FileNode {
@@ -49,10 +33,12 @@ interface FileNode {
 export default function DashboardPage() {
   const [selectedFileRoute, setSelectedFileRoute] = useState<string[]>([]);
   const [selectedFile, setSelectedFile] = useState<string>("");
+  const [selectedFileText, setSelectedFileText] = useState<string>("");
   const [threshold, setThreshold] = useState([15]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [files, setFiles] = useState<FileNode[]>([]);
-  const [datasetKey, setDatasetKey] = useState("typescript");
+  const [datasetKey, setDatasetKey] = useState<BackendLanguageKey>("typescript");
+  const [fileComplexityResult, setFileComplexityResult] = useState<MethodPreview[]>([]);
   const { notify } = useNotification();
 
   const handleAnalyze = () => {
@@ -165,24 +151,51 @@ export default function DashboardPage() {
     }
   };
 
-  const handleFileTransferAndRouteGeneration = (file: FileNode) => {
-    console.log("Turbo Log  ~ handleFileTransferAndRouteGeneration ~ file:", file);
-    console.log("Turbo Log  ~ handleFileTransferAndRouteGeneration ~ file:", file.id);
+  const handleFileSelect = async (node: FileNode) => {
+    // Only process file nodes, not folders
+    if (node.type !== "file") {
+      return;
+    }
+
     try {
-      if (!file.dir) {
+      if (!node.dir) {
         return notify("File has no directory information", "error");
       }
 
-      const directoryParts = file.dir.split("/");
+      const directoryParts = node.dir.split("/");
 
-      setSelectedFileRoute(directoryParts.slice(0, -1)); // folders only
-      setSelectedFile(file.name); // exact file
+      // Set route (folders only)
+      setSelectedFileRoute(directoryParts.slice(0, -1));
+
+      // Set selected file name
+      setSelectedFile(node.name);
+
+      // TODO: Load file content here if needed
+      const content = await node.file?.text();
+      setSelectedFileText(content || "// Unable to load file content.");
+
     } catch (error) {
       console.error("Error handling file selection:", error);
       notify("Failed to load file. Please try again.", "error");
     }
   };
 
+  const userSelectedProgrammingLang = useCallback(() => (
+    BACKEND_LANGUAGES.find((lang) => lang.key === datasetKey)?.label || "unknown"
+  ), [datasetKey])
+
+  useEffect(() => {
+
+    async function fetchComplexityResult() {
+      try {
+        setFileComplexityResult(MOCK_METHOD_COMPLEXITY);
+      } catch (error) {
+        console.log("Turbo Log  ~ fetchComplexityResult ~ error:", error);
+        notify("Failed to fetch complexity results", "error");
+      }
+    }
+    fetchComplexityResult()
+  }, []);
 
   return (
     <Layout>
@@ -215,7 +228,7 @@ export default function DashboardPage() {
                     key={file.id}
                     node={file}
                     selected={selectedFile}
-                    onSelect={() => handleFileTransferAndRouteGeneration(file)}
+                    onSelect={handleFileSelect}
                   />
                 ))
               )}
@@ -225,28 +238,51 @@ export default function DashboardPage() {
           {/* Section: Frameworks */}
           <div className="p-4 border-t border-border">
             <span className="font-mono text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 block">Frameworks</span>
-
             <div className="space-y-2">
               {/* Backend - Active */}
-              <div className="flex items-center justify-between p-2 rounded bg-primary/10 border border-primary/20">
+              <div className="p-2 rounded bg-primary/10 border border-primary/20 space-y-2">
                 <div className="flex items-center gap-2">
                   <Server className="h-3 w-3 text-primary" />
-                  <span className="text-xs font-medium">Express / Node</span>
+                  <span className="text-xs font-medium">Backend Language</span>
                 </div>
-                <div className="h-1.5 w-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]" />
+
+                <select
+                  title="Select Programming Language"
+                  value={datasetKey}
+                  onChange={(e) => setDatasetKey(e.target.value as BackendLanguageKey)}
+                  className="
+        w-full h-8 rounded-md
+         border border-border
+        text-xs px-2
+        focus:outline-none focus:ring-1 focus:ring-primary
+      "
+                >
+                  {BACKEND_LANGUAGES.map((lang) => (
+                    <option key={lang.key} value={lang.key}>
+                      {lang.label}
+                    </option>
+                  ))}
+                </select>
+
+                <div className="flex justify-end">
+                  <div className="h-1.5 w-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]" />
+                </div>
               </div>
 
               {/* Frontend - Coming Soon */}
-              <div className="relative overflow-hidden p-2 rounded border border-border bg-muted/5 opacity-60 grayscale group cursor-not-allowed">
+              <div className="relative overflow-hidden p-2 rounded border border-border bg-muted/5 opacity-60 grayscale cursor-not-allowed">
                 <div className="flex items-center gap-2">
                   <AppWindow className="h-3 w-3" />
-                  <span className="text-xs font-medium">React / Vue</span>
+                  <span className="text-xs font-medium">Frontend (React / Vue)</span>
                 </div>
                 <div className="absolute inset-0 backdrop-blur-[1px] flex items-center justify-center bg-background/20">
-                  <Badge variant="outline" className="bg-background/80 text-[10px] h-5 px-1.5">Coming Soon</Badge>
+                  <Badge variant="outline" className="bg-background/80 text-[10px] h-5 px-1.5">
+                    Coming Soon
+                  </Badge>
                 </div>
               </div>
             </div>
+
           </div>
 
           {/* Section: Status */}
@@ -271,16 +307,24 @@ export default function DashboardPage() {
           {/* Toolbar */}
           <header className="h-14 border-b border-border flex items-center justify-between px-6 bg-background/50 backdrop-blur-sm shrink-0">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              {selectedFileRoute.length !== 0 && selectedFileRoute.map((part: string, index: number) => (
-
-                <div key={index} className="flex items-center gap-1">
+              {selectedFileRoute.length === 0 ? (
+                <>
                   <Folder className="h-4 w-4" />
-                  <span>{part}</span>
-                  <ChevronRight className="h-3 w-3" />
-                </div>
-              ))}
-              <ChevronRight className="h-3 w-3" />
-              <span className="text-foreground font-medium">{selectedFile || "Overview"}</span>
+                  <span className="text-foreground font-medium">Overview</span>
+                </>
+              ) : (
+                <>
+                  {selectedFileRoute.map((part: string, index: number) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <Folder className="h-4 w-4" />
+                      <span>{part}</span>
+                      <ChevronRight className="h-3 w-3" />
+                    </div>
+                  ))}
+                  <FileCode className="h-4 w-4 text-foreground" />
+                  <span className="text-foreground font-medium">{selectedFile}</span>
+                </>
+              )}
             </div>
 
             <div className="flex items-center gap-4">
@@ -308,9 +352,9 @@ export default function DashboardPage() {
                       <FileCode className="h-4 w-4 text-muted-foreground" />
                       Source Code
                     </h3>
-                    <Badge variant="outline" className="font-mono text-xs">TypeScript</Badge>
+                    <Badge variant="outline" className="font-mono  text-xs">{BACKEND_LANGUAGES.find((lang) => lang.key === datasetKey)?.label || "Unknown"}</Badge>
                   </div>
-                  <CodeEditor code={MOCK_CODE} language="typescript" />
+                  <CodeEditor code={selectedFileText} resolveLanguage={userSelectedProgrammingLang} />
                 </div>
 
                 {/* Analysis Panel */}
@@ -325,11 +369,13 @@ export default function DashboardPage() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                      <div className="flex justify-between text-xs font-mono">
-                        <span>Strict (10)</span>
+                      {/* Header */}
+                      <div className="flex items-center justify-between text-xs font-mono">
+                        <span className="text-muted-foreground">Function Complexity Threshold</span>
                         <span className="text-primary font-bold">{threshold[0]}</span>
-                        <span>Loose (50)</span>
                       </div>
+
+                      {/* Slider */}
                       <Slider
                         value={threshold}
                         onValueChange={setThreshold}
@@ -338,37 +384,107 @@ export default function DashboardPage() {
                         step={1}
                         className="py-2"
                       />
-                      <div className="text-xs text-muted-foreground bg-muted/20 p-2 rounded border border-border">
-                        <span className="font-bold text-foreground">Tip:</span> Functions with complexity &gt; {threshold[0]} will block PRs.
+
+                      {/* Scale explanation */}
+                      <div className="flex justify-between text-[10px] text-muted-foreground font-mono">
+                        <span>Strict (Safer functions)</span>
+                        <span>Loose (More complex functions)</span>
+                      </div>
+
+                      {/* Explanation */}
+                      <div className="text-xs text-muted-foreground bg-muted/20 p-2 rounded border border-border space-y-1">
+                        <p>
+                          <span className="font-semibold text-foreground">What this checks:</span>{" "}
+                          Each <span className="font-semibold text-primary">function</span> is analyzed independently.
+                        </p>
+                        <p>
+                          If a function’s complexity score is greater than{" "}
+                          <span className="font-bold text-primary">{threshold[0]}</span>, it will be flagged and may block pull requests.
+                        </p>
+                      </div>
+
+                      {/* Learn more */}
+                      <div className="flex justify-end">
+                        <button
+                          type="button"
+                          onClick={() => window.open("/complexity-guide", "_blank")}
+                          className="text-[10px] font-medium text-primary hover:underline transition-colors"
+                        >
+                          How function complexity works →
+                        </button>
                       </div>
                     </CardContent>
+
                   </Card>
 
                   {/* Method Breakdown */}
                   <Card className="border-border shadow-sm flex-1">
-                    <CardHeader className="pb-3">
+                    <CardHeader className="pb-3 flex flex-row items-center justify-between">
                       <CardTitle className="text-sm font-medium">Method Analysis</CardTitle>
+
+                      <button
+                        type="button"
+                        onClick={() => notify("Detailed suggestions coming soon", "info")}
+                        className="text-[10px] text-muted-foreground hover:text-primary transition-colors"
+                      >
+                        Suggestions
+                      </button>
                     </CardHeader>
+
                     <CardContent className="p-0">
                       <div className="divide-y divide-border">
-                        {MOCK_ANALYSIS.methods.map((method, i) => (
+                        {fileComplexityResult.slice(0, 5).map((method) => (
                           <button
-                            key={i}
+                            key={method.id}
                             type="button"
-                            className="w-full p-3 hover:bg-muted/30 transition-colors flex items-center justify-between group cursor-pointer"
+                            className="w-full p-3 hover:bg-muted/30 transition-colors flex items-center justify-between text-left"
                           >
-                            <div className="text-left">
-                              <div className="font-mono text-xs font-bold">{method.name}()</div>
-                              <div className="text-xs text-muted-foreground mt-1">Line {method.line}</div>
+                            {/* Left */}
+                            <div className="space-y-0.5">
+                              <div className="font-mono text-xs font-bold">
+                                {method.name}()
+                              </div>
+                              <div className="text-[10px] text-muted-foreground">
+                                Line {method.startLine}
+                              </div>
                             </div>
-                            <div className="text-right">
-                              <Badge variant="outline" className={cn("mb-1 font-mono text-[10px]", getRiskColor(method.risk))}>
-                                {method.type}
+
+                            {/* Right */}
+                            <div className="text-right space-y-0.5">
+                              <Badge
+                                variant="outline"
+                                className={cn(
+                                  "font-mono text-[10px]",
+                                  getRiskColor(method.riskLevel)
+                                )}
+                              >
+                                {method.timeComplexity} / {method.spaceComplexity}
                               </Badge>
-                              <div className="text-xs font-bold">{method.complexity}</div>
+                              <div className="text-xs font-bold">
+                                {method.totalScore}
+                              </div>
                             </div>
                           </button>
                         ))}
+                      </div>
+
+                      {/* Footer actions */}
+                      <div className="flex items-center justify-between p-3 border-t border-border bg-muted/10">
+                        <button
+                          type="button"
+                          onClick={() => notify("Fuzz testing is coming soon", "info")}
+                          className="text-[10px] font-medium text-muted-foreground hover:text-primary transition-colors"
+                        >
+                          Run fuzz test
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => window.open("/analysis/full-report", "_blank")}
+                          className="text-[10px] font-medium text-primary hover:underline"
+                        >
+                          Show full results →
+                        </button>
                       </div>
                     </CardContent>
                   </Card>
@@ -399,13 +515,23 @@ export default function DashboardPage() {
 interface FileTreeItemProps {
   node: FileNode;
   level?: number;
-  selected: string | null;
+  selected: string;
   onSelect: (node: FileNode) => void;
 }
 
 function FileTreeItem({ node, level = 0, selected, onSelect }: FileTreeItemProps) {
   const [isOpen, setIsOpen] = useState(true);
   const isSelected = selected === node.name && node.type === "file";
+
+  const handleClick = () => {
+    if (node.type === "folder") {
+      // Just toggle folder open/close
+      setIsOpen(!isOpen);
+    } else {
+      // Only call onSelect for files
+      onSelect(node);
+    }
+  };
 
   return (
     <div>
@@ -416,12 +542,7 @@ function FileTreeItem({ node, level = 0, selected, onSelect }: FileTreeItemProps
           isSelected && "bg-primary/10 text-primary hover:bg-primary/15"
         )}
         style={{ paddingLeft: `${level * 12 + 8}px` }}
-        onClick={() => {
-          if (node.type === "folder") {
-            setIsOpen(!isOpen);
-          }
-          onSelect(node);
-        }}
+        onClick={handleClick}
       >
         {node.type === "folder" ? (
           <Folder className={cn("h-3 w-3 text-muted-foreground", isOpen && "text-foreground")} />

@@ -2,10 +2,12 @@ import { Highlight, themes } from "prism-react-renderer";
 
 interface CodeEditorProps {
   code: string;
-  language?: string;
+  resolveLanguage?: () => string;
 }
 
-export function CodeEditor({ code, language = "typescript" }: CodeEditorProps) {
+export function CodeEditor({ code, resolveLanguage }: CodeEditorProps) {
+  const language = resolveLanguage ? resolveLanguage() : "typescript";
+
   return (
     <div className="rounded-md overflow-hidden border border-border bg-[#0d1117] font-mono text-sm relative group">
       <div className="absolute top-3 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity">

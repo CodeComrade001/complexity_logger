@@ -58,8 +58,8 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
 };
 
 const notificationStyles: Record<NotificationType, string> = {
-  info: "border-primary/40 text-foreground",
-  success: "border-[hsl(140_70%_50%)] text-[hsl(140_70%_50%)]",
-  warning: "border-[hsl(35_90%_50%)] text-[hsl(35_90%_50%)]",
-  error: "border-destructive text-destructive",
+  info: "border-primary/40 text-foreground notification-info",
+  success: "border-[hsl(140_70%_50%)] text-[hsl(140_70%_50%)] notification-success",
+  warning: "border-[hsl(35_90%_50%)] text-[hsl(35_90%_50%)] notification-warning",
+  error: "border-destructive text-destructive notification-error",
 };

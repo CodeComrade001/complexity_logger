@@ -20,16 +20,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
       <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-md">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Link to="/">
-            <a className="flex items-center gap-2 group">
-              <div className="bg-primary/10 p-2 rounded-md border border-primary/20 group-hover:border-primary/50 transition-colors">
-                <Terminal className="h-5 w-5 text-primary" />
-              </div>
-              <span className="font-mono font-bold text-lg tracking-tight">
-                COMPLEXITY<span className="text-primary">ZERO</span>
-              </span>
-            </a>
-          </Link>
+          <a href="/" className="flex items-center gap-2 group">
+            <div className="bg-primary/10 p-2 rounded-md border border-primary/20 group-hover:border-primary/50 transition-colors">
+              <Terminal className="h-5 w-5 text-primary" />
+            </div>
+            <span className="font-mono font-bold text-lg tracking-tight">
+              COMPLEXITY<span className="text-primary">ZERO</span>
+            </span>
+          </a>
 
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
             {!isDashboard && (

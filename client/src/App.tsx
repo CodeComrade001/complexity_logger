@@ -6,6 +6,7 @@ import NotFound from "./pages/not-found";
 import { TooltipProvider } from "./components/ui/tooltip";
 import { Toaster } from "./components/ui/toaster";
 import { NotificationProvider } from "./context/notificationContext";
+import ComplexityResultPage from "./pages/complexityResultPage";
 
 function Router() {
   return (
@@ -13,6 +14,7 @@ function Router() {
       <Routes>
 
         <Route path="/" element={<LandingPage />} />
+        <Route path="/analysis/full-report" element={<ComplexityResultPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/dashboard/:subpath" element={<DashboardPage />} />
