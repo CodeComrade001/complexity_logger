@@ -46,10 +46,12 @@ export default function ComplexityResultPage() {
 
   return (
     <Layout>
-      <div className="max-w-7xl mx-auto p-6 space-y-6">
+      <div className="w-full mx-auto p-[50px] space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <h1 className="text-lg font-semibold">Complexity Analysis Results</h1>
+          <input type="text" name="search" id="" placeholder="Search For Function" />
+          <input type="text" name="filter" id="" placeholder="Filter Results" />
 
           <div className="flex items-center gap-2">
             <Button
@@ -141,23 +143,21 @@ export default function ComplexityResultPage() {
 
         {/* LIST VIEW */}
         {viewMode === "list" && (
-          <div className="divide-y divide-border rounded-md border">
+          <div className="divide-y divide-border flex flex-col gap-5 rounded-md border">
             {results.map((m) => (
               <div
                 key={m.id}
-                className="p-3 flex flex-col md:flex-row md:items-center justify-between hover:bg-muted/30"
+                className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-2 hover:bg-muted/30"
               >
-                <div className="flex flex-col md:flex-row md:gap-4">
-                  <div className="font-mono text-xs font-bold">{m.name}()</div>
-                  <div className="text-[10px] text-muted-foreground">
-                    Lines {m.startLine}–{m.endLine}
-                  </div>
+                <div className="flex flex-col md:flex-row md:gap-6 min-w-0">
+                  <div className="font-mono text-sm font-bold truncate">{m.name}()</div>
+                  <div className="text-sm text-muted-foreground">Lines {m.startLine}–{m.endLine}</div>
                 </div>
-                <div className="flex items-center gap-4 mt-2 md:mt-0">
-                  <Badge variant="outline" className="font-mono text-[10px]">
+                <div className="flex items-center gap-4 mt-2 md:mt-0 flex-shrink-0">
+                  <Badge variant="outline" className="font-mono text-sm min-w-[80px] text-center">
                     {m.timeComplexity} / {m.spaceComplexity}
                   </Badge>
-                  <span className="text-xs font-bold">{m.totalScore}</span>
+                  <span className="text-sm font-bold w-8 text-center">{m.totalScore}</span>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -165,13 +165,15 @@ export default function ComplexityResultPage() {
                       setActiveReasonId(activeReasonId === m.id ? null : m.id)
                     }
                   >
-                    <Info className="h-3 w-3" />
+                    <Info className="h-4 w-4" />
                   </Button>
                 </div>
                 {activeReasonId === m.id && (
-                  <div className="mt-1 p-2 bg-muted rounded text-[10px] text-foreground font-mono">
+                  <div className="mt-2 p-2 bg-muted rounded text-sm text-foreground font-mono break-words">
                     {m.reasons.length > 0
-                      ? m.reasons.map((r, i) => <div key={i}>• {typeof r === 'string' ? r : r.detail}</div>)
+                      ? m.reasons.map((r, i) => (
+                        <div key={i}>• {typeof r === "string" ? r : r.detail}</div>
+                      ))
                       : "No reasons provided"}
                   </div>
                 )}
@@ -183,15 +185,15 @@ export default function ComplexityResultPage() {
         {/* TABLE VIEW */}
         {viewMode === "table" && (
           <div className="overflow-auto border rounded-md">
-            <table className="w-full text-xs">
+            <table className="w-full text-sm table-auto">
               <thead className="bg-muted/30">
                 <tr className="text-left">
-                  <th className="p-2">Method</th>
-                  <th className="p-2">Lines</th>
-                  <th className="p-2">Time</th>
-                  <th className="p-2">Space</th>
-                  <th className="p-2">Score</th>
-                  <th className="p-2">Reasons</th>
+                  <th className="p-3 min-w-[120px]">Method</th>
+                  <th className="p-3 min-w-[80px]">Lines</th>
+                  <th className="p-3 min-w-[80px]">Time</th>
+                  <th className="p-3 min-w-[80px]">Space</th>
+                  <th className="p-3 min-w-[60px]">Score</th>
+                  <th className="p-3 min-w-[200px]">Reasons</th>
                 </tr>
               </thead>
               <tbody>
@@ -203,15 +205,15 @@ export default function ComplexityResultPage() {
                       riskGlow(m.riskLevel)
                     )}
                   >
-                    <td className="p-2 font-mono">{m.name}()</td>
-                    <td className="p-2">
-                      {m.startLine}–{m.endLine}
-                    </td>
-                    <td className="p-2">{m.timeComplexity}</td>
-                    <td className="p-2">{m.spaceComplexity}</td>
-                    <td className="p-2 font-bold">{m.totalScore}</td>
-                    <td className="p-2">
-                      {m.reasons.length > 0 ? m.reasons.join(", ") : "-"}
+                    <td className="p-3 font-mono break-words">{m.name}()</td>
+                    <td className="p-3">{m.startLine}–{m.endLine}</td>
+                    <td className="p-3">{m.timeComplexity}</td>
+                    <td className="p-3">{m.spaceComplexity}</td>
+                    <td className="p-3 font-bold text-center">{m.totalScore}</td>
+                    <td className="p-3 break-words">
+                      {m.reasons.length > 0 ? m.reasons.map((r, i) => (
+                        <div key={i}>• {typeof r === "string" ? r : r.detail}</div>
+                      )) : "-"}
                     </td>
                   </tr>
                 ))}
@@ -219,6 +221,7 @@ export default function ComplexityResultPage() {
             </table>
           </div>
         )}
+
       </div>
     </Layout>
   );
