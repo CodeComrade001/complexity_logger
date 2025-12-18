@@ -59,3 +59,13 @@ export type MethodPreview = {
   reasons: ComplexityReason[];
 };
 
+// Type definitions for file tree
+export interface SingleFile {
+  id: string;
+  name: string;
+  type: 'file';
+  language: string;
+  size: number;
+  dir: string;
+  file: File;
+}

@@ -1,7 +1,7 @@
 import { GetFileHealth } from "../../usecases/GetFileHealth";
 import { IFileRepository } from "../../ports/IFileRepository";
 import { GetFileAnalyzer } from "../../usecases/getFileAnalyzer";
-import Compiler from "../../../../compiler/compiler";
+import Compiler from "../../../compiler/compiler";
 import { GetFileData } from "../../usecases/GetFileData";
 import { GetSingleFileReport } from "../../usecases/getSingleFileReport";
 import { GetFilePatchApply } from "../../usecases/getFilePatchApply";
@@ -29,44 +29,6 @@ export class FileController {
 
   }
 
-  // public async getHealth(reply: any) {
-  //   const result = await this.getHealthUsecase.execute();
-  //   console.log("Turbo Log  ~ FileController ~ getHealth ~ result:", result);
-  //   return reply.code(200).send(result);
-  // }
-
-  // public async getFile(request: any, reply: any) {
-  //   const { id } = request.params as { id: string };
-  //   try {
-  //     const result = await this.getFileDataUsecase.execute(id);
-  //     if ((result as any).status === 404) return reply.code(404).send(result);
-  //     return reply.code(200).send(result);
-  //   } catch (err) {
-  //     return reply.code(500).send({ error: "Internal Server Error" });
-  //   }
-  // }
-
-  // public async getFileAnalyzer(reply: any) {
-  //   const result = await this.getFileAnalyzerUsecase.execute();
-  //   return reply.code(200).send(result);
-  // }
-
-  // public async getSingleFileReport(reply: any) {
-  //   const result = await this.getSingleFileReportUsecase.execute();
-  //   return reply.code(200).send(result
-  //   );
-  // }
-
-  // public async getFilePatchApply(reply: any) {
-  //   const result = await this.getFilePatchApplyUsecase.execute();
-  //   return reply.code(200).send(result);
-  // }
-
-  // public async getUser(reply: any) {
-  //   const result = await this.getUserUsecase.execute();
-  //   return reply.code(200).send(result);
-  // }
-
   public async getHealth(request: any, reply: any) {
     const result = await this.getHealthUsecase.execute();
     return reply.code(200).send(result);
@@ -79,7 +41,12 @@ export class FileController {
   }
 
   public async getFileAnalyzer(request: any, reply: any) {
-    const result = await this.getFileAnalyzerUsecase.execute();
+    const dataRequestBody = request.body;
+    if (!dataRequestBody || dataRequestBody.length === 0) {
+      return { success: false, message: "No files provided for analysis" };
+    }
+    console.log("Turbo Log  ~ FileController ~ getFileAnalyzer ~ dataRequestBody:", dataRequestBody);
+    const result = await this.getFileAnalyzerUsecase.execute(dataRequestBody);
     console.log("Turbo Log  ~ FileController ~ getFileAnalyzer ~ result:", result);
     return reply.code(200).send(result);
   }
