@@ -1,3 +1,4 @@
+import { FileUploadModel } from "../module/model/fileInterface";
 import { CancelRunningTask } from "./modules/cancelTask";
 import { GetCodeChanges } from "./modules/codeChange";
 import { GetComplexityGenerator } from "./modules/complexityGenerator";
@@ -22,10 +23,10 @@ export default class Compiler {
   }
 
 
-  private async fetchPartOfCode() {
+  private async fetchPartOfCode(allFilesToAnalyze: FileUploadModel[]) {
     const fetchedPart = await this.getUnitPartOfCode.extract({
-      targets: ["functions", "classes", "variables", "arrows", "methods", "variables", "classes", "interfaces", "enums", "imports", "exports"] // Example targets
-    });
+      targets: ["functions", "classes", "variables", "arrows", "methods", "variables"] // Example targets
+    }, allFilesToAnalyze);
     return fetchedPart;
   }
 
@@ -43,8 +44,8 @@ export default class Compiler {
   }
 
 
-  public async execute() {
-    const { success, data } = await this.fetchPartOfCode();
+  public async execute(allFilesToAnalyze: FileUploadModel[]) {
+    const { success, data } = await this.fetchPartOfCode(allFilesToAnalyze);
     if (!success)
       return { success: false, message: "parse tree generator failed" };
 

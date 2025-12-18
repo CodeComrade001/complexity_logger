@@ -19,6 +19,7 @@ import { cn } from "../lib/utils";
 import type { MethodPreview } from "../types/fileUploadInterface";
 import { MOCK_METHOD_COMPLEXITY } from "../services/fakeDataset";
 import type { ViewMode } from "../types/complexityResultInterface";
+import { CodeEditor } from "../components/dashboard/CodeEditor";
 
 export default function ComplexityResultPage() {
   const [viewMode, setViewMode] = useState<ViewMode>("card");
@@ -46,7 +47,7 @@ export default function ComplexityResultPage() {
 
   return (
     <Layout>
-      <div className="w-full mx-auto p-[50px] space-y-6">
+      <div className="w-full mx-auto p-[50px] max-h-[200px] overflow-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <h1 className="text-lg font-semibold">Complexity Analysis Results</h1>
@@ -58,7 +59,7 @@ export default function ComplexityResultPage() {
               variant="ghost"
               size="icon"
               onClick={() => setViewMode("list")}
-              className={cn(viewMode === "list" && "bg-muted")}
+              className={`btn-interactive ${cn(viewMode === "list" && "bg-muted")}`}
             >
               <List className="h-4 w-4" />
             </Button>
@@ -66,7 +67,7 @@ export default function ComplexityResultPage() {
               variant="ghost"
               size="icon"
               onClick={() => setViewMode("card")}
-              className={cn(viewMode === "card" && "bg-muted")}
+              className={`btn-interactive ${cn(viewMode === "card" && "bg-muted")}`}
             >
               <LayoutGrid className="h-4 w-4" />
             </Button>
@@ -74,7 +75,7 @@ export default function ComplexityResultPage() {
               variant="ghost"
               size="icon"
               onClick={() => setViewMode("table")}
-              className={cn(viewMode === "table" && "bg-muted")}
+              className={`btn-interactive ${cn(viewMode === "table" && "bg-muted")}`}
             >
               <TableIcon className="h-4 w-4" />
             </Button>
@@ -83,7 +84,7 @@ export default function ComplexityResultPage() {
               variant="outline"
               size="sm"
               onClick={refreshResults}
-              className="gap-2"
+              className="gap-2 btn-interactive"
             >
               <RefreshCcw className="h-3 w-3" /> Refresh
             </Button>
@@ -96,7 +97,7 @@ export default function ComplexityResultPage() {
             {results.map((m) => (
               <Card
                 key={m.id}
-                className={cn("transition-all", riskGlow(m.riskLevel))}
+                className={`flex flex-col justify-between items-center ${cn("transition-all", riskGlow(m.riskLevel))}`}
               >
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-mono">{m.name}()</CardTitle>
@@ -105,14 +106,20 @@ export default function ComplexityResultPage() {
                   <div className="text-xs text-muted-foreground">
                     Lines {m.startLine}–{m.endLine}
                   </div>
-                  <Badge variant="outline" className="font-mono text-[10px]">
-                    {m.timeComplexity} / {m.spaceComplexity}
-                  </Badge>
+                  <div className="flex items-center gap-2 text-[10px] font-mono">
+                    <Badge variant="outline" className="px-2 py-0.5">
+                      Time: {m.timeComplexity}
+                    </Badge>
+                    <Badge variant="outline" className="px-2 py-0.5">
+                      Space: {m.spaceComplexity}
+                    </Badge>
+                  </div>
                   <div className="text-sm font-bold">Score: {m.totalScore}</div>
 
                   {/* Code preview */}
                   <div className="text-xs font-mono text-muted-foreground hover:text-foreground hover:bg-muted p-1 rounded cursor-pointer">
-                    {m.text}
+                    {/* {m.text} */}
+                    <CodeEditor code={m.text} />
                   </div>
 
                   {/* Reasons modal toggle */}
@@ -143,7 +150,7 @@ export default function ComplexityResultPage() {
 
         {/* LIST VIEW */}
         {viewMode === "list" && (
-          <div className="divide-y divide-border flex flex-col gap-5 rounded-md border">
+          <div className="divide-y divide-border flex flex-col gap-5 rounded-md border shadow-sm dark:shadow-[0_4px_12px_rgba(0,0,0,0.4)]">
             {results.map((m) => (
               <div
                 key={m.id}
@@ -153,8 +160,8 @@ export default function ComplexityResultPage() {
                   <div className="font-mono text-sm font-bold truncate">{m.name}()</div>
                   <div className="text-sm text-muted-foreground">Lines {m.startLine}–{m.endLine}</div>
                 </div>
-                <div className="flex items-center gap-4 mt-2 md:mt-0 flex-shrink-0">
-                  <Badge variant="outline" className="font-mono text-sm min-w-[80px] text-center">
+                <div className="flex items-center gap-4 mt-2 md:mt-0 shrink-0">
+                  <Badge variant="outline" className="font-mono text-sm min-w-20 text-center">
                     {m.timeComplexity} / {m.spaceComplexity}
                   </Badge>
                   <span className="text-sm font-bold w-8 text-center">{m.totalScore}</span>
@@ -184,7 +191,7 @@ export default function ComplexityResultPage() {
 
         {/* TABLE VIEW */}
         {viewMode === "table" && (
-          <div className="overflow-auto border rounded-md">
+          <div className="overflow-auto border rounded-md shadow-sm dark:shadow-[0_6px_16px_rgba(0,0,0,0.45)]">
             <table className="w-full text-sm table-auto">
               <thead className="bg-muted/30">
                 <tr className="text-left">

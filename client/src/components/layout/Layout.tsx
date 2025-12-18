@@ -32,17 +32,17 @@ export function Layout({ children }: { children: React.ReactNode }) {
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
             {!isDashboard && (
               <>
-                <a href="#features" className="hover:text-foreground transition-colors">Features</a>
-                <a href="#how-it-works" className="hover:text-foreground transition-colors">Methodology</a>
-                <a href="#pricing" className="hover:text-foreground transition-colors">Pricing</a>
+                <a href="#features" className="btn-interactive hover:text-foreground transition-colors">Features</a>
+                <a href="#how-it-works" className="btn-interactive hover:text-foreground transition-colors">Methodology</a>
+                <a href="#pricing" className="btn-interactive hover:text-foreground transition-colors">Pricing</a>
               </>
             )}
             {isDashboard && (
               <>
-                <Link to="/dashboard"><a className={cn("hover:text-foreground transition-colors")}>Overview</a></Link>
+                <Link to="/dashboard"><a className={cn("btn-interactive hover:text-foreground transition-colors")}>Overview</a></Link>
                 {/* <Link to="/dashboard"><a className={cn("hover:text-foreground transition-colors", location === "/dashboard" && "text-foreground")}>Overview</a></Link> */}
-                <Link to="/dashboard/projects"><a className="hover:text-foreground transition-colors">Projects</a></Link>
-                <Link to="/dashboard/settings"><a className="hover:text-foreground transition-colors">Settings</a></Link>
+                <Link to="/dashboard/projects"><a className="btn-interactive hover:text-foreground transition-colors">Projects</a></Link>
+                <Link to="/dashboard/settings"><a className="btn-interactive hover:text-foreground transition-colors">Settings</a></Link>
               </>
             )}
           </nav>

@@ -16,7 +16,7 @@ export function CodeEditor({ code, resolveLanguage }: CodeEditorProps) {
         </span>
       </div>
 
-      <div className="h-[400px] overflow-auto custom-scrollbar">
+      <div className="h-fit-content max-h-[700px] overflow-auto custom-scrollbar">
         <Highlight
           theme={themes.vsDark}
           code={code}

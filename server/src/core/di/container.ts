@@ -2,22 +2,30 @@ import fastify from "fastify";
 import { createPostgresPool } from "../../infra/db/postgres";
 import { createMongooseConnection } from "../../infra/db/mongo";
 import compiler_plugin from "../../compiler/plugins/compiler_plugin";
-import fileRoute from "../../module/mvp_file";
+import fileRoute from "../../module";
+import cors from '@fastify/cors';
 
 export async function createApp() {
   const app = fastify({ logger: true });
 
-  // ---------- INFRA ----------
-  const pgPool = await createPostgresPool();
-  const mongoose = await createMongooseConnection();
+  // ---------- CROSS ORIGIN ----------
+  await app.register(cors, {
+    origin: "http://localhost:5173",
+    methods: ['GET', 'POST'], // Specify allowed methods
+    credentials: true, // Allow cookies, authorization headers, etc.
+  })
 
-  app.decorate("pgPool", pgPool);
-  app.decorate("mongoose", mongoose);
+  // ---------- INFRA ----------
+  // const pgPool = await createPostgresPool();
+  // const mongoose = await createMongooseConnection();
+
+  // app.decorate("pgPool", pgPool);
+  // app.decorate("mongoose", mongoose);
 
   // Mongo models
-  const fileSchema = new mongoose.Schema({ data: {} }, { strict: false });
-  const FileModel = mongoose.model("File", fileSchema);
-  app.decorate("FileModel", FileModel);
+  // const fileSchema = new mongoose.Schema({ data: {} }, { strict: false });
+  // const FileModel = mongoose.model("File", fileSchema);
+  // app.decorate("FileModel", FileModel);
 
   // ---------- PLUGINS ----------
   await app.register(compiler_plugin);

@@ -2,20 +2,24 @@
 import { useCallback, useEffect, useState } from "react";
 import {
   Folder, FileCode, Plus, Play, Settings, ChevronRight, Github,
-  Activity, Zap, Server, AppWindow
+  Activity, Zap, Server, AppWindow,
+  EyeOff,
+  Eye
 } from "lucide-react";
 import { Layout } from "../components/layout/Layout";
 import { Button } from "../components/ui/button";
 import { ScrollArea } from "../components/ui/scroll-area";
 import { Badge } from "../components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
-import { Slider } from "../components/ui/slider";
 import { CodeEditor } from "../components/dashboard/CodeEditor";
 import { cn } from "../lib/utils";
 import { ComplexityChart } from "../components/dashboard/ComplexityChart";
 import { useNotification } from "../context/useNotification";
-import { BACKEND_LANGUAGES, DATASETS, IGNORED_FILES, IGNORED_PATHS, type BackendLanguageKey, type MethodPreview } from "../types/fileUploadInterface";
+import { BACKEND_LANGUAGES, DATASETS, IGNORED_FILES, IGNORED_PATHS, type BackendLanguageKey, type MethodPreview, type SingleFile } from "../types/fileUploadInterface";
 import { MOCK_METHOD_COMPLEXITY } from "../services/fakeDataset";
+import { FileUploadProgress } from "../hooks/fileUploading";
+import { uploadAndAnalyzeFiles } from "../utils/axios";
+import type { AnalyzeFileUpload } from "../types/apiDataInterface";
 
 // Type definitions for file tree
 interface FileNode {
@@ -30,6 +34,20 @@ interface FileNode {
   risk?: string;
 }
 
+
+
+
+const fakeChartData = [
+  { name: "auth.ts", complexity: 12, risk: "Low" },
+  { name: "utils.ts", complexity: 5, risk: "Low" },
+  { name: "parser.ts", complexity: 45, risk: "High" },
+  { name: "graph.ts", complexity: 28, risk: "Medium" },
+  { name: "api.ts", complexity: 8, risk: "Low" },
+  { name: "legacy.js", complexity: 85, risk: "Critical" },
+  { name: "user.ts", complexity: 15, risk: "Low" },
+];
+
+
 export default function DashboardPage() {
   const [selectedFileRoute, setSelectedFileRoute] = useState<string[]>([]);
   const [selectedFile, setSelectedFile] = useState<string>("");
@@ -39,12 +57,56 @@ export default function DashboardPage() {
   const [files, setFiles] = useState<FileNode[]>([]);
   const [datasetKey, setDatasetKey] = useState<BackendLanguageKey>("typescript");
   const [fileComplexityResult, setFileComplexityResult] = useState<MethodPreview[]>([]);
+  const [hideComplexityChart, setHideComplexityChart] = useState<boolean>(false)
   const { notify } = useNotification();
+  const [showUploadProcess, setShowUploadProcess] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [isEditing, _setIsEditing] = useState(false);
+  const [uploadFilesForComplexity, setUploadFilesForComplexity] = useState<SingleFile[]>([]);
 
-  const handleAnalyze = () => {
-    setIsAnalyzing(true);
-    setTimeout(() => setIsAnalyzing(false), 1200);
-  };
+  const serializeFilesForUpload = useCallback((files: SingleFile[]): { success: boolean, data: any } => {
+    try {
+
+      const serializedData: AnalyzeFileUpload[] = []
+      files.map((item) => (
+        serializedData.push({
+          name: item.name, language: item.language, size: item.size, file: item.file
+        })
+      ))
+
+      return { success: true, data: serializedData }
+
+    } catch (error) {
+      console.error("Error serializing files for upload:", error);
+      return { success: false, data: null }
+    }
+  }, []);
+
+  const handleAnalyze = useCallback(async () => {
+    try {
+      setIsAnalyzing(true);
+      const { success: serializationSuccess, data: serializedData } = await serializeFilesForUpload(uploadFilesForComplexity);
+      if (!serializationSuccess) {
+        return notify("Failed to prepare files for upload. Please try again.", "error");
+      }
+
+      const result = await uploadAndAnalyzeFiles(serializedData)
+      const { success, data } = result.data()
+      if (!success) {
+        return notify("Analysis failed. Please try again.", "error");
+      }
+      setFileComplexityResult(data)
+      notify("Analysis completed successfully!", "success");
+    } catch (error) {
+      console.error("Error during analysis:", error);
+      notify("Analysis failed. Please try again.", "error");
+    } finally {
+      setIsAnalyzing(true);
+      setShowUploadProcess(!showUploadProcess)
+      setTimeout(() => setIsAnalyzing(false), 1200);
+    }
+  }, [uploadFilesForComplexity, notify, serializeFilesForUpload, showUploadProcess]);
+
 
   const getRiskColor = (risk: string) => {
     switch (risk) {
@@ -83,6 +145,9 @@ export default function DashboardPage() {
 
       const allowedPatterns = DATASETS[datasetKey as keyof typeof DATASETS];
       const root: FileNode[] = [];
+      console.log("Turbo Log  ~ processFiles ~ root:", root);
+      const fileArrayForUpload: SingleFile[] = []
+      console.log("Turbo Log  ~ processFiles ~ fileArrayForUpload:", fileArrayForUpload);
 
       const getOrCreateFolder = (children: FileNode[], name: string): FileNode => {
         let folder = children.find((c) => c.type === "folder" && c.name === name);
@@ -135,6 +200,15 @@ export default function DashboardPage() {
           dir: file.webkitRelativePath,
           file, // raw File object for later parsing
         });
+        fileArrayForUpload.push({
+          id: crypto.randomUUID(),
+          name: file.name,
+          type: "file",
+          language: datasetKey,
+          size: file.size,
+          dir: file.webkitRelativePath,
+          file,
+        })
       });
 
       if (root.length > 0) {
@@ -143,6 +217,8 @@ export default function DashboardPage() {
         notify("No valid files found in selected folder", "warning");
       }
 
+      setUploadFilesForComplexity(fileArrayForUpload)
+
       return root;
     } catch (error) {
       console.error("Error processing files:", error);
@@ -150,6 +226,7 @@ export default function DashboardPage() {
       return [];
     }
   };
+
 
   const handleFileSelect = async (node: FileNode) => {
     // Only process file nodes, not folders
@@ -184,6 +261,10 @@ export default function DashboardPage() {
     BACKEND_LANGUAGES.find((lang) => lang.key === datasetKey)?.label || "unknown"
   ), [datasetKey])
 
+  const handleComplexityChartView = useCallback(() => {
+    setHideComplexityChart(!hideComplexityChart)
+  }, [hideComplexityChart])
+
   useEffect(() => {
 
     async function fetchComplexityResult() {
@@ -199,7 +280,8 @@ export default function DashboardPage() {
 
   return (
     <Layout>
-      <div className="flex-1 flex overflow-hidden h-full">
+      <div className="flex-1 relative flex overflow-hidden h-full">
+        <FileUploadProgress projectName={selectedFile} hide={!showUploadProcess} />
         {/* LEFT SIDEBAR - File Explorer & Config */}
         <aside className="w-64 border-r border-border bg-sidebar overflow-none flex flex-col">
 
@@ -207,10 +289,10 @@ export default function DashboardPage() {
           <div className="p-4 border-b border-border flex items-center justify-between">
             <span className="font-mono text-xs font-bold text-muted-foreground uppercase tracking-wider">Explorer</span>
             <div className="flex gap-1">
-              <Button onClick={importUserFileFolder} variant="ghost" size="icon" className="h-6 w-6">
+              <Button onClick={importUserFileFolder} variant="ghost" size="icon" className="btn-interactive h-6 w-6">
                 <Plus className="h-3 w-3" />
               </Button>
-              <Button variant="ghost" size="icon" className="h-6 w-6">
+              <Button variant="ghost" size="icon" className="btn-interactive h-6 w-6">
                 <Settings className="h-3 w-3" />
               </Button>
             </div>
@@ -327,14 +409,23 @@ export default function DashboardPage() {
               )}
             </div>
 
+
             <div className="flex items-center gap-4">
               <Button
                 onClick={handleAnalyze}
-                className={cn("gap-2 font-mono text-xs h-8", isAnalyzing && "opacity-80")}
+                className={cn("gap-2 btn-interactive font-mono text-xs h-8", isAnalyzing && "opacity-80")}
                 disabled={isAnalyzing}
               >
                 {isAnalyzing ? <Zap className="h-3 w-3 animate-spin" /> : <Play className="h-3 w-3" />}
                 {isAnalyzing ? "Analyzing..." : "Generate Complexity"}
+              </Button>
+              <Button
+                onClick={() => handleComplexityChartView()}
+                className={cn("gap-2 btn-interactive font-mono text-xs h-8", isAnalyzing && "opacity-80")}
+                disabled={isAnalyzing}
+              >
+                {hideComplexityChart ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
+                {hideComplexityChart ? "Show Chart" : "Hide Chart"}
               </Button>
             </div>
           </header>
@@ -368,22 +459,60 @@ export default function DashboardPage() {
                         Adjust tolerance for complexity alerts.
                       </CardDescription>
                     </CardHeader>
+
                     <CardContent className="space-y-4">
+
                       {/* Header */}
                       <div className="flex items-center justify-between text-xs font-mono">
                         <span className="text-muted-foreground">Function Complexity Threshold</span>
                         <span className="text-primary font-bold">{threshold[0]}</span>
                       </div>
 
-                      {/* Slider */}
-                      <Slider
-                        value={threshold}
-                        onValueChange={setThreshold}
-                        max={50}
-                        min={10}
-                        step={1}
-                        className="py-2"
+                      {/* Editable display for complexity threshold */}
+                      <input
+                        title="Function Complexity Threshold"
+                        type="number"
+                        value={threshold[0]}
+                        onChange={(e) => setThreshold([Number(e.target.value)])}
+                        className={`w-auto my-auto text-right ${isEditing ? 'font-bold' : 'font-normal'} border border-border rounded px-1 m-1 py-0.5 text-primary focus:outline-none focus:ring-1 focus:ring-primary focus:ring-offset-1`}
+                        min={0}
+                        max={100}
                       />
+
+
+                      {/* Preset buttons */}
+                      <div className="flex gap-2 text-[10px]">
+                        <button
+                          className="px-2 py-1 rounded border border-border text-muted-foreground hover:bg-muted transition"
+                          onClick={() => setThreshold([15])}
+                        >
+                          Low
+                        </button>
+                        <button
+                          className="px-2 py-1 rounded border border-border text-muted-foreground hover:bg-muted transition"
+                          onClick={() => setThreshold([30])}
+                        >
+                          Medium
+                        </button>
+                        <button
+                          className="px-2 py-1 rounded border border-border text-muted-foreground hover:bg-muted transition"
+                          onClick={() => setThreshold([45])}
+                        >
+                          High
+                        </button>
+                        <button
+                          className="px-2 py-1 rounded border border-border text-muted-foreground hover:bg-muted transition"
+                          onClick={() => setThreshold([0])}
+                        >
+                          Ignore
+                        </button>
+                        <button
+                          className="px-2 py-1 rounded border border-border text-primary hover:bg-muted transition font-bold"
+                          onClick={() => setThreshold([25])} // default value
+                        >
+                          Reset
+                        </button>
+                      </div>
 
                       {/* Scale explanation */}
                       <div className="flex justify-between text-[10px] text-muted-foreground font-mono">
@@ -414,8 +543,8 @@ export default function DashboardPage() {
                         </button>
                       </div>
                     </CardContent>
-
                   </Card>
+
 
                   {/* Method Breakdown */}
                   <Card className="border-border shadow-sm flex-1">
@@ -458,7 +587,7 @@ export default function DashboardPage() {
                                   getRiskColor(method.riskLevel)
                                 )}
                               >
-                                {method.timeComplexity} / {method.spaceComplexity}
+                                time: {method.timeComplexity} / space: {method.spaceComplexity}
                               </Badge>
                               <div className="text-xs font-bold">
                                 {method.totalScore}
@@ -488,18 +617,19 @@ export default function DashboardPage() {
                       </div>
                     </CardContent>
                   </Card>
-
                 </div>
               </div>
 
               {/* Chart Section */}
-              <div className="mt-8">
+              <div className={`relative mt-8 ${hideComplexityChart ? "hidden display-none" : ""}`}>
                 <h3 className="text-sm font-medium mb-4 flex items-center gap-2">
                   <Activity className="h-4 w-4" />
                   Project Complexity Trend
                 </h3>
+
+
                 <div className="border border-border rounded-md p-4 bg-card">
-                  <ComplexityChart />
+                  <ComplexityChart chartData={fakeChartData} />
                 </div>
               </div>
 

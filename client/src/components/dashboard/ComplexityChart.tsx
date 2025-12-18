@@ -1,17 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Cell } from "recharts";
+import type { complexityChart } from "../../types/complexityChartInterface";
 
-const data = [
-  { name: "auth.ts", complexity: 12, risk: "Low" },
-  { name: "utils.ts", complexity: 5, risk: "Low" },
-  { name: "parser.ts", complexity: 45, risk: "High" },
-  { name: "graph.ts", complexity: 28, risk: "Medium" },
-  { name: "api.ts", complexity: 8, risk: "Low" },
-  { name: "legacy.js", complexity: 85, risk: "Critical" },
-  { name: "user.ts", complexity: 15, risk: "Low" },
-];
 
-export function ComplexityChart() {
+export function ComplexityChart({ chartData: data }: complexityChart) {
   const getColor = (risk: string) => {
     switch (risk) {
       case "Low": return "var(--chart-2)"; // Greenish
