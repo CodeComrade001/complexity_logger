@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, { type AxiosRequestConfig } from "axios";
-import type { AnalyzeFileUpload } from "../types/apiDataInterface";
 
 const baseURL = import.meta.env.VITE_LOCAL_BACKEND_URL || "";
 
@@ -35,9 +34,10 @@ export const applyFilePatch = (data: { fileId: string; patch: any }, config?: Ax
   return api.patch("/patches/apply", data, config);
 };
 
-export const uploadAndAnalyzeFiles = (data: AnalyzeFileUpload[], config?: AxiosRequestConfig) => {
-  return api.post("file/repos/analyze", data, config);
-};
+export const uploadAndAnalyzeFiles = (formData: FormData, config?: AxiosRequestConfig) => {
+  return api.post("file/repos/analyze", formData, config);
+  ;
+}
 
 // --------------------
 // GENERIC REQUEST

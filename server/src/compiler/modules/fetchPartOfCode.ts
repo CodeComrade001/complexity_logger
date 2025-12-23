@@ -2,6 +2,7 @@ import { Project } from "ts-morph";
 import { FetchUnitPartOfCodeProps } from "../interfaces/fetchUnitPartOfCodeProps";
 import { extractors } from "../utils/extractor";
 import { FileUploadModel } from "../../module/model/fileInterface";
+import { streamToString } from "../../module/utils/parserFileData";
 
 
 export class GetUnitPartOfCode {
@@ -14,7 +15,7 @@ export class GetUnitPartOfCode {
   public async extract(
     props: FetchUnitPartOfCodeProps,
     files: FileUploadModel[],
-    batchSize = 10
+    batchSize = 20
   ) {
     const results: Record<string, any> = {};
 
@@ -25,7 +26,7 @@ export class GetUnitPartOfCode {
         batch.map(async (file) => {
           const source = this.project.createSourceFile(
             file.name,
-            await file.file.text(),
+            file.fileContent!,
             { overwrite: true }
           );
 

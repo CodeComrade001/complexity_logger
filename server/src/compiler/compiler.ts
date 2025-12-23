@@ -4,6 +4,16 @@ import { GetCodeChanges } from "./modules/codeChange";
 import { GetComplexityGenerator } from "./modules/complexityGenerator";
 import { GetUnitPartOfCode } from "./modules/fetchPartOfCode";
 
+interface ComplexityUnit {
+  functions: any[];
+  arrows: any[];
+  methods: any[];
+  classes: any[];
+}
+
+type ComplexityGeneratorPayload = Record<string, ComplexityUnit>;
+
+
 export default class Compiler {
   private getUnitPartOfCode: GetUnitPartOfCode;
   private getIfCodeChange: GetCodeChanges;
@@ -25,15 +35,27 @@ export default class Compiler {
 
   private async fetchPartOfCode(allFilesToAnalyze: FileUploadModel[]) {
     const fetchedPart = await this.getUnitPartOfCode.extract({
-      targets: ["functions", "classes", "variables", "arrows", "methods", "variables"] // Example targets
+      targets: ["functions", "arrows", "methods", "classes"] // Example targets
     }, allFilesToAnalyze);
+    console.log("Turbo Log  ~ Compiler ~ fetchPartOfCode ~ fetchedPart:", fetchedPart);
     return fetchedPart;
   }
 
-  private async complexityGenerator(fetchPartOfCodeResult: any) {
-    const result = await this.getComplexityGenerator.execute(fetchPartOfCodeResult);
-    return result;
+  private async complexityGenerator(
+    payload: ComplexityGeneratorPayload,
+    batchSize = 10
+  ) {
+    const batches = chunkRecord(payload, batchSize);
+    const results = [];
+
+    for (const batch of batches) {
+      const result = await this.getComplexityGenerator.execute(batch);
+      results.push(result);
+    }
+
+    return results;
   }
+
 
   private async _codeChange() {
     return this.getIfCodeChange.hasCodeChanged("", "");
@@ -56,5 +78,20 @@ export default class Compiler {
   }
 
 
+}
+
+
+function chunkRecord<T>(
+  record: Record<string, T>,
+  size: number
+): Record<string, T>[] {
+  const entries = Object.entries(record);
+  const chunks: Record<string, T>[] = [];
+
+  for (let i = 0; i < entries.length; i += size) {
+    chunks.push(Object.fromEntries(entries.slice(i, i + size)));
+  }
+
+  return chunks;
 }
 

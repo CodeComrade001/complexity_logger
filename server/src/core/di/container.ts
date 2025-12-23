@@ -4,6 +4,7 @@ import { createMongooseConnection } from "../../infra/db/mongo";
 import compiler_plugin from "../../compiler/plugins/compiler_plugin";
 import fileRoute from "../../module";
 import cors from '@fastify/cors';
+import fastifyMultipart from "@fastify/multipart";
 
 export async function createApp() {
   const app = fastify({ logger: true });
@@ -14,6 +15,14 @@ export async function createApp() {
     methods: ['GET', 'POST'], // Specify allowed methods
     credentials: true, // Allow cookies, authorization headers, etc.
   })
+
+  await app.register(fastifyMultipart, {
+    limits: {
+      fileSize: 200 * 1024, // 200KB (match your MAX_FILE_SIZE)
+      files: 300
+    }
+  });
+
 
   // ---------- INFRA ----------
   // const pgPool = await createPostgresPool();

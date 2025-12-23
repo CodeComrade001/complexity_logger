@@ -1,6 +1,9 @@
+import { Readable } from "stream";
+
 export interface FileUploadModel {
   name: string;
-  language: string;
   size: number;
-  file: File;
+  language: string;
+  file: Readable;        // original stream
+  fileContent?: string; // sanitized text
 }
