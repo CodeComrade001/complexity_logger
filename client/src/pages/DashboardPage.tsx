@@ -19,7 +19,6 @@ import { BACKEND_LANGUAGES, DATASETS, IGNORED_FILES, IGNORED_PATHS, type Backend
 import { MOCK_METHOD_COMPLEXITY } from "../services/fakeDataset";
 import { FileUploadProgress } from "../hooks/fileUploading";
 import { uploadAndAnalyzeFiles } from "../utils/axios";
-import type { AnalyzeFileUpload } from "../types/apiDataInterface";
 
 // Type definitions for file tree
 interface FileNode {
@@ -64,48 +63,51 @@ export default function DashboardPage() {
   const [isEditing, _setIsEditing] = useState(false);
   const [uploadFilesForComplexity, setUploadFilesForComplexity] = useState<SingleFile[]>([]);
 
-  const serializeFilesForUpload = useCallback((files: SingleFile[]): { success: boolean, data: any } => {
-    try {
-
-      const serializedData: AnalyzeFileUpload[] = []
-      files.map((item) => (
-        serializedData.push({
-          name: item.name, language: item.language, size: item.size, file: item.file
-        })
-      ))
-
-      return { success: true, data: serializedData }
-
-    } catch (error) {
-      console.error("Error serializing files for upload:", error);
-      return { success: false, data: null }
-    }
-  }, []);
 
   const handleAnalyze = useCallback(async () => {
     try {
       setIsAnalyzing(true);
-      const { success: serializationSuccess, data: serializedData } = await serializeFilesForUpload(uploadFilesForComplexity);
-      if (!serializationSuccess) {
-        return notify("Failed to prepare files for upload. Please try again.", "error");
-      }
 
-      const result = await uploadAndAnalyzeFiles(serializedData)
-      const { success, data } = result.data()
+      // 1. Create FormData
+      const formData = new FormData();
+
+      // 2. Append files. 
+      // Assuming uploadFilesForComplexity is an array of { file: File, name: string, ... }
+      uploadFilesForComplexity.forEach((item) => {
+        // Append the actual File object. The key 'files' must match what your backend expects (e.g. @UploadedFiles() files)
+        formData.append('files', item.file);
+        formData.append('language', item.language);
+        formData.append('size', item.size.toString());
+        // If you need to send metadata (like language/size) alongside each file, 
+        // it's often better to send a parallel JSON array string if your backend supports it,
+        // OR rely on the backend to detect size/extension from the file itself.
+        // For now, let's assume we just send the files.
+      });
+
+      // 3. Send the FormData
+      const result = await uploadAndAnalyzeFiles(formData);
+
+      console.log("Turbo Log ~ DashboardPage ~ result:", result);
+
+      // Axios response is usually result.data, not result.data()
+      const { success, data } = result.data;
+
       if (!success) {
         return notify("Analysis failed. Please try again.", "error");
       }
-      setFileComplexityResult(data)
+
+      setFileComplexityResult(data);
       notify("Analysis completed successfully!", "success");
+
     } catch (error) {
       console.error("Error during analysis:", error);
       notify("Analysis failed. Please try again.", "error");
     } finally {
-      setIsAnalyzing(true);
-      setShowUploadProcess(!showUploadProcess)
-      setTimeout(() => setIsAnalyzing(false), 1200);
+      // setIsAnalyzing(true); // <-- BUG: You likely meant false here
+      setIsAnalyzing(false);
+      setShowUploadProcess(!showUploadProcess);
     }
-  }, [uploadFilesForComplexity, notify, serializeFilesForUpload, showUploadProcess]);
+  }, [uploadFilesForComplexity, notify, showUploadProcess]);
 
 
   const getRiskColor = (risk: string) => {

@@ -1,6 +1,7 @@
 import { Project } from "ts-morph";
 import { extractors } from "../../compiler/utils/extractor";
 import { checkMemory, withTimeout } from "./limit";
+import { streamToString } from "../utils/parserFileData";
 
 export async function runExtraction(job: any) {
   const project = new Project();
@@ -11,7 +12,7 @@ export async function runExtraction(job: any) {
 
     const source = project.createSourceFile(
       file.name,
-      await file.file.text(),
+      file.fileContent!,
       { overwrite: true }
     );
 

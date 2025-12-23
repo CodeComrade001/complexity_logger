@@ -22,7 +22,6 @@ export class GetComplexityGenerator {
     try {
 
       const freeComplexityReport = await this.complexityEngineGenerator.executeFreeTier(data);
-      console.log("Turbo Log  ~ GetComplexityGenerator ~ execute ~ freeComplexityReport:", freeComplexityReport);
 
       return ({ success: true, message: "Free  tier report generation successful", data: freeComplexityReport });
     } catch (error) {
@@ -35,7 +34,6 @@ export class GetComplexityGenerator {
     try {
 
       const paidComplexityReport = await this.complexityEngineGenerator.executeFreeTier(data);
-      console.log("Turbo Log  ~ GetComplexityGenerator ~ execute ~ paidComplexityReport:", paidComplexityReport);
       return { success: true, message: "Paid  tier report generation successful", data: paidComplexityReport };
     } catch (error) {
       console.log("Turbo Log  ~ GetComplexityGenerator ~ generateFreeTierReport ~ error:", error);

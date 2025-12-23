@@ -6,7 +6,7 @@ import NotFound from "./pages/not-found";
 import { TooltipProvider } from "./components/ui/tooltip";
 import { Toaster } from "./components/ui/toaster";
 import { NotificationProvider } from "./context/notificationContext";
-import ComplexityResultPage from "./pages/complexityResultPage";
+import ComplexityResultPage from "./pages/ComplexityResultPage";
 
 function Router() {
   return (
