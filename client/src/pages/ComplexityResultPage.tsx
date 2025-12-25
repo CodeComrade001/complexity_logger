@@ -45,8 +45,13 @@ export default function ComplexityResultPage() {
     }
   };
 
+  const navigationDataItems = [
+    { navigationLabel: "Projects", navigationHref: "/projects" },
+    { navigationLabel: "Settings", navigationHref: "/settings" },
+  ];
+
   return (
-    <Layout>
+    <Layout navigationData={navigationDataItems}>
       <div className="w-full mx-auto p-[50px] max-h-[200px] overflow-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">

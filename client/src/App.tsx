@@ -14,7 +14,7 @@ function Router() {
       <Routes>
 
         <Route path="/" element={<LandingPage />} />
-        <Route path="/analysis/full-report" element={<ComplexityResultPage />} />
+        <Route path="/dashboard/analysis/full-report" element={<ComplexityResultPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/dashboard/:subpath" element={<DashboardPage />} />

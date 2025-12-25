@@ -3,7 +3,6 @@ import path from "path";
 import Compiler from "../../compiler/compiler";
 import { FileUploadModel } from "../model/fileInterface";
 import { IFileRepository } from "../ports/IFileRepository";
-import { Readable } from "stream";
 import { streamToString } from "../utils/parserFileData";
 
 const IGNORED_FILES = [
@@ -45,7 +44,6 @@ export class GetFileAnalyzer {
   private async dataSecurityAndSanitization(
     files: FileUploadModel[]
   ): Promise<{ success: boolean; data: FileUploadModel[] }> {
-    console.log("Turbo Log  ~ GetFileAnalyzer ~ dataSecurityAndSanitization ~ files:", files);
 
     if (!Array.isArray(files) || files.length === 0) {
       return { success: false, data: [] };

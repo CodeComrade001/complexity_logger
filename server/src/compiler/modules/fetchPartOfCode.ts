@@ -2,7 +2,6 @@ import { Project } from "ts-morph";
 import { FetchUnitPartOfCodeProps } from "../interfaces/fetchUnitPartOfCodeProps";
 import { extractors } from "../utils/extractor";
 import { FileUploadModel } from "../../module/model/fileInterface";
-import { streamToString } from "../../module/utils/parserFileData";
 
 
 export class GetUnitPartOfCode {
