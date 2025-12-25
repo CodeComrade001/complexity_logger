@@ -11,7 +11,7 @@ interface ComplexityUnit {
   classes: any[];
 }
 
-type ComplexityGeneratorPayload = Record<string, ComplexityUnit>;
+export type ComplexityGeneratorPayload = Record<string, ComplexityUnit>;
 
 
 export default class Compiler {
@@ -37,24 +37,33 @@ export default class Compiler {
     const fetchedPart = await this.getUnitPartOfCode.extract({
       targets: ["functions", "arrows", "methods", "classes"] // Example targets
     }, allFilesToAnalyze);
-    console.log("Turbo Log  ~ Compiler ~ fetchPartOfCode ~ fetchedPart:", fetchedPart);
     return fetchedPart;
   }
 
   private async complexityGenerator(
     payload: ComplexityGeneratorPayload,
-    batchSize = 10
+    concurrency = 10
   ) {
-    const batches = chunkRecord(payload, batchSize);
-    const results = [];
+    const entries = Object.entries(payload);
 
-    for (const batch of batches) {
-      const result = await this.getComplexityGenerator.execute(batch);
-      results.push(result);
+    const results: any[] = [];
+
+    for (let i = 0; i < entries.length; i += concurrency) {
+      const slice = entries.slice(i, i + concurrency);
+
+      const promises = slice.map(([fileName, data]) => {
+        return this.getComplexityGenerator.execute({
+          [fileName]: data,
+        });
+      });
+
+      const batchResults = await Promise.all(promises);
+      results.push(...batchResults);
     }
 
     return results;
   }
+
 
 
   private async _codeChange() {

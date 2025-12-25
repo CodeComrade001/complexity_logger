@@ -45,6 +45,7 @@ export interface ComplexityResult {
 }
 
 export interface AnalysisSummary {
+  nameOfFile: string;
   success: boolean;
   generatedAt: string;
   tierUsed: TierLevel;

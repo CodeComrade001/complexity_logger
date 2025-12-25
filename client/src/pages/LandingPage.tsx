@@ -3,8 +3,15 @@ import { Hero } from "../components/landing/Hero";
 import { Layout } from "../components/layout/Layout";
 
 export default function LandingPage() {
+
+  const navigationDataItems = [
+    { navigationLabel: "Dashboard", navigationHref: "/dashboard" },
+    { navigationLabel: "Login", navigationHref: "/login" },
+    { navigationLabel: "Customer Care", navigationHref: "/customer-care" },
+  ];
+
   return (
-    <Layout>
+    <Layout navigationData={navigationDataItems}>
       <div className="flex flex-col">
         <Hero />
         <ComplexityVisualizer />

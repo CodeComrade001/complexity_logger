@@ -4,6 +4,7 @@ import { ComplexityCalculator } from "./calculator";
 import { ReasonGenerator } from "./reason";
 import { FastAnalyzer } from "./fast_analyzer";
 import { dataSets } from "../../utils/datasets";
+import { normalizedPayloadData } from "../complexityOrchestrator/complexityOrchestratorInterface";
 
 export class EnhancedComplexityGenerator_v1 {
   private keywordSet: Set<string>;
@@ -42,9 +43,10 @@ export class EnhancedComplexityGenerator_v1 {
    * Analyze with FREE tier (fast, regex-based)
    * Accuracy: 70-80%, Speed: <100ms
    */
-  private async analyzeFast(fetchPartOfCodeResult: any): Promise<AnalysisSummary> {
+  private async analyzeFast(fetchPartOfCodeResult: normalizedPayloadData): Promise<AnalysisSummary> {
 
     const { methods, arrows, functions } = fetchPartOfCodeResult;
+    console.log("Turbo Log  ~ EnhancedComplexityGenerator_v1 ~ analyzeFast ~ fetchPartOfCodeResult:", fetchPartOfCodeResult);
 
 
     const methodResults = this.ensureArray(methods).map((m: any) =>
@@ -59,15 +61,16 @@ export class EnhancedComplexityGenerator_v1 {
       this.analyzeFastNode(f, "function")
     );
 
-    return this.buildSummary(methodResults, arrowResults, functionResults, "free");
+    return this.buildSummary(fetchPartOfCodeResult.nameOfFile, methodResults, arrowResults, functionResults, "free");
   }
 
   /**
    * Analyze with PAID tier (deep, AST-based)
    * Accuracy: 95%+, Speed: <500ms
    */
-  private async analyzeDeep(fetchPartOfCodeResult: any): Promise<AnalysisSummary> {
+  private async analyzeDeep(fetchPartOfCodeResult: normalizedPayloadData): Promise<AnalysisSummary> {
     const { methods, arrows, functions } = fetchPartOfCodeResult;
+    console.log("Turbo Log  ~ EnhancedComplexityGenerator_v1 ~ analyzeDeep ~ fetchPartOfCodeResult:", fetchPartOfCodeResult);
 
     const methodResults = this.ensureArray(methods).map((m: any) =>
       this.analyzeDeepNode(m, "method")
@@ -81,14 +84,14 @@ export class EnhancedComplexityGenerator_v1 {
       this.analyzeDeepNode(f, "function")
     );
 
-    return this.buildSummary(methodResults, arrowResults, functionResults, "paid");
+    return this.buildSummary(fetchPartOfCodeResult.nameOfFile, methodResults, arrowResults, functionResults, "paid");
   }
 
   /**
    * BACKWARD COMPATIBLE - matches your original execute() method
    * Defaults to DEEP analysis for paid tier
    */
-  public async executePaidTier(fetchPartOfCodeResult: any): Promise<AnalysisSummary> {
+  public async executePaidTier(fetchPartOfCodeResult: normalizedPayloadData): Promise<AnalysisSummary> {
     return this.analyzeDeep(fetchPartOfCodeResult);
   }
 
@@ -96,7 +99,7 @@ export class EnhancedComplexityGenerator_v1 {
    * BACKWARD COMPATIBLE - matches your original execute() method
    * Defaults to fast analysis for free tier
    */
-  public async executeFreeTier(fetchPartOfCodeResult: any): Promise<AnalysisSummary> {
+  public async executeFreeTier(fetchPartOfCodeResult: normalizedPayloadData): Promise<AnalysisSummary> {
     return this.analyzeFast(fetchPartOfCodeResult);
   }
 
@@ -457,7 +460,7 @@ export class EnhancedComplexityGenerator_v1 {
     return tokens.filter(t => this.keywordSet.has(t));
   }
 
-  private buildSummary(methods: ComplexityResult[], arrows: ComplexityResult[], functions: ComplexityResult[], tier: TierLevel): AnalysisSummary {
+  private buildSummary(fileName: string, methods: ComplexityResult[], arrows: ComplexityResult[], functions: ComplexityResult[], tier: TierLevel): AnalysisSummary {
     const all = [...methods, ...arrows, ...functions];
 
     const totalScore = all.reduce((s, it) => s + it.totalScore, 0);
@@ -472,6 +475,7 @@ export class EnhancedComplexityGenerator_v1 {
     const avgSpaceComplexity = this.calculateAverageComplexity(all.map(a => a.spaceComplexity));
 
     return {
+      nameOfFile: fileName,
       success: true,
       generatedAt: new Date().toISOString(),
       tierUsed: tier,

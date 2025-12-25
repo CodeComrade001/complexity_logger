@@ -280,8 +280,14 @@ export default function DashboardPage() {
     fetchComplexityResult()
   }, []);
 
+  const navigationDataItems = [
+    { navigationLabel: "Projects", navigationHref: "/projects" },
+    { navigationLabel: "Settings", navigationHref: "/settings" },
+    { navigationLabel: "Full Report", navigationHref: "/dashboard/analysis/full-report" },
+  ];
+
   return (
-    <Layout>
+    <Layout navigationData={navigationDataItems}>
       <div className="flex-1 relative flex overflow-hidden h-full">
         <FileUploadProgress projectName={selectedFile} hide={!showUploadProcess} />
         {/* LEFT SIDEBAR - File Explorer & Config */}

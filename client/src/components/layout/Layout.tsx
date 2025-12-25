@@ -1,10 +1,15 @@
 import { Link, useLocation } from "react-router-dom";
 import { Terminal, Github, Smartphone } from "lucide-react";
-import { cn } from "../../lib/utils";
+// import { cn } from "../../lib/utils";
 import { Button } from "../ui/button";
 import { ThemeToggle } from "../ThemeToggle";
 
-export function Layout({ children }: { children: React.ReactNode }) {
+interface NavigationProps {
+  navigationHref: string;
+  navigationLabel: string;
+}
+
+export function Layout({ children, navigationData }: { children: React.ReactNode, navigationData: NavigationProps[] }) {
   const location = useLocation();
   const isDashboard = location.pathname.startsWith("/dashboard");
 
@@ -30,21 +35,25 @@ export function Layout({ children }: { children: React.ReactNode }) {
           </a>
 
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
-            {!isDashboard && (
+            {(!isDashboard && navigationData.length !== 0) && (
               <>
-                <a href="#features" className="btn-interactive hover:text-foreground transition-colors">Features</a>
-                <a href="#how-it-works" className="btn-interactive hover:text-foreground transition-colors">Methodology</a>
-                <a href="#pricing" className="btn-interactive hover:text-foreground transition-colors">Pricing</a>
+                {navigationData.map((item, index) => (
+                  <a key={index} href={item.navigationHref} className="btn-interactive hover:text-foreground transition-colors">{item.navigationLabel}</a>
+                ))}
               </>
             )}
-            {isDashboard && (
+            {(isDashboard && navigationData.length !== 0) && (
               <>
-                <Link to="/dashboard"><a className={cn("btn-interactive hover:text-foreground transition-colors")}>Overview</a></Link>
-                {/* <Link to="/dashboard"><a className={cn("hover:text-foreground transition-colors", location === "/dashboard" && "text-foreground")}>Overview</a></Link> */}
-                <Link to="/dashboard/projects"><a className="btn-interactive hover:text-foreground transition-colors">Projects</a></Link>
-                <Link to="/dashboard/settings"><a className="btn-interactive hover:text-foreground transition-colors">Settings</a></Link>
+                {navigationData.map((item, index) => (
+                  <a key={index} href={item.navigationHref} className="btn-interactive hover:text-foreground transition-colors">{item.navigationLabel}</a>
+                ))}
               </>
             )}
+            {/* <Link to="/dashboard"><a className={cn("btn-interactive hover:text-foreground transition-colors")}>Overview</a></Link> */}
+            {/* <Link to="/dashboard"><a className={cn("hover:text-foreground transition-colors", location === "/dashboard" && "text-foreground")}>Overview</a></Link> */}
+            {/* <Link to="/dashboard/projects"><a className="btn-interactive hover:text-foreground transition-colors">Projects</a></Link>
+                <Link to="/dashboard/settings"><a className="btn-interactive hover:text-foreground transition-colors">Settings</a></Link> */}
+
           </nav>
 
           <div className="flex items-center gap-4">
