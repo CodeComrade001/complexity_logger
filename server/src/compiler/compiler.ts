@@ -2,16 +2,10 @@ import { FileUploadModel } from "../module/model/fileInterface";
 import { CancelRunningTask } from "./modules/cancelTask";
 import { GetCodeChanges } from "./modules/codeChange";
 import { GetComplexityGenerator } from "./modules/complexityGenerator";
+import { CodeParts } from "./modules/complexityOrchestrator/complexityOrchestratorInterface";
 import { GetUnitPartOfCode } from "./modules/fetchPartOfCode";
 
-interface ComplexityUnit {
-  functions: any[];
-  arrows: any[];
-  methods: any[];
-  classes: any[];
-}
-
-export type ComplexityGeneratorPayload = Record<string, ComplexityUnit>;
+export type ComplexityGeneratorPayload = Record<string, CodeParts>;
 
 
 export default class Compiler {
@@ -35,7 +29,18 @@ export default class Compiler {
 
   private async fetchPartOfCode(allFilesToAnalyze: FileUploadModel[]) {
     const fetchedPart = await this.getUnitPartOfCode.extract({
-      targets: ["functions", "arrows", "methods", "classes"] // Example targets
+      targets: [
+        "functions",
+        "arrows",
+        "methods",
+        "constructors",
+        "getters",
+        "setters",
+        "callbacks",
+        "handlers",
+        "staticBlocks",
+        "topLevelStatements"
+      ] // Example targets
     }, allFilesToAnalyze);
     return fetchedPart;
   }

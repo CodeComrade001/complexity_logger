@@ -5,7 +5,7 @@
 
 import { ComplexityReason, ComplexityResult, WEIGHTS } from "../../interfaces/complexityGeneratorInterface";
 import { ComplexityCalculator } from "./calculator";
-import { ReasonGenerator } from "./reason";
+import { ReasonGenerator } from "./paidTierReason";
 
 export class FastAnalyzer {
 

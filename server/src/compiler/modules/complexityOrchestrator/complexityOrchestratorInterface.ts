@@ -1,8 +1,14 @@
 export interface CodeParts {
-  functions: any[];
-  arrows: any[];
-  methods: any[];
-  classes: any[];
+  functions: any[],
+  arrows: any[],
+  methods: any[],
+  constructors: any[],
+  getters: any[],
+  setters: any[],
+  callbacks: any[],
+  handlers: any[],
+  staticBlocks: any[],
+  topLevelStatements: any[]
 }
 
 export interface FilePayload {
@@ -12,7 +18,14 @@ export interface FilePayload {
 
 export interface normalizedPayloadData {
   nameOfFile: string;
-  functions: any[];
-  arrows: any[];
-  methods: any[];
+  functions: any[],
+  arrows: any[],
+  methods: any[],
+  constructors: any[],
+  getters: any[],
+  setters: any[],
+  callbacks: any[],
+  handlers: any[],
+  staticBlocks: any[],
+  topLevelStatements: any[]
 }
