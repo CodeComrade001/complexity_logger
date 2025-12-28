@@ -4,26 +4,45 @@ export enum CodeUnitType {
   FUNCTIONS = "functions",
   ARROWS = "arrows",
   METHODS = "methods",
-  VARIABLES = "variables",
-  CLASSES = "classes",
-  INTERFACES = "interfaces",
-  ENUMS = "enums",
-  IMPORTS = "imports",
-  EXPORTS = "exports",
+  CONSTRUCTORS = "constructors",
+  GETTERS = "getters",
+  SETTERS = "setters",
+  CALLBACKS = "callbacks",
+  HANDLERS = "handlers",
+  STATIC_BLOCKS = "staticBlocks",
+  TOP_LEVEL_STATEMENTS = "topLevelStatements",
 }
 
 
-export const extractors = {
-  [CodeUnitType.FUNCTIONS]: (source: any) => source.getFunctions(),
-  [CodeUnitType.ARROWS]: (source: any) =>
+export const extractors: Record<CodeUnitType, (source: any) => any[]> = {
+  [CodeUnitType.FUNCTIONS]: (source) =>
+    source.getFunctions(),
+
+  [CodeUnitType.ARROWS]: (source) =>
     source.getDescendantsOfKind(SyntaxKind.ArrowFunction),
-  [CodeUnitType.METHODS]: (source: any) =>
-    source.getClasses().flatMap((c: any) => c.getMethods()),
-  [CodeUnitType.VARIABLES]: (source: any) => source.getVariableDeclarations(),
-  [CodeUnitType.CLASSES]: (source: any) => source.getClasses(),
-  [CodeUnitType.INTERFACES]: (source: any) => source.getInterfaces(),
-  [CodeUnitType.ENUMS]: (source: any) => source.getEnums(),
-  [CodeUnitType.IMPORTS]: (source: any) => source.getImportDeclarations(),
-  [CodeUnitType.EXPORTS]: (source: any) => source.getExportDeclarations(),
+
+  [CodeUnitType.METHODS]: (source) =>
+    source.getClasses().flatMap((c: { getMethods: () => any; }) => c.getMethods()),
+
+  [CodeUnitType.CONSTRUCTORS]: (source) =>
+    source.getClasses().map((c: { getConstructors: () => any; }) => c.getConstructors()).flat(),
+
+  [CodeUnitType.GETTERS]: (source) =>
+    source.getClasses().flatMap((c: { getGetAccessors: () => any; }) => c.getGetAccessors()),
+
+  [CodeUnitType.SETTERS]: (source) =>
+    source.getClasses().flatMap((c: { getSetAccessors: () => any; }) => c.getSetAccessors()),
+
+  [CodeUnitType.STATIC_BLOCKS]: (source) =>
+    source.getClasses().flatMap((c: { getStaticBlocks: () => any; }) => c.getStaticBlocks()),
+
+  [CodeUnitType.CALLBACKS]: (source) =>
+    source.getDescendantsOfKind(SyntaxKind.FunctionExpression),
+
+  [CodeUnitType.HANDLERS]: (source) =>
+    source.getDescendantsOfKind(SyntaxKind.FunctionExpression),
+
+  [CodeUnitType.TOP_LEVEL_STATEMENTS]: (source) =>
+    source.getStatements(),
 };
 

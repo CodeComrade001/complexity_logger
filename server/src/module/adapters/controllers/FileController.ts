@@ -59,6 +59,7 @@ export class FileController {
       if (!files || files.length === 0) {
         return { success: false, message: "No files provided for analysis" };
       }
+      console.log("Turbo Log  ~ FileController ~ getFileAnalyzer ~ files:", files);
       const { success, data, message } = await this.getFileAnalyzerUsecase.execute(files);
       if (!success) {
         return reply.code(400).send({ success: false, message: message || "File analysis failed." });

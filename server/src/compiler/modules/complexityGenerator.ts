@@ -15,16 +15,17 @@ export class GetComplexityGenerator {
   public async execute(payload: FilePayload) {
     try {
       const normalized = this.normalizer.normalize(payload);
-      console.log("Turbo Log  ~ GetComplexityGenerator ~ execute ~ normalized:", normalized);
+
+      if (!normalized) {
+        return { success: false, message: "No analyzable code found" };
+      }
 
       if (!Object.keys(normalized).length) {
         return { success: false, message: "No analyzable code found" };
       }
 
       const freeReport = await this.tierRunner.runFree(normalized);
-      console.log("Turbo Log  ~ GetComplexityGenerator ~ execute ~ freeReport:", freeReport);
       const paidReport = await this.tierRunner.runPaid(normalized);
-      console.log("Turbo Log  ~ GetComplexityGenerator ~ execute ~ paidReport:", paidReport);
 
       return {
         success: true,
