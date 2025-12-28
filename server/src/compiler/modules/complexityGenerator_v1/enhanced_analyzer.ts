@@ -487,8 +487,8 @@ export class EnhancedComplexityGenerator_v1 {
     const confidence = ComplexityCalculator.calculateOverallConfidence(reasons);
 
     return {
-      timeComplexity: timeComplexityResult.notation || timeComplexityResult,
-      spaceComplexity: spaceComplexityResult.notation || spaceComplexityResult,
+      timeComplexity: timeComplexityResult,
+      spaceComplexity: spaceComplexityResult,
       riskLevel,
       confidence
     };
