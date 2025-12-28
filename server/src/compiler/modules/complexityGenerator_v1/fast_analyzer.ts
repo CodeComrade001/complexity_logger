@@ -5,7 +5,7 @@
 
 import { ComplexityReason, ComplexityResult, WEIGHTS } from "../../interfaces/complexityGeneratorInterface";
 import { ComplexityCalculator } from "./calculator";
-import { ReasonGenerator } from "./paidTierReason";
+import { FreeTierReasonGenerator } from "./freeTierReason";
 
 export class FastAnalyzer {
 
@@ -48,12 +48,12 @@ export class FastAnalyzer {
         const nestedLoopScore = (nestingDepth - 1) * WEIGHTS.NESTED_LOOP_FACTOR;
         timeScore += nestedLoopScore;
 
-        reasons.push(ReasonGenerator.generateTimeReason("nested-loop-2", {
+        reasons.push(FreeTierReasonGenerator.generateTimeReason("nested-loop-2", {
           loopDepth: nestingDepth,
           lineNumber: startLine
         }));
       } else {
-        reasons.push(ReasonGenerator.generateTimeReason("single-loop", {
+        reasons.push(FreeTierReasonGenerator.generateTimeReason("single-loop", {
           lineNumber: startLine
         }));
       }
@@ -61,7 +61,7 @@ export class FastAnalyzer {
 
     if (hasRecursion) {
       timeScore += WEIGHTS.RECURSION;
-      reasons.push(ReasonGenerator.generateTimeReason("recursion-simple", {
+      reasons.push(FreeTierReasonGenerator.generateTimeReason("recursion-simple", {
         isRecursive: true,
         callName: name,
         lineNumber: startLine
@@ -70,14 +70,14 @@ export class FastAnalyzer {
 
     if (hasSorting) {
       timeScore += WEIGHTS.SORT;
-      reasons.push(ReasonGenerator.generateTimeReason("sort", {
+      reasons.push(FreeTierReasonGenerator.generateTimeReason("sort", {
         lineNumber: startLine
       }));
     }
 
     if (hasJSON) {
       timeScore += WEIGHTS.HIGH_COST_BUILTIN;
-      reasons.push(ReasonGenerator.generateTimeReason("json-operations", {
+      reasons.push(FreeTierReasonGenerator.generateTimeReason("json-operations", {
         lineNumber: startLine
       }));
     }
@@ -85,7 +85,7 @@ export class FastAnalyzer {
     // SPACE COMPLEXITY ANALYSIS
     if (allocationMatches.length > 0 && totalLoops > 0) {
       spaceScore += allocationMatches.length * WEIGHTS.PUSH_IN_LOOP;
-      reasons.push(ReasonGenerator.generateSpaceReason("array-allocation-loop", {
+      reasons.push(FreeTierReasonGenerator.generateSpaceReason("array-allocation-loop", {
         inLoop: true,
         allocationType: "array/object",
         lineNumber: startLine,
@@ -95,7 +95,7 @@ export class FastAnalyzer {
 
     if (spreadMatches.length > 0) {
       spaceScore += spreadMatches.length * WEIGHTS.SPREAD;
-      reasons.push(ReasonGenerator.generateSpaceReason("spread-operator", {
+      reasons.push(FreeTierReasonGenerator.generateSpaceReason("spread-operator", {
         inLoop: totalLoops > 0,
         lineNumber: startLine
       }));

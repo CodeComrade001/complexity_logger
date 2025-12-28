@@ -36,8 +36,8 @@ export interface ComplexityScores {
 
 // Classification results
 export interface ComplexityClassification {
-  timeComplexity: ComplexityNotation;
-  spaceComplexity: ComplexityNotation;
+  timeComplexity: CalculatorComplexityResult;
+  spaceComplexity: CalculatorComplexityResult;
   riskLevel: Uppercase_RiskLevelType;
   confidence: number;
 }
@@ -61,8 +61,8 @@ export interface ComplexityResult {
   endLine?: number;
   text: string;
 
-  timeComplexity: ComplexityNotation;
-  spaceComplexity: ComplexityNotation;
+  timeComplexity: CalculatorComplexityResult;
+  spaceComplexity: CalculatorComplexityResult;
 
   timeScore: number;
   spaceScore: number;
