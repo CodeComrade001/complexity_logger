@@ -1,39 +1,11 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { RefreshCcw, List, LayoutGrid, Info, Search, Filter, AlertCircle, CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
-import { apiData } from "../temp/apiFakeData";
+import { useNotification } from "../context/useNotification";
+import { fetchSession } from "../utils/sessionStorage";
+import type { FileComplexityReceivedPayload, RiskCounts, RiskLevel, RiskThresholdConfig } from "../types/apiDataInterface";
+import type { ViewMode } from "../types/complexityResultInterface";
 
-// Type definitions matching the API response
-interface Reason {
-  type: string;
-  pattern: string;
-  detail: string;
-  impact: string;
-  confidence: number;
-  lineNumber: number;
-}
 
-type RiskLevel = typeof VALID_RISK_LEVELS[number];
-interface FunctionAnalysis {
-  id: string;
-  kind: string;
-  name: string;
-  startLine: number;
-  endLine: number;
-  text: string;
-  timeComplexity: string;
-  spaceComplexity: string;
-  timeScore: number;
-  spaceScore: number;
-  totalScore: number;
-  riskLevel: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
-  confidence: number;
-  reasons: Reason[];
-  matchedKeywords: string[];
-  tierUsed: string;
-  fileName?: string;
-}
-
-type ViewMode = "card" | "list" | "table";
 
 export default function ComplexityResultPage() {
   const [viewMode, setViewMode] = useState<ViewMode>("card");
@@ -42,58 +14,123 @@ export default function ComplexityResultPage() {
   const [activeReasonId, setActiveReasonId] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<string>("all");
   const VALID_RISK_LEVELS = ["LOW", "MEDIUM", "HIGH", "CRITICAL"] as const;
+  const [fileComplexityResult, setFileComplexityResult] = useState<FileComplexityReceivedPayload[]>([]);
+  const { notify } = useNotification();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [riskThresholds, setRiskThresholds] = useState<RiskThresholdConfig>({
+    high: 100,
+    critical: 85,
+    medium: 60,
+    low: 30
+  });
+
+
+
 
   // Parse the actual API data
 
 
   // Flatten all functions from all files
-  const allFunctions: FunctionAnalysis[] = apiData.flatMap(item => {
-  if (!item.data?.freeComplexityReport) return [];
-  
-  const report = item.data.freeComplexityReport;
+  const allFunctions: FileComplexityReceivedPayload[] = fileComplexityResult.flatMap(item => {
+    if (!item.data?.freeComplexityReport) return [];
 
-  return [
-    ...report.details.functions,
-    ...report.details.methods,
-    ...report.details.arrows
-  ].map(fn => ({
-    ...fn,
-    riskLevel: normalizeRiskLevel(fn.riskLevel),
-    fileName: report.nameOfFile
-  }));
-});
+    const report = item.data.freeComplexityReport;
+    // const paidReport = item.data.freeComplexityReport;
+
+    return [
+      ...report.details.functions,
+      ...report.details.arrows,
+      ...report.details.methods,
+      ...report.details.constructors,
+      ...report.details.getters,
+      ...report.details.setters,
+      ...report.details.callbacks,
+      ...report.details.handlers,
+      ...report.details.staticBlocks,
+      ...report.details.topLevelStatements
+    ].map(fn => ({
+      ...fn,
+      riskLevel: normalizeRiskLevel(report.summary),
+      fileName: report.nameOfFile
+    }));
+  });
 
 
   // Get unique file names for filter
-  const fileNames = ["all", ...new Set(apiData.map(item => {
+  const fileNames = ["all", ...new Set(fileComplexityResult.map(item => {
     if (!item.data?.freeComplexityReport) return [];
-    
-   return item.data.freeComplexityReport.nameOfFile}))];
+
+    return item.data.freeComplexityReport.nameOfFile
+  }))];
 
 
-function normalizeRiskLevel(value: string): RiskLevel {
-  return VALID_RISK_LEVELS.includes(value as RiskLevel)
-    ? (value as RiskLevel)
-    : "LOW"; // safe fallback
-}
+  function normalizeRiskLevel(numberMetrics: RiskCounts): RiskLevel {
+    const convertedStringFormat = convertNumberRiskCountToString(numberMetrics, riskThresholds);
+    return VALID_RISK_LEVELS.includes(convertedStringFormat as RiskLevel)
+      ? (convertedStringFormat as RiskLevel)
+      : "LOW"; // safe fallback
+  }
+
+  const convertNumberRiskCountToString = (
+    counts: RiskCounts,
+    thresholds: RiskThresholdConfig
+  ): RiskLevel => {
+    if (counts.criticalRiskCount >= thresholds.critical) {
+      return "CRITICAL";
+    }
+
+    if (counts.highRiskCount >= thresholds.high) {
+      return "HIGH";
+    }
+
+    if (counts.mediumRiskCount >= thresholds.medium) {
+      return "MEDIUM";
+    }
+
+    return "LOW";
+  }
+
+  const convertSingleNumberRiskCountToString = (
+    counts: number,
+    thresholds: RiskThresholdConfig
+  ): RiskLevel => {
+
+    if (counts >= thresholds?.critical) {
+      return "CRITICAL";
+    }
+
+    if (counts >= thresholds?.high) {
+      return "HIGH";
+    }
+
+    if (counts >= thresholds?.medium) {
+      return "MEDIUM";
+    }
+
+    return "LOW";
+  }
 
   // Filter functions based on search and risk level
   const filteredFunctions = allFunctions.filter(fn => {
-    const matchesSearch = fn.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesRisk = filterRisk === "ALL" || fn.riskLevel === filterRisk;
-    const matchesFile = selectedFile === "all" || fn.fileName === selectedFile;
+    const report = fn.data.freeComplexityReport;
+    const matchesSearch = report.nameOfFile.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesRisk = filterRisk === "ALL" || normalizeRiskLevel(report.summary) === filterRisk;
+    const matchesFile = selectedFile === "all" || report.nameOfFile === selectedFile;
     return matchesSearch && matchesRisk && matchesFile;
   });
 
   // Calculate summary statistics
-  const summary = {
-    total: allFunctions.length,
-    critical: allFunctions.filter(f => f.riskLevel === "CRITICAL").length,
-    high: allFunctions.filter(f => f.riskLevel === "HIGH").length,
-    medium: allFunctions.filter(f => f.riskLevel === "MEDIUM").length,
-    low: allFunctions.filter(f => f.riskLevel === "LOW").length,
-    avgScore: Math.round(allFunctions.reduce((sum, f) => sum + f.totalScore, 0) / allFunctions.length)
-  };
+  const summary = () => {
+
+    return {
+      total: allFunctions.length,
+      critical: allFunctions.filter(f => convertSingleNumberRiskCountToString(f.data.freeComplexityReport.summary.criticalRiskCount, riskThresholds) === "CRITICAL").length,
+      high: allFunctions.filter(f => convertSingleNumberRiskCountToString(f.data.freeComplexityReport.summary.highRiskCount, riskThresholds) === "HIGH").length,
+      medium: allFunctions.filter(f => convertSingleNumberRiskCountToString(f.data.freeComplexityReport.summary.mediumRiskCount, riskThresholds) === "MEDIUM").length,
+      low: allFunctions.filter(f => convertSingleNumberRiskCountToString(f.data.freeComplexityReport.summary.lowRiskCount, riskThresholds) === "LOW").length,
+      avgScore: Math.round(allFunctions.reduce((sum, f) => sum + f.data.freeComplexityReport.summary.totalScore, 0) / allFunctions.length)
+    };
+  }
 
   const refreshResults = () => {
     setSearchQuery("");
@@ -143,6 +180,34 @@ function normalizeRiskLevel(value: string): RiskLevel {
 
   const cn = (...classes: (string | boolean | undefined)[]) => classes.filter(Boolean).join(' ');
 
+
+  const fetchStoredApiPayload = useCallback(async () => {
+    try {
+      const cached = fetchSession<
+        FileComplexityReceivedPayload | FileComplexityReceivedPayload[]
+      >("fileComplexityResult");
+
+      if (!cached) return;
+
+      const normalized = Array.isArray(cached) ? cached : [cached];
+
+      setFileComplexityResult(normalized);
+    } catch (error) {
+      console.error("Failed to restore session data", error);
+      notify("Failed to restore previous analysis", "error");
+    }
+  }, [notify]);
+
+
+  useEffect(() => {
+    async function handleFetchStoredApiPayload() {
+      await fetchStoredApiPayload();
+    }
+    handleFetchStoredApiPayload()
+  }, [fetchStoredApiPayload]);
+
+
+
   return (
     <div className="w-full mx-auto p-6 space-y-6" style={{ maxWidth: '1400px' }}>
       {/* Header with Summary */}
@@ -161,27 +226,27 @@ function normalizeRiskLevel(value: string): RiskLevel {
         <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
           <div className="panel p-3">
             <div className="text-xs text-muted">Total</div>
-            <div className="text-xl font-bold">{summary.total}</div>
+            <div className="text-xl font-bold">{summary().total}</div>
           </div>
           <div className="panel p-3">
             <div className="text-xs text-muted">Critical</div>
-            <div className="text-xl font-bold status-error">{summary.critical}</div>
+            <div className="text-xl font-bold status-error">{summary().critical}</div>
           </div>
           <div className="panel p-3">
             <div className="text-xs text-muted">High</div>
-            <div className="text-xl font-bold status-warning">{summary.high}</div>
+            <div className="text-xl font-bold status-warning">{summary().high}</div>
           </div>
           <div className="panel p-3">
             <div className="text-xs text-muted">Medium</div>
-            <div className="text-xl font-bold status-warning">{summary.medium}</div>
+            <div className="text-xl font-bold status-warning">{summary().medium}</div>
           </div>
           <div className="panel p-3">
             <div className="text-xs text-muted">Low</div>
-            <div className="text-xl font-bold status-success">{summary.low}</div>
+            <div className="text-xl font-bold status-success">{summary().low}</div>
           </div>
           <div className="panel p-3">
             <div className="text-xs text-muted">Avg Score</div>
-            <div className="text-xl font-bold">{summary.avgScore}</div>
+            <div className="text-xl font-bold">{summary().avgScore}</div>
           </div>
         </div>
 
@@ -207,8 +272,8 @@ function normalizeRiskLevel(value: string): RiskLevel {
               className="px-3 py-2 text-sm border rounded-md bg-card focus:outline-none focus:ring-2 focus:ring-ring"
               style={{ borderColor: 'hsl(var(--border))' }}
             >
-              {fileNames.map(file => (
-                <option key={file} value={file}>
+              {fileNames.map((file, index) => (
+                <option key={index} value={file}>
                   {file === "all" ? "All Files" : file}
                 </option>
               ))}
@@ -388,8 +453,8 @@ function normalizeRiskLevel(value: string): RiskLevel {
                         {fn.reasons.map((reason, i) => (
                           <div key={i} className="p-2 bg-muted rounded text-xs">
                             <div className="font-semibold capitalize mb-1">
-                               {reason.pattern.replace(/-/g, " ")} (Line {reason.lineNumber})<br/>
-                               {reason.details.replace(/-/g, " ")} <br/>
+                              {reason.pattern.replace(/-/g, " ")} (Line {reason.lineNumber})<br />
+                              {reason.details.replace(/-/g, " ")} <br />
                             </div>
                             <div className="text-muted">{reason.detail}</div>
                           </div>

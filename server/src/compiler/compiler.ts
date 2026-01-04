@@ -40,14 +40,14 @@ export default class Compiler {
         "handlers",
         "staticBlocks",
         "topLevelStatements"
-      ] // Example targets
+      ] 
     }, allFilesToAnalyze);
     return fetchedPart;
   }
 
   private async complexityGenerator(
     payload: ComplexityGeneratorPayload,
-    concurrency = 10
+    concurrency = 100
   ) {
     const entries = Object.entries(payload);
 
@@ -94,18 +94,4 @@ export default class Compiler {
 
 }
 
-
-function chunkRecord<T>(
-  record: Record<string, T>,
-  size: number
-): Record<string, T>[] {
-  const entries = Object.entries(record);
-  const chunks: Record<string, T>[] = [];
-
-  for (let i = 0; i < entries.length; i += size) {
-    chunks.push(Object.fromEntries(entries.slice(i, i + size)));
-  }
-
-  return chunks;
-}
 

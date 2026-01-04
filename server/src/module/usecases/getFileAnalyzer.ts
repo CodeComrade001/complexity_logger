@@ -45,6 +45,8 @@ export class GetFileAnalyzer {
     files: FileUploadModel[]
   ): Promise<{ success: boolean; data: FileUploadModel[] }> {
 
+    console.log("data sanitization has started ")
+
     if (!Array.isArray(files) || files.length === 0) {
       return { success: false, data: [] };
     }
@@ -129,10 +131,9 @@ export class GetFileAnalyzer {
     filesToAnalyze: FileUploadModel[]
   ): Promise<{ success: boolean; data: any | null, message?: string }> {
 
-    const {
-      success,
-      data: serializedData
-    } = await this.dataSecurityAndSanitization(filesToAnalyze);
+    const { success, data: serializedData } = await this.dataSecurityAndSanitization(filesToAnalyze);
+    console.log("Turbo Log  ~ GetFileAnalyzer ~ execute ~ success:", success);
+    console.log("Turbo Log  ~ GetFileAnalyzer ~ execute ~ serializedData:", serializedData);
 
     if (!success) {
       return { success: false, data: null, message: "File sanitization failed." };
