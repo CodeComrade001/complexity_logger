@@ -19,6 +19,7 @@ import { BACKEND_LANGUAGES, DATASETS, IGNORED_FILES, IGNORED_PATHS, type Backend
 import { MOCK_METHOD_COMPLEXITY } from "../services/fakeDataset";
 import { FileUploadProgress } from "../hooks/fileUploading";
 import { uploadAndAnalyzeFiles } from "../utils/axios";
+import { storeSession } from "../utils/sessionStorage";
 
 // Type definitions for file tree
 interface FileNode {
@@ -64,7 +65,7 @@ export default function DashboardPage() {
   const [uploadFilesForComplexity, setUploadFilesForComplexity] = useState<SingleFile[]>([]);
 
 
-  const handleAnalyze = useCallback(async () => {
+  const SubmitFilesForAnalyzing = useCallback(async () => {
     try {
       setIsAnalyzing(true);
 
@@ -90,13 +91,14 @@ export default function DashboardPage() {
       console.log("Turbo Log ~ DashboardPage ~ result:", result);
 
       // Axios response is usually result.data, not result.data()
-      const { success, data } = result.data;
+      const { success, data } = result.data.compilerAnalysis;
 
       if (!success) {
         return notify("Analysis failed. Please try again.", "error");
       }
 
       setFileComplexityResult(data);
+      storeSession("fileComplexityResult", data);
       notify("Analysis completed successfully!", "success");
 
     } catch (error) {
@@ -147,9 +149,7 @@ export default function DashboardPage() {
 
       const allowedPatterns = DATASETS[datasetKey as keyof typeof DATASETS];
       const root: FileNode[] = [];
-      console.log("Turbo Log  ~ processFiles ~ root:", root);
       const fileArrayForUpload: SingleFile[] = []
-      console.log("Turbo Log  ~ processFiles ~ fileArrayForUpload:", fileArrayForUpload);
 
       const getOrCreateFolder = (children: FileNode[], name: string): FileNode => {
         let folder = children.find((c) => c.type === "folder" && c.name === name);
@@ -220,6 +220,8 @@ export default function DashboardPage() {
       }
 
       setUploadFilesForComplexity(fileArrayForUpload)
+
+
 
       return root;
     } catch (error) {
@@ -420,7 +422,7 @@ export default function DashboardPage() {
 
             <div className="flex items-center gap-4">
               <Button
-                onClick={handleAnalyze}
+                onClick={SubmitFilesForAnalyzing}
                 className={cn("gap-2 btn-interactive font-mono text-xs h-8", isAnalyzing && "opacity-80")}
                 disabled={isAnalyzing}
               >
