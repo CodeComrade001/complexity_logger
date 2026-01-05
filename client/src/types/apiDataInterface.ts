@@ -153,3 +153,5 @@ export interface ComplexityReason {
   confidence: number;
   lineNumber: number;
 }
+
+export type ViewMode = "card" | "list" | "table";
