@@ -2,10 +2,17 @@ import { useCallback, useEffect, useState } from "react";
 import { RefreshCcw, List, LayoutGrid, Info, Search, Filter, AlertCircle, CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
 import { useNotification } from "../context/useNotification";
 import { fetchSession } from "../utils/sessionStorage";
-import type { FileComplexityReceivedPayload, RiskCounts, RiskLevel, RiskThresholdConfig } from "../types/apiDataInterface";
+import type { ComplexityReason, ComplexityUnit, FileComplexityReceivedPayload, RiskLevel } from "../types/apiDataInterface";
 import type { ViewMode } from "../types/complexityResultInterface";
 
-
+// ============================================================================
+// UI-ONLY TYPE
+// Purpose: Flatten nested API structure for easier rendering
+// Change Strategy: If API structure changes, update only these helper functions
+// ============================================================================
+type UIFunction = ComplexityUnit & {
+  fileName: string; // Derived from parent ComplexityReport.nameOfFile
+};
 
 export default function ComplexityResultPage() {
   const [viewMode, setViewMode] = useState<ViewMode>("card");
@@ -13,31 +20,23 @@ export default function ComplexityResultPage() {
   const [filterRisk, setFilterRisk] = useState<string>("ALL");
   const [activeReasonId, setActiveReasonId] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<string>("all");
-  const VALID_RISK_LEVELS = ["LOW", "MEDIUM", "HIGH", "CRITICAL"] as const;
   const [fileComplexityResult, setFileComplexityResult] = useState<FileComplexityReceivedPayload[]>([]);
   const { notify } = useNotification();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [riskThresholds, setRiskThresholds] = useState<RiskThresholdConfig>({
-    high: 100,
-    critical: 85,
-    medium: 60,
-    low: 30
-  });
 
+  // ============================================================================
+  // DATA TRANSFORMATION LAYER
+  // Fix: Extract ComplexityUnits (which have riskLevel) and enrich with fileName
+  // Change Strategy: If API structure changes, update only this function
+  // ============================================================================
+  const allFunctions: UIFunction[] = fileComplexityResult.flatMap(payload => {
+    // Navigate API structure: payload.data.freeComplexityReport
+    if (!payload.data?.paidComplexityReport) return [];
 
+    const report = payload.data.freeComplexityReport;
+    const fileName = report.nameOfFile;
 
-
-  // Parse the actual API data
-
-
-  // Flatten all functions from all files
-  const allFunctions: FileComplexityReceivedPayload[] = fileComplexityResult.flatMap(item => {
-    if (!item.data?.freeComplexityReport) return [];
-
-    const report = item.data.freeComplexityReport;
-    // const paidReport = item.data.freeComplexityReport;
-
-    return [
+    // Collect all ComplexityUnit arrays (each already has riskLevel from API)
+    const allUnits: ComplexityUnit[] = [
       ...report.details.functions,
       ...report.details.arrows,
       ...report.details.methods,
@@ -48,89 +47,64 @@ export default function ComplexityResultPage() {
       ...report.details.handlers,
       ...report.details.staticBlocks,
       ...report.details.topLevelStatements
-    ].map(fn => ({
-      ...fn,
-      riskLevel: normalizeRiskLevel(report.summary),
-      fileName: report.nameOfFile
+    ];
+
+    // Enrich each unit with parent fileName for UI filtering/display
+    return allUnits.map(unit => ({
+      ...unit, // Spread preserves all API fields including unit.riskLevel
+      fileName // UI-only enhancement
     }));
   });
 
+  // ============================================================================
+  // EXTRACT UNIQUE FILE NAMES FOR FILTER DROPDOWN
+  // Change Strategy: If payload structure changes, update the path here
+  // ============================================================================
+  const fileNames: string[] = [
+    "all",
+    ...new Set(
+      fileComplexityResult
+        .map(payload => payload.data?.freeComplexityReport?.nameOfFile)
+        .filter((name): name is string => Boolean(name))
+    )
+  ];
 
-  // Get unique file names for filter
-  const fileNames = ["all", ...new Set(fileComplexityResult.map(item => {
-    if (!item.data?.freeComplexityReport) return [];
-
-    return item.data.freeComplexityReport.nameOfFile
-  }))];
-
-
-  function normalizeRiskLevel(numberMetrics: RiskCounts): RiskLevel {
-    const convertedStringFormat = convertNumberRiskCountToString(numberMetrics, riskThresholds);
-    return VALID_RISK_LEVELS.includes(convertedStringFormat as RiskLevel)
-      ? (convertedStringFormat as RiskLevel)
-      : "LOW"; // safe fallback
-  }
-
-  const convertNumberRiskCountToString = (
-    counts: RiskCounts,
-    thresholds: RiskThresholdConfig
-  ): RiskLevel => {
-    if (counts.criticalRiskCount >= thresholds.critical) {
-      return "CRITICAL";
-    }
-
-    if (counts.highRiskCount >= thresholds.high) {
-      return "HIGH";
-    }
-
-    if (counts.mediumRiskCount >= thresholds.medium) {
-      return "MEDIUM";
-    }
-
-    return "LOW";
-  }
-
-  const convertSingleNumberRiskCountToString = (
-    counts: number,
-    thresholds: RiskThresholdConfig
-  ): RiskLevel => {
-
-    if (counts >= thresholds?.critical) {
-      return "CRITICAL";
-    }
-
-    if (counts >= thresholds?.high) {
-      return "HIGH";
-    }
-
-    if (counts >= thresholds?.medium) {
-      return "MEDIUM";
-    }
-
-    return "LOW";
-  }
-
-  // Filter functions based on search and risk level
+  // ============================================================================
+  // FILTER LOGIC
+  // Fix: Use unit.riskLevel (from API) and unit.fileName (UI-derived)
+  // Change Strategy: Filters reference UIFunction properties - resilient to API changes
+  // ============================================================================
   const filteredFunctions = allFunctions.filter(fn => {
-    const report = fn.data.freeComplexityReport;
-    const matchesSearch = report.nameOfFile.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesRisk = filterRisk === "ALL" || normalizeRiskLevel(report.summary) === filterRisk;
-    const matchesFile = selectedFile === "all" || report.nameOfFile === selectedFile;
+    const matchesSearch = fn.fileName.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesRisk = filterRisk === "ALL" || fn.riskLevel === filterRisk;
+    const matchesFile = selectedFile === "all" || fn.fileName === selectedFile;
     return matchesSearch && matchesRisk && matchesFile;
   });
 
-  // Calculate summary statistics
+  // ============================================================================
+  // SUMMARY STATISTICS
+  // Fix: Count by individual unit.riskLevel (from API), not summary aggregates
+  // Change Strategy: Uses array methods on UIFunction[] - resilient to changes
+  // ============================================================================
   const summary = () => {
+    const total = allFunctions.length;
+    if (total === 0) {
+      return { total: 0, critical: 0, high: 0, medium: 0, low: 0, avgScore: 0 };
+    }
 
     return {
-      total: allFunctions.length,
-      critical: allFunctions.filter(f => convertSingleNumberRiskCountToString(f.data.freeComplexityReport.summary.criticalRiskCount, riskThresholds) === "CRITICAL").length,
-      high: allFunctions.filter(f => convertSingleNumberRiskCountToString(f.data.freeComplexityReport.summary.highRiskCount, riskThresholds) === "HIGH").length,
-      medium: allFunctions.filter(f => convertSingleNumberRiskCountToString(f.data.freeComplexityReport.summary.mediumRiskCount, riskThresholds) === "MEDIUM").length,
-      low: allFunctions.filter(f => convertSingleNumberRiskCountToString(f.data.freeComplexityReport.summary.lowRiskCount, riskThresholds) === "LOW").length,
-      avgScore: Math.round(allFunctions.reduce((sum, f) => sum + f.data.freeComplexityReport.summary.totalScore, 0) / allFunctions.length)
+      total,
+      // Count units by their API-provided riskLevel
+      critical: allFunctions.filter(fn => fn.riskLevel === "CRITICAL").length,
+      high: allFunctions.filter(fn => fn.riskLevel === "HIGH").length,
+      medium: allFunctions.filter(fn => fn.riskLevel === "MEDIUM").length,
+      low: allFunctions.filter(fn => fn.riskLevel === "LOW").length,
+      // Average totalScore across all units
+      avgScore: Math.round(
+        allFunctions.reduce((sum, fn) => sum + fn.totalScore, 0) / total
+      )
     };
-  }
+  };
 
   const refreshResults = () => {
     setSearchQuery("");
@@ -139,58 +113,43 @@ export default function ComplexityResultPage() {
     setActiveReasonId(null);
   };
 
-  const getRiskIcon = (risk: string) => {
+  const getRiskIcon = (risk: RiskLevel) => {
     switch (risk) {
-      case "CRITICAL":
-        return <XCircle className="h-4 w-4" />;
-      case "HIGH":
-        return <AlertCircle className="h-4 w-4" />;
-      case "MEDIUM":
-        return <AlertTriangle className="h-4 w-4" />;
-      default:
-        return <CheckCircle2 className="h-4 w-4" />;
+      case "CRITICAL": return <XCircle className="h-4 w-4" />;
+      case "HIGH": return <AlertCircle className="h-4 w-4" />;
+      case "MEDIUM": return <AlertTriangle className="h-4 w-4" />;
+      case "LOW": return <CheckCircle2 className="h-4 w-4" />;
     }
   };
 
-  const getRiskClass = (risk: string) => {
+  const getRiskClass = (risk: RiskLevel) => {
     switch (risk) {
-      case "CRITICAL":
-        return "border-red-600 animate-pulse";
-      case "HIGH":
-        return "border-orange-500 animate-pulse";
-      case "MEDIUM":
-        return "border-yellow-500";
-      default:
-        return "border-emerald-500";
+      case "CRITICAL": return "border-red-600 animate-pulse";
+      case "HIGH": return "border-orange-500 animate-pulse";
+      case "MEDIUM": return "border-yellow-500";
+      case "LOW": return "border-emerald-500";
     }
   };
 
-  const getRiskBadgeClass = (risk: string) => {
+  const getRiskBadgeClass = (risk: RiskLevel) => {
     switch (risk) {
-      case "CRITICAL":
-        return "status-error";
-      case "HIGH":
-        return "status-warning";
-      case "MEDIUM":
-        return "status-warning";
-      default:
-        return "status-success";
+      case "CRITICAL": return "status-error";
+      case "HIGH": return "status-warning";
+      case "MEDIUM": return "status-warning";
+      case "LOW": return "status-success";
     }
   };
 
   const cn = (...classes: (string | boolean | undefined)[]) => classes.filter(Boolean).join(' ');
 
-
   const fetchStoredApiPayload = useCallback(async () => {
     try {
-      const cached = fetchSession<
-        FileComplexityReceivedPayload | FileComplexityReceivedPayload[]
-      >("fileComplexityResult");
-
+      const cached = fetchSession<FileComplexityReceivedPayload | FileComplexityReceivedPayload[]>(
+        "fileComplexityResult"
+      );
       if (!cached) return;
 
       const normalized = Array.isArray(cached) ? cached : [cached];
-
       setFileComplexityResult(normalized);
     } catch (error) {
       console.error("Failed to restore session data", error);
@@ -198,31 +157,24 @@ export default function ComplexityResultPage() {
     }
   }, [notify]);
 
-
   useEffect(() => {
-    async function handleFetchStoredApiPayload() {
+    async function loadData() {
       await fetchStoredApiPayload();
     }
-    handleFetchStoredApiPayload()
+    loadData();
   }, [fetchStoredApiPayload]);
-
-
 
   return (
     <div className="w-full mx-auto p-6 space-y-6" style={{ maxWidth: '1400px' }}>
-      {/* Header with Summary */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h1 className="text-lg font-semibold">Complexity Analysis Results</h1>
-          <button
-            onClick={refreshResults}
-            className="btn-interactive flex items-center gap-2"
-          >
+          <button onClick={refreshResults} className="btn-interactive flex items-center gap-2">
             <RefreshCcw className="h-3 w-3" /> Reset
           </button>
         </div>
 
-        {/* Summary Cards */}
+        {/* Summary Cards - uses global CSS classes: panel, text-muted, status-* */}
         <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
           <div className="panel p-3">
             <div className="text-xs text-muted">Total</div>
@@ -250,7 +202,7 @@ export default function ComplexityResultPage() {
           </div>
         </div>
 
-        {/* Filters and View Controls */}
+        {/* Filters - uses global CSS: btn-interactive */}
         <div className="flex flex-col md:flex-row gap-3 items-start md:items-center justify-between">
           <div className="flex flex-col md:flex-row gap-3 flex-1 w-full md:w-auto">
             <div className="relative flex-1 max-w-xs">
@@ -261,30 +213,27 @@ export default function ComplexityResultPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-9 pr-3 py-2 text-sm border rounded-md bg-card focus:outline-none focus:ring-2 focus:ring-ring"
-                style={{ borderColor: 'hsl(var(--border))' }}
               />
             </div>
 
             <select
-              title="Select File"
+              title="Filter by File"
               value={selectedFile}
               onChange={(e) => setSelectedFile(e.target.value)}
               className="px-3 py-2 text-sm border rounded-md bg-card focus:outline-none focus:ring-2 focus:ring-ring"
-              style={{ borderColor: 'hsl(var(--border))' }}
             >
-              {fileNames.map((file, index) => (
-                <option key={index} value={file}>
+              {fileNames.map((file, idx) => (
+                <option key={idx} value={file}>
                   {file === "all" ? "All Files" : file}
                 </option>
               ))}
             </select>
 
             <select
-              title="Select Risk Analysis"
+              title="Filter by Risk Level"
               value={filterRisk}
               onChange={(e) => setFilterRisk(e.target.value)}
               className="px-3 py-2 text-sm border rounded-md bg-card focus:outline-none focus:ring-2 focus:ring-ring"
-              style={{ borderColor: 'hsl(var(--border))' }}
             >
               <option value="ALL">All Risk Levels</option>
               <option value="CRITICAL">Critical</option>
@@ -322,7 +271,6 @@ export default function ComplexityResultPage() {
         </div>
       </div>
 
-      {/* Results Count */}
       <div className="text-sm text-muted">
         Showing {filteredFunctions.length} of {allFunctions.length} functions
       </div>
@@ -331,10 +279,7 @@ export default function ComplexityResultPage() {
       {viewMode === "card" && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredFunctions.map((fn) => (
-            <div
-              key={fn.id}
-              className={cn("panel transition-all border-2", getRiskClass(fn.riskLevel))}
-            >
+            <div key={fn.id} className={cn("panel transition-all border-2", getRiskClass(fn.riskLevel))}>
               <div className="p-4 space-y-3">
                 <div className="flex items-start justify-between gap-2">
                   <div className="text-sm font-mono font-bold truncate">{fn.name}()</div>
@@ -347,13 +292,13 @@ export default function ComplexityResultPage() {
                 </div>
 
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="px-2 py-0.5 text-xs font-mono border rounded" style={{ borderColor: 'hsl(var(--border))' }}>
-                    T: {fn.timeComplexity}
+                  <span className="px-2 py-0.5 text-xs font-mono border rounded">
+                    T: {fn.timeComplexity.notation}
                   </span>
-                  <span className="px-2 py-0.5 text-xs font-mono border rounded" style={{ borderColor: 'hsl(var(--border))' }}>
-                    S: {fn.spaceComplexity}
+                  <span className="px-2 py-0.5 text-xs font-mono border rounded">
+                    S: {fn.spaceComplexity.notation}
                   </span>
-                  <span className="px-2 py-0.5 text-xs border rounded" style={{ borderColor: 'hsl(var(--border))' }}>
+                  <span className="px-2 py-0.5 text-xs border rounded">
                     Score: {fn.totalScore}
                   </span>
                 </div>
@@ -362,7 +307,7 @@ export default function ComplexityResultPage() {
                   <div className="font-semibold mb-1">Confidence: {fn.confidence}%</div>
                   {fn.matchedKeywords.length > 0 && (
                     <div className="flex flex-wrap gap-1">
-                      {fn.matchedKeywords.map((kw, i) => (
+                      {fn.matchedKeywords.map((kw: string, i: number) => (
                         <span key={i} className="px-1.5 py-0.5 bg-muted rounded text-[10px] font-mono">
                           {kw}
                         </span>
@@ -371,7 +316,7 @@ export default function ComplexityResultPage() {
                   )}
                 </div>
 
-                <div className="relative max-h-32 overflow-auto border rounded p-2 panel-muted" style={{ borderColor: 'hsl(var(--border))' }}>
+                <div className="relative max-h-32 overflow-auto border rounded p-2 panel-muted">
                   <pre className="text-[10px] font-mono leading-relaxed whitespace-pre-wrap">
                     {fn.text}
                   </pre>
@@ -386,13 +331,12 @@ export default function ComplexityResultPage() {
                 </button>
 
                 {activeReasonId === fn.id && fn.reasons.length > 0 && (
-                  <div className="space-y-2 pt-2" style={{ borderTop: '1px solid hsl(var(--border))' }}>
-                    {fn.reasons.map((reason, i) => (
+                  <div className="space-y-2 pt-2 border-t">
+                    {fn.reasons.map((reason: ComplexityReason, i: number) => (
                       <div key={i} className="p-2 bg-muted rounded text-xs space-y-1">
                         <div className="font-semibold flex items-center justify-between">
                           <span className="capitalize">{reason.pattern.replace(/-/g, " ")}</span>
-                          <span className="capitalize">{reason.details.replace(/-/g, " ")}</span>
-                          <span className="text-[10px] px-1.5 py-0.5 border rounded" style={{ borderColor: 'hsl(var(--border))' }}>
+                          <span className="text-[10px] px-1.5 py-0.5 border rounded">
                             Line {reason.lineNumber}
                           </span>
                         </div>
@@ -434,27 +378,26 @@ export default function ComplexityResultPage() {
                     </div>
 
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-xs font-mono px-2 py-0.5 border rounded" style={{ borderColor: 'hsl(var(--border))' }}>
-                        {fn.timeComplexity}
+                      <span className="text-xs font-mono px-2 py-0.5 border rounded">
+                        {fn.timeComplexity.notation}
                       </span>
-                      <span className="text-xs font-mono px-2 py-0.5 border rounded" style={{ borderColor: 'hsl(var(--border))' }}>
-                        {fn.spaceComplexity}
+                      <span className="text-xs font-mono px-2 py-0.5 border rounded">
+                        {fn.spaceComplexity.notation}
                       </span>
-                      <span className="text-xs px-2 py-0.5 border rounded" style={{ borderColor: 'hsl(var(--border))' }}>
+                      <span className="text-xs px-2 py-0.5 border rounded">
                         Score: {fn.totalScore}
                       </span>
-                      <span className="text-xs px-2 py-0.5 border rounded" style={{ borderColor: 'hsl(var(--border))' }}>
+                      <span className="text-xs px-2 py-0.5 border rounded">
                         {fn.confidence}% confident
                       </span>
                     </div>
 
                     {activeReasonId === fn.id && (
                       <div className="space-y-2 pt-2">
-                        {fn.reasons.map((reason, i) => (
+                        {fn.reasons.map((reason: ComplexityReason, i: number) => (
                           <div key={i} className="p-2 bg-muted rounded text-xs">
                             <div className="font-semibold capitalize mb-1">
-                              {reason.pattern.replace(/-/g, " ")} (Line {reason.lineNumber})<br />
-                              {reason.details.replace(/-/g, " ")} <br />
+                              {reason.pattern.replace(/-/g, " ")} (Line {reason.lineNumber})
                             </div>
                             <div className="text-muted">{reason.detail}</div>
                           </div>
@@ -464,7 +407,7 @@ export default function ComplexityResultPage() {
                   </div>
 
                   <button
-                    title="Show Info"
+                    title="View Analysis Details"
                     onClick={() => setActiveReasonId(activeReasonId === fn.id ? null : fn.id)}
                     className="shrink-0 btn-interactive"
                   >
@@ -479,18 +422,18 @@ export default function ComplexityResultPage() {
 
       {/* TABLE VIEW */}
       {viewMode === "table" && (
-        <div className="overflow-auto border rounded-md" style={{ borderColor: 'hsl(var(--border))' }}>
+        <div className="overflow-auto border rounded-md">
           <table className="w-full text-sm">
             <thead className="panel-muted">
               <tr className="text-left">
                 <th className="p-3 font-semibold min-w-[140px]">Function</th>
                 <th className="p-3 font-semibold min-w-[120px]">File</th>
-                <th className="p-3 font-semibold min-w-[80px]">Lines</th>
+                <th className="p-3 font-semibold min-w-20">Lines</th>
                 <th className="p-3 font-semibold min-w-[100px]">Time</th>
                 <th className="p-3 font-semibold min-w-[100px]">Space</th>
-                <th className="p-3 font-semibold min-w-[80px] text-center">Score</th>
+                <th className="p-3 font-semibold min-w-20 text-center">Score</th>
                 <th className="p-3 font-semibold min-w-[90px]">Risk</th>
-                <th className="p-3 font-semibold min-w-[80px] text-center">Info</th>
+                <th className="p-3 font-semibold min-w-20 text-center">Info</th>
               </tr>
             </thead>
             <tbody>
@@ -499,13 +442,12 @@ export default function ComplexityResultPage() {
                   <tr
                     key={fn.id}
                     className={cn("border-t border-l-4 hover:bg-muted", getRiskClass(fn.riskLevel))}
-                    style={{ borderTopColor: 'hsl(var(--border))' }}
                   >
                     <td className="p-3 font-mono text-xs">{fn.name}()</td>
                     <td className="p-3 text-xs text-muted">{fn.fileName}</td>
                     <td className="p-3 text-xs">{fn.startLine}–{fn.endLine}</td>
-                    <td className="p-3 font-mono text-xs">{fn.timeComplexity}</td>
-                    <td className="p-3 font-mono text-xs">{fn.spaceComplexity}</td>
+                    <td className="p-3 font-mono text-xs">{fn.timeComplexity.notation}</td>
+                    <td className="p-3 font-mono text-xs">{fn.spaceComplexity.notation}</td>
                     <td className="p-3 font-bold text-center">{fn.totalScore}</td>
                     <td className="p-3">
                       <div className={cn("flex items-center gap-1 text-xs", getRiskBadgeClass(fn.riskLevel))}>
@@ -515,6 +457,7 @@ export default function ComplexityResultPage() {
                     </td>
                     <td className="p-3 text-center">
                       <button
+                        title="View Analysis Details"
                         onClick={() => setActiveReasonId(activeReasonId === fn.id ? null : fn.id)}
                         className="btn-interactive inline-flex"
                       >
@@ -523,16 +466,16 @@ export default function ComplexityResultPage() {
                     </td>
                   </tr>
                   {activeReasonId === fn.id && (
-                    <tr className="border-t panel-muted" style={{ borderTopColor: 'hsl(var(--border))' }}>
+                    <tr className="border-t panel-muted">
                       <td colSpan={8} className="p-4">
                         <div className="space-y-2">
                           <div className="font-semibold text-sm">Analysis Details:</div>
-                          {fn.reasons.map((reason, i) => (
+                          {fn.reasons.map((reason: ComplexityReason, i: number) => (
                             <div key={i} className="p-3 panel rounded text-xs space-y-1">
                               <div className="font-semibold capitalize">
                                 {reason.pattern.replace(/-/g, " ")} · Line {reason.lineNumber}
                               </div>
-                              <div className="text-muted leading-relaxed">{reason.details}</div>
+                              <div className="text-muted leading-relaxed">{reason.detail}</div>
                               <div className="flex items-center gap-3 text-[10px] text-muted">
                                 <span>Impact: <span className="capitalize font-semibold">{reason.impact}</span></span>
                                 <span>Confidence: <span className="font-semibold">{reason.confidence}%</span></span>
