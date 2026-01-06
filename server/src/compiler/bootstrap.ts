@@ -2,11 +2,11 @@ import Compiler from "./compiler";
 import { CancelRunningTask } from './modules/cancelTask';
 import { GetCodeChanges } from "./modules/codeChange";
 import { GetComplexityGenerator } from "./modules/complexityGenerator";
-import { EnhancedComplexityGenerator_v1 } from "./modules/complexityGenerator_v1/enhanced_analyzer";
+import { ComplexityOrchestrator_v1 } from "./modules/complexityGenerator_v1/calculator_orchestrator";
 import { GetUnitPartOfCode } from "./modules/fetchPartOfCode";
 
 export function createCompiler() {
-  const complexityEngineGenerator = new EnhancedComplexityGenerator_v1()
+  const complexityEngineGenerator = new ComplexityOrchestrator_v1()
 
 
 

@@ -1,14 +1,14 @@
-import { EnhancedComplexityGenerator_v1 } from "./complexityGenerator_v1/enhanced_analyzer";
-import { FilePayload } from "./complexityOrchestrator/complexityOrchestratorInterface";
-import { ErrorBoundary } from "./complexityOrchestrator/ErrorBoundary";
-import { PayloadNormalizer } from "./complexityOrchestrator/payloadNormalizer";
-import { TierRunner } from "./complexityOrchestrator/tierRunner";
+import { ComplexityOrchestrator_v1 } from "./complexityGenerator_v1/calculator_orchestrator";
+import { FilePayload } from "./complexityOrchestratorHelpers/complexityOrchestratorInterface";
+import { ErrorBoundary } from "./complexityOrchestratorHelpers/ErrorBoundary";
+import { PayloadNormalizer } from "./complexityOrchestratorHelpers/payloadNormalizer";
+import { TierRunner } from "./complexityOrchestratorHelpers/tierRunner";
 
 export class GetComplexityGenerator {
   private normalizer = new PayloadNormalizer();
   private tierRunner: TierRunner;
 
-  constructor(engine: EnhancedComplexityGenerator_v1) {
+  constructor(engine: ComplexityOrchestrator_v1) {
     this.tierRunner = new TierRunner(engine);
   }
 

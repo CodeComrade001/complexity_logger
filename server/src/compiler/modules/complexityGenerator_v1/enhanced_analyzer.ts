@@ -1,187 +1,24 @@
 import { Node, SyntaxKind } from "ts-morph";
-import { AnalysisSummary, ASTSignals, ComplexityClassification, ComplexityNotation, ComplexityReason, ComplexityResult, ComplexityScores, TierLevel, WEIGHTS } from "../../interfaces/complexityGeneratorInterface";
-import { ComplexityCalculator } from "./calculator";
+import {
+  ASTSignals,
+  ComplexityClassification,
+  ComplexityReason,
+  ComplexityScores,
+  WEIGHTS
+} from "../../interfaces/complexityGeneratorInterface";
 import { PaidTierReasonGenerator } from "./paidTierReason";
-import { FastAnalyzer } from "./fast_analyzer";
-import { dataSets } from "../../utils/datasets";
-import { normalizedPayloadData } from "../complexityOrchestrator/complexityOrchestratorInterface";
-import { fetchUnitPartOfCodeArrayTargets } from "../../interfaces/fetchUnitPartOfCodeProps";
+import { ComplexityCalculator } from "./calculator";
 
-// ========================================
-// TYPES
-// ========================================
-
-type UnitTarget = fetchUnitPartOfCodeArrayTargets;
-
-export class EnhancedComplexityGenerator_v1 {
-  private keywordSet: Set<string>;
-
-  constructor() {
-    this.keywordSet = this.buildKeywordSet();
-  }
-
-  // ========================================
-  // PUBLIC API - TIER SELECTION
-  // ========================================
-
-
-
-  /**
-   * BACKWARD COMPATIBLE - matches your original execute() method
-   * Defaults to DEEP analysis for paid tier
-   */
-  public async executePaidTier(fetchPartOfCodeResult: normalizedPayloadData): Promise<AnalysisSummary> {
-    return this.analyzeDeep(fetchPartOfCodeResult);
-  }
-
-  /**
-   * BACKWARD COMPATIBLE - matches your original execute() method
-   * Defaults to fast analysis for free tier
-   */
-  public async executeFreeTier(fetchPartOfCodeResult: normalizedPayloadData): Promise<AnalysisSummary> {
-    return this.analyzeFast(fetchPartOfCodeResult);
-  }
-
-  // ========================================
-  // TIER-SPECIFIC ANALYSIS
-  // ========================================
-
-  /**
-   * Analyze with FREE tier (fast, regex-based)
-   * Accuracy: 70-80%, Speed: <100ms
-   */
-  private async analyzeFast(
-    fetchPartOfCodeResult: normalizedPayloadData
-  ): Promise<AnalysisSummary> {
-    const resultsByUnit = this.processUnits(
-      fetchPartOfCodeResult,
-      (node, unitType, idx) => this.analyzeFastNode(node, unitType, `${unitType}_${idx}`)
-    );
-
-    return this.buildSummary(
-      fetchPartOfCodeResult.nameOfFile,
-      resultsByUnit,
-      "free"
-    );
-  }
-
-  /**
- * Analyze with PAID tier (deep, AST-based)
- * Accuracy: 95%+, Speed: <500ms
+/**
+ * Enhanced (Paid Tier) AST-based analysis logic
+ * Extracted for modularity
  */
-  private async analyzeDeep(
-    fetchPartOfCodeResult: normalizedPayloadData
-  ): Promise<AnalysisSummary> {
-    const resultsByUnit = this.processUnits(
-      fetchPartOfCodeResult,
-      (node, unitType, idx) => this.analyzeDeepNode(node, unitType, `${unitType}_${idx}`)
-    );
-
-    return this.buildSummary(
-      fetchPartOfCodeResult.nameOfFile,
-      resultsByUnit,
-      "paid"
-    );
-  }
-
-
-  // ========================================
-  // DEEP ANALYSIS (PAID TIER)
-  // ========================================
-
-  // ========================================
-  // FAST ANALYSIS (FREE TIER)
-  // ========================================
-
-  private analyzeFastNode(
-    node: any,
-    kind: fetchUnitPartOfCodeArrayTargets,
-    nameHint?: string
-  ): ComplexityResult {
-    const name = this.extractNodeName(node, nameHint);
-    const startLine = this.getStartLine(node);
-    const endLine = this.getEndLine(node);
-    const text = this.extractNodeText(node);
-
-    // Use FastAnalyzer for regex-based analysis
-    const fastResult = FastAnalyzer.analyze(text, name || "", startLine);
-
-    // Simple keyword matching for additional signals
-    const matchedKeywords = this.findKeywordMatches(text);
-
-    return {
-      id: `${name || "anon"}:${startLine}`,
-      kind,
-      name,
-      startLine,
-      endLine,
-      text,
-      timeComplexity: fastResult.timeComplexity!,
-      spaceComplexity: fastResult.spaceComplexity!,
-      timeScore: fastResult.timeScore!,
-      spaceScore: fastResult.spaceScore!,
-      totalScore: fastResult.totalScore!,
-      riskLevel: fastResult.riskLevel!,
-      confidence: fastResult.confidence!,
-      reasons: fastResult.reasons!,
-      matchedKeywords,
-      tierUsed: "free"
-    };
-  }
-
-  private analyzeDeepNode(
-    node: Node,
-    kind: fetchUnitPartOfCodeArrayTargets,
-    nameHint?: string
-  ): ComplexityResult {
-    const name = this.extractNodeName(node, nameHint);
-    const startLine = this.getStartLine(node);
-    const endLine = this.getEndLine(node);
-    const text = this.extractNodeText(node);
-
-    const reasons: ComplexityReason[] = [];
-
-    // Phase 1: Collect AST signals
-    const asyncWeight = this.detectAsyncPattern(node, startLine, reasons);
-    const signals = this.collectASTSignals(node, name, this.keywordSet);
-
-    // Phase 2: Calculate scores from signals
-    const scores = this.calculateScores(signals, asyncWeight, startLine, reasons);
-
-    // Phase 3: Classify complexity
-    const classification = this.classifyComplexity(signals, scores, reasons);
-
-    // Deduplicate keywords
-    const uniqueKeywords = Array.from(new Set(signals.matchedKeywords)) as string[];
-
-    return {
-      id: `${name || "anon"}:${startLine}`,
-      kind,
-      name,
-      startLine,
-      endLine,
-      text,
-      timeComplexity: classification.timeComplexity,
-      spaceComplexity: classification.spaceComplexity,
-      timeScore: Math.round(scores.timeScore),
-      spaceScore: Math.round(scores.spaceScore),
-      totalScore: scores.totalScore,
-      riskLevel: classification.riskLevel,
-      confidence: classification.confidence,
-      reasons,
-      matchedKeywords: uniqueKeywords,
-      tierUsed: "paid"
-    };
-  }
-
-  // ========================================
-  // PHASE 1: AST SIGNAL COLLECTION
-  // ========================================
+export class EnhancedAnalyzer {
 
   /**
    * Collects all complexity signals from AST traversal
    */
-  private collectASTSignals(
+  static collectASTSignals(
     node: Node,
     functionName: string | null,
     keywordSet: Set<string>
@@ -263,12 +100,10 @@ export class EnhancedComplexityGenerator_v1 {
     return signals;
   }
 
-
-
   /**
    * Analyzes call expressions for complexity patterns
    */
-  private analyzeCallExpression(
+  private static analyzeCallExpression(
     node: Node,
     functionName: string | null,
     currentLoopDepth: number,
@@ -311,7 +146,7 @@ export class EnhancedComplexityGenerator_v1 {
   /**
    * Detects async pattern and returns weight
    */
-  private detectAsyncPattern(node: Node, startLine: number, reasons: ComplexityReason[]): number {
+  static detectAsyncPattern(node: Node, startLine: number, reasons: ComplexityReason[]): number {
     const isAsync = (node as any).isAsync ? (node as any).isAsync() : false;
 
     if (isAsync) {
@@ -329,14 +164,10 @@ export class EnhancedComplexityGenerator_v1 {
     return 0;
   }
 
-  // ========================================
-  // PHASE 2: SCORING LOGIC
-  // ========================================
-
   /**
    * Calculates time and space scores from collected signals
    */
-  private calculateScores(
+  static calculateScores(
     signals: ASTSignals,
     asyncWeight: number,
     startLine: number,
@@ -359,7 +190,7 @@ export class EnhancedComplexityGenerator_v1 {
   /**
    * Calculates time complexity score
    */
-  private calculateTimeScore(
+  private static calculateTimeScore(
     signals: ASTSignals,
     startLine: number,
     reasons: ComplexityReason[]
@@ -395,7 +226,7 @@ export class EnhancedComplexityGenerator_v1 {
       }));
     }
 
-    // Binary recursion scoring (already added in signal collection phase)
+    // Binary recursion scoring
     if (signals.isBinaryRecursion) {
       score += WEIGHTS.BINARY_RECURSION;
     }
@@ -424,7 +255,7 @@ export class EnhancedComplexityGenerator_v1 {
   /**
    * Calculates space complexity score
    */
-  private calculateSpaceScore(
+  private static calculateSpaceScore(
     signals: ASTSignals,
     startLine: number,
     reasons: ComplexityReason[]
@@ -456,15 +287,55 @@ export class EnhancedComplexityGenerator_v1 {
   }
 
   // ========================================
-  // PHASE 3: CLASSIFICATION LOGIC
+  // HELPER METHODS
   // ========================================
 
   /**
-   * Classifies complexity based on signals and scores
+   * Traverses node body or node itself
    */
-  private classifyComplexity(
-    signals: ASTSignals,
-    scores: ComplexityScores,
+  private static traverseNodeBody(node: Node, visitor: (n: Node) => void): void {
+    try {
+      const body = (node as any).getBody ? (node as any).getBody() : null;
+      if (body && body.forEachChild) {
+        body.forEachChild(visitor);
+      } else {
+        node.forEachChild(visitor);
+      }
+    } catch (err) {
+      console.error("AST traversal error:", err);
+    }
+  }
+
+  /**
+   * Checks if node is a loop construct
+   */
+  private static isLoopNode(kind: SyntaxKind): boolean {
+    return (
+      kind === SyntaxKind.ForStatement ||
+      kind === SyntaxKind.ForOfStatement ||
+      kind === SyntaxKind.ForInStatement ||
+      kind === SyntaxKind.WhileStatement ||
+      kind === SyntaxKind.DoStatement
+    );
+  }
+
+  /**
+   * Checks if property is an accumulation method
+   */
+  private static isAccumulationMethod(propText: string): boolean {
+    return (
+      propText.endsWith(".push") ||
+      propText.endsWith(".concat") ||
+      propText.endsWith(".unshift")
+    );
+  }
+  // ========================================
+  // CLASSIFICATION LOGIC
+  // ========================================
+
+  static classifyComplexity(
+    signals: any,
+    scores: any,
     reasons: ComplexityReason[]
   ): ComplexityClassification {
     const timeComplexityResult = ComplexityCalculator.calculateTimeComplexity(
@@ -494,220 +365,4 @@ export class EnhancedComplexityGenerator_v1 {
     };
   }
 
-
-  // ========================================
-  // HELPER METHODS
-  // ========================================
-
-  /**
-   * Builds keyword set from datasets
-   */
-  private buildKeywordSet(): Set<string> {
-    return new Set([
-      ...dataSets.loops,
-      ...dataSets.nestedLoopSignals,
-      ...dataSets.recursion,
-      ...dataSets.divideAndConquer,
-      ...dataSets.dataIteration,
-      ...dataSets.expensiveBuiltins,
-      ...dataSets.memoryAllocations,
-      ...dataSets.temporaryStructures,
-      ...dataSets.recursionSpace,
-      ...dataSets.dataDuplication,
-      ...dataSets.branches,
-      ...dataSets.inputDependent,
-      ...dataSets.directCodePatterns,
-      ...dataSets.hiddenCostOps,
-      ...dataSets.spaceImpactOps,
-      ...dataSets.algorithmicFactors,
-      ...dataSets.inputFactors,
-      ...dataSets.runtimeFactors,
-      ...dataSets.architectureFactors,
-      ...dataSets.languageSpecific
-    ]);
-  }
-
-  /**
-   * Processes all units with provided analysis function
-   */
-  private processUnits(
-    fetchPartOfCodeResult: normalizedPayloadData,
-    analyzeNode: (node: any, unitType: UnitTarget, idx: number) => ComplexityResult
-  ): Record<UnitTarget, any[]> {
-    const resultsByUnit: Record<UnitTarget, any[]> = {} as any;
-
-    for (const [unitType, nodes] of Object.entries(fetchPartOfCodeResult)) {
-      if (unitType === "nameOfFile") continue;
-
-      const typedUnit = unitType as UnitTarget;
-      resultsByUnit[typedUnit] = this.ensureArray(nodes).map((node: any, idx: number) =>
-        analyzeNode(node, typedUnit, idx)
-      );
-    }
-
-    return resultsByUnit;
-  }
-
-  /**
-   * Traverses node body or node itself
-   */
-  private traverseNodeBody(node: Node, visitor: (n: Node) => void): void {
-    try {
-      const body = (node as any).getBody ? (node as any).getBody() : null;
-      if (body && body.forEachChild) {
-        body.forEachChild(visitor);
-      } else {
-        node.forEachChild(visitor);
-      }
-    } catch (err) {
-      console.error("AST traversal error:", err);
-    }
-  }
-
-  /**
-   * Checks if node is a loop construct
-   */
-  private isLoopNode(kind: SyntaxKind): boolean {
-    return (
-      kind === SyntaxKind.ForStatement ||
-      kind === SyntaxKind.ForOfStatement ||
-      kind === SyntaxKind.ForInStatement ||
-      kind === SyntaxKind.WhileStatement ||
-      kind === SyntaxKind.DoStatement
-    );
-  }
-
-  /**
-   * Checks if property is an accumulation method
-   */
-  private isAccumulationMethod(propText: string): boolean {
-    return (
-      propText.endsWith(".push") ||
-      propText.endsWith(".concat") ||
-      propText.endsWith(".unshift")
-    );
-  }
-
-  /**
-   * Extracts node name
-   */
-  private extractNodeName(node: any, nameHint?: string): string | null {
-    return nameHint || (node.getName ? node.getName() : null);
-  }
-
-  /**
-   * Extracts node text
-   */
-  private extractNodeText(node: any): string {
-    return node.getText ? node.getText() : (node.text || "");
-  }
-
-  /**
-   * Gets start line number
-   */
-  private getStartLine(node: Node): number {
-    try {
-      return (node as any).getStartLineNumber ? (node as any).getStartLineNumber() : 0;
-    } catch {
-      return 0;
-    }
-  }
-
-  /**
-   * Gets end line number
-   */
-  private getEndLine(node: Node): number {
-    try {
-      return (node as any).getEndLineNumber ? (node as any).getEndLineNumber() : 0;
-    } catch {
-      return 0;
-    }
-  }
-
-  /**
-   * Ensures input is an array
-   */
-  private ensureArray(x: any): any[] {
-    if (!x) return [];
-    if (Array.isArray(x)) return x;
-    return [x];
-  }
-
-  /**
-   * Finds keyword matches in text
-   */
-  private findKeywordMatches(text: string): string[] {
-    const tokens = text.split(/[^A-Za-z0-9_$\.]+/).filter(Boolean);
-    return tokens.filter(t => this.keywordSet.has(t));
-  }
-
-  /**
-   * Builds analysis summary
-   */
-  private buildSummary(
-    fileName: string,
-    allCodeUnitResult: Record<UnitTarget, any[]>,
-    tier: TierLevel
-  ): AnalysisSummary {
-    // Flatten all executable unit results
-    const all = Object.values(allCodeUnitResult).flat();
-
-    const totalScore = all.reduce((s, it) => s + it.totalScore, 0);
-    const avgScore = all.length ? Math.round(totalScore / all.length) : 0;
-
-    const criticalRisk = all.filter(a => a.riskLevel === "CRITICAL");
-    const highRisk = all.filter(a => a.riskLevel === "HIGH");
-    const mediumRisk = all.filter(a => a.riskLevel === "MEDIUM");
-
-    const avgTimeComplexity = this.calculateAverageComplexity(
-      all.map(a => a.timeComplexity)
-    );
-
-    const avgSpaceComplexity = this.calculateAverageComplexity(
-      all.map(a => a.spaceComplexity)
-    );
-
-    return {
-      nameOfFile: fileName,
-      success: true,
-      generatedAt: new Date().toISOString(),
-      tierUsed: tier,
-      summary: {
-        itemsAnalyzed: all.length,
-        totalScore,
-        avgScore,
-        avgTimeComplexity,
-        avgSpaceComplexity,
-        criticalRiskCount: criticalRisk.length,
-        highRiskCount: highRisk.length,
-        mediumRiskCount: mediumRisk.length,
-        lowRiskCount:
-          all.length -
-          criticalRisk.length -
-          highRisk.length -
-          mediumRisk.length
-      },
-      details: allCodeUnitResult
-    };
-  }
-
-  /**
-   * Calculates average complexity notation
-   */
-  private calculateAverageComplexity(complexities: ComplexityNotation[]): string {
-    if (complexities.length === 0) return "O(1)";
-
-    // Find the highest complexity in the set
-    const complexityOrder: ComplexityNotation[] = [
-      "O(1)", "O(log n)", "O(n)", "O(n log n)", "O(n^k)", "O(2^n)", "UNKNOWN"
-    ];
-
-    let maxIndex = 0;
-    for (const c of complexities) {
-      const index = complexityOrder.indexOf(c);
-      if (index > maxIndex) maxIndex = index;
-    }
-
-    return complexityOrder[maxIndex];
-  }
 }
