@@ -1,8 +1,9 @@
 import { FileUploadModel } from "../module/model/fileInterface";
+import { COMPLEXITYGENERATORMAXFILES } from "./interfaces/fetchUnitPartOfCodeProps";
 import { CancelRunningTask } from "./modules/cancelTask";
 import { GetCodeChanges } from "./modules/codeChange";
 import { GetComplexityGenerator } from "./modules/complexityGenerator";
-import { CodeParts } from "./modules/complexityOrchestrator/complexityOrchestratorInterface";
+import { CodeParts } from "./modules/complexityOrchestratorHelpers/complexityOrchestratorInterface";
 import { GetUnitPartOfCode } from "./modules/fetchPartOfCode";
 
 export type ComplexityGeneratorPayload = Record<string, CodeParts>;
@@ -40,14 +41,14 @@ export default class Compiler {
         "handlers",
         "staticBlocks",
         "topLevelStatements"
-      ] 
+      ]
     }, allFilesToAnalyze);
     return fetchedPart;
   }
 
   private async complexityGenerator(
     payload: ComplexityGeneratorPayload,
-    concurrency = 100
+    concurrency = COMPLEXITYGENERATORMAXFILES
   ) {
     const entries = Object.entries(payload);
 
@@ -71,13 +72,13 @@ export default class Compiler {
 
 
 
-  private async _codeChange() {
-    return this.getIfCodeChange.hasCodeChanged("", "");
-  }
+  // private async _codeChange() {
+  //   return this.getIfCodeChange.hasCodeChanged("", "");
+  // }
 
-  private async _cancelFileTask() {
-    return this.cancelRunningTask.pause();
-  }
+  // private async _cancelFileTask() {
+  //   return this.cancelRunningTask.pause();
+  // }
 
 
   public async execute(allFilesToAnalyze: FileUploadModel[]) {

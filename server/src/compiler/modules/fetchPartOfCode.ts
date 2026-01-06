@@ -1,5 +1,5 @@
 import { Project } from "ts-morph";
-import { FetchUnitPartOfCodeProps } from "../interfaces/fetchUnitPartOfCodeProps";
+import { BATCHSIZEVALUES, FetchUnitPartOfCodeProps } from "../interfaces/fetchUnitPartOfCodeProps";
 import { extractors } from "../utils/extractor";
 import { FileUploadModel } from "../../module/model/fileInterface";
 
@@ -14,7 +14,7 @@ export class GetUnitPartOfCode {
   public async extract(
     props: FetchUnitPartOfCodeProps,
     files: FileUploadModel[],
-    batchSize = 20
+    batchSize = BATCHSIZEVALUES
   ) {
     const results: Record<string, any> = {};
 
