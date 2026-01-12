@@ -2,7 +2,7 @@ import { parentPort } from "worker_threads";
 import { Job, JobResult } from "./worker_types/workerTypes";
 import { saveResult } from "../utils/fileStorage";
 import { FilePayload, normalizedPayloadData } from "../../compiler/modules/complexityOrchestratorHelpers/complexityOrchestratorInterface";
-import { ComplexityOrchestrator_v1 } from "../../compiler/modules/complexityGenerator_v1/calculator_orchestrator";
+import { ComplexityOrchestrator_v1 } from "../../compiler/modules/complexityGenerator_v1/complexity_orchestrator";
 import { PayloadNormalizer } from "../../compiler/modules/complexityOrchestratorHelpers/payloadNormalizer";
 import { GetUnitPartOfCode } from "../../compiler/modules/fetchPartOfCode";
 import { FetchUnitPartOfCodeProps } from "../../compiler/interfaces/fetchUnitPartOfCodeProps";

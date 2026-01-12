@@ -1,4 +1,4 @@
-import { ComplexityOrchestrator_v1 } from "./complexityGenerator_v1/calculator_orchestrator";
+import { ComplexityOrchestrator_v1 } from "./complexityGenerator_v1/complexity_orchestrator";
 import { FilePayload } from "./complexityOrchestratorHelpers/complexityOrchestratorInterface";
 import { ErrorBoundary } from "./complexityOrchestratorHelpers/ErrorBoundary";
 import { PayloadNormalizer } from "./complexityOrchestratorHelpers/payloadNormalizer";
@@ -24,15 +24,15 @@ export class GetComplexityGenerator {
         return { success: false, message: "No analyzable code found" };
       }
 
-      const freeReport = await this.tierRunner.runFree(normalized);
+      // const freeReport = await this.tierRunner.runFree(normalized);
       const paidReport = await this.tierRunner.runPaid(normalized);
 
       return {
         success: true,
         message: "Complexity analysis complete",
         data: {
-          freeComplexityReport: freeReport,
-          paidComplexityReport: paidReport,
+          freeComplexityReport: paidReport
+          // paidComplexityReport: paidReport,
         },
       };
     } catch (error) {

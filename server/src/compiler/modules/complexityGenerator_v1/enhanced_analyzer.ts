@@ -198,21 +198,33 @@ export class EnhancedAnalyzer {
     let score = 0;
 
     // Loop scoring
-    if (signals.maxLoopDepth === 1) {
-      score += WEIGHTS.LOOP;
-      reasons.push(PaidTierReasonGenerator.generateTimeReason("single-loop", {
-        lineNumber: startLine
-      }));
-    } else if (signals.maxLoopDepth > 1) {
-      score += WEIGHTS.LOOP;
-      const nestedPenalty = (signals.maxLoopDepth - 1) * WEIGHTS.NESTED_LOOP_FACTOR;
-      score += nestedPenalty;
+    const depth = signals.maxLoopDepth;
 
-      const pattern = signals.maxLoopDepth === 2 ? "nested-loop-2" : "nested-loop-3";
-      reasons.push(PaidTierReasonGenerator.generateTimeReason(pattern, {
-        loopDepth: signals.maxLoopDepth,
-        lineNumber: startLine
-      }));
+    // Base cost: any loop present
+    if (depth >= 1) {
+      score += WEIGHTS.LOOP;
+
+      // Nested loop penalty grows with depth
+      if (depth > 1) {
+        score += (depth - 1) * WEIGHTS.NESTED_LOOP_FACTOR;
+      }
+
+      // Reason selection
+      const reasonKey =
+        depth === 1
+          ? "single-loop"
+          : depth === 2
+            ? "nested-loop-2"
+            : depth === 3
+              ? "nested-loop-3"
+              : "many-loops";
+
+      reasons.push(
+        PaidTierReasonGenerator.generateTimeReason(reasonKey, {
+          loopDepth: depth,
+          lineNumber: startLine,
+        })
+      );
     }
 
     // Recursion scoring

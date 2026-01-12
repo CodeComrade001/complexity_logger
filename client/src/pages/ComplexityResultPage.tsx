@@ -30,7 +30,7 @@ export default function ComplexityResultPage() {
   // ============================================================================
   const allFunctions: UIFunction[] = fileComplexityResult.flatMap(payload => {
     // Navigate API structure: payload.data.freeComplexityReport
-    if (!payload.data?.paidComplexityReport) return [];
+    if (!payload.data?.freeComplexityReport) return [];
 
     const report = payload.data.freeComplexityReport;
     const fileName = report.nameOfFile;
@@ -293,10 +293,10 @@ export default function ComplexityResultPage() {
 
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="px-2 py-0.5 text-xs font-mono border rounded">
-                    T: {fn.timeComplexity.notation}
+                    Time: {fn.timeComplexity.notation}
                   </span>
                   <span className="px-2 py-0.5 text-xs font-mono border rounded">
-                    S: {fn.spaceComplexity.notation}
+                    Space: {fn.spaceComplexity.notation}
                   </span>
                   <span className="px-2 py-0.5 text-xs border rounded">
                     Score: {fn.totalScore}
@@ -379,10 +379,10 @@ export default function ComplexityResultPage() {
 
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-xs font-mono px-2 py-0.5 border rounded">
-                        {fn.timeComplexity.notation}
+                        Time : {fn.timeComplexity.notation}
                       </span>
                       <span className="text-xs font-mono px-2 py-0.5 border rounded">
-                        {fn.spaceComplexity.notation}
+                        Space: {fn.spaceComplexity.notation}
                       </span>
                       <span className="text-xs px-2 py-0.5 border rounded">
                         Score: {fn.totalScore}

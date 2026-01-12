@@ -1,4 +1,4 @@
-import { ComplexityOrchestrator_v1 } from "../complexityGenerator_v1/calculator_orchestrator";
+import { ComplexityOrchestrator_v1 } from "../complexityGenerator_v1/complexity_orchestrator";
 import { normalizedPayloadData } from "./complexityOrchestratorInterface";
 
 export class TierRunner {
@@ -12,6 +12,6 @@ export class TierRunner {
 
   async runPaid(data: normalizedPayloadData) {
     // placeholder – different logic later
-    return this.engine.executeFreeTier(data);
+    return this.engine.executePaidTier(data);
   }
 }

@@ -15,7 +15,7 @@ export type ComplexityNotation =
 
 export type UnitTarget = fetchUnitPartOfCodeArrayTargets;
 export type Uppercase_RiskLevelType = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
-export type Lowercase_RiskLevelType = "low" | "medium" | "high" | "critical";
+export type Lowercase_RiskLevelType = "low" | "medium" | "high" | "critical" | "unknown";
 // Signal collection results from AST traversal
 export interface ASTSignals {
   maxLoopDepth: number;
@@ -46,7 +46,7 @@ export interface ComplexityClassification {
 
 
 export interface ComplexityReason {
-  type: "time" | "space";
+  type: "time" | "space" | "unknown";
   pattern: string;
   detail: string;
   impact: Lowercase_RiskLevelType;
@@ -110,7 +110,7 @@ export interface ComplexityPattern {
   time: ComplexityNotation;
   space: ComplexityNotation;
   reason: string;
-  category: "loop" | "recursion" | "builtin" | "allocation" | "nested";
+  category: "loop" | "recursion" | "builtin" | "allocation" | "nested" | "unclassified";
 }
 
 export interface CalculatorComplexityResult {
@@ -143,6 +143,13 @@ export const COMPLEXITY_PATTERNS_FREE: Record<string, ComplexityPattern> = {
     space: "O(1)",
     reason: "Loop inside another loop",
     category: "nested"
+  },
+
+  "many-loops": {
+    time: "UNKNOWN",
+    space: "UNKNOWN",
+    reason: "Multiple loop constructs detected with variable nesting depth",
+    category: "unclassified"
   },
 
   "nested-loop-3": {
@@ -260,6 +267,12 @@ export const COMPLEXITY_PATTERNS_PAID: Record<string, ComplexityPattern> = {
     space: "O(1)",
     reason: "O(n³) time: Each nesting level multiplies again - 100 items = 1 million operations! This is very slow for large inputs.\nO(1) space: Memory usage stays constant.\n\nCubic complexity from three-level nesting. Each nesting level multiplies iteration count: n × n × n = n³ operations. Typically seen in naive matrix multiplication, triple-sum problems, or three-way comparisons. Performance degrades rapidly—1000 elements = 1 billion operations. Constant space assumes no auxiliary data structures scale with n.",
     category: "nested"
+  },
+  "many-loops": {
+    time: "UNKNOWN",  // FIXED
+    space: "UNKNOWN",
+    reason: "Multiple loop constructs detected with variable nesting depth",
+    category: "unclassified"
   },
 
   "sort": {
