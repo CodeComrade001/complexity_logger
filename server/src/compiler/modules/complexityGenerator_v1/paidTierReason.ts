@@ -37,12 +37,29 @@ export class PaidTierReasonGenerator {
     let confidence = 70;
     let impact: ComplexityReason["impact"] = "medium";
 
-    // Advanced context analysis with optimization guidance
-    if (context.loopDepth && context.loopDepth > 1) {
-      const ops = Math.pow(10, context.loopDepth);
-      detail += ` ⚠️ Detected ${context.loopDepth}-level nesting: execution grows as O(n^${context.loopDepth}). For n=1000, expect ~${ops.toExponential(1)} operations. Consider: (1) breaking into separate passes, (2) hash-based lookups to eliminate inner loops, (3) spatial data structures (quad-trees, k-d trees) for geometric queries.`;
-      confidence = 85;
-      impact = context.loopDepth >= 3 ? "critical" : "high";
+
+
+    if (context.loopDepth) {
+      if (context.loopDepth === 1) {
+        confidence = 85;
+        impact = "low";
+      }
+
+      if (context.loopDepth === 2) {
+        confidence = 85;
+        impact = "medium";
+      }
+
+      if (context.loopDepth === 3) {
+        confidence = 85;
+        impact = "high";
+      }
+
+      if (context.loopDepth > 3) {
+        confidence = 85;
+        impact = "critical";
+      }
+
     }
 
     if (context.callName) {

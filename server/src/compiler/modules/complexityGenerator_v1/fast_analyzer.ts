@@ -59,22 +59,39 @@ export class FastAnalyzer {
     // ===================
 
     // Pattern 1: Nested loops (most critical for time)
-    if (nestingDepth >= 2) {
-      const nestedLoopScore = Math.pow(nestingDepth, 2) * WEIGHTS.NESTED_LOOP_FACTOR;
+    // 1. Loop structure scoring
+    if (nestingDepth > 1) {
+      const nestedLoopScore =
+        Math.pow(nestingDepth, 2) * WEIGHTS.NESTED_LOOP_FACTOR;
+
       timeScore += nestedLoopScore;
 
-      const patternKey = nestingDepth === 2 ? "nested-loop-2" : "nested-loop-3";
-      reasons.push(FreeTierReasonGenerator.generateTimeReason(patternKey, {
-        loopDepth: nestingDepth,
-        lineNumber: startLine
-      }));
-
+      reasons.push(
+        FreeTierReasonGenerator.generateTimeReason(
+          `nested-loop-${Math.min(nestingDepth, 3)}`,
+          {
+            loopDepth: nestingDepth,
+            lineNumber: startLine,
+          }
+        )
+      );
     } else if (totalLoops > 0) {
-      // Single loop - O(n)
+      // Multiple independent loops → O(k·n)
       timeScore += totalLoops * WEIGHTS.LOOP;
-      reasons.push(FreeTierReasonGenerator.generateTimeReason("single-loop", {
-        lineNumber: startLine
-      }));
+
+      const pattern =
+        totalLoops === 1
+          ? "single-loop"
+          : totalLoops <= 3
+            ? "many-loops"
+            : "excessive-loops";
+
+      reasons.push(
+        FreeTierReasonGenerator.generateTimeReason(pattern, {
+          loopDepth: totalLoops,
+          lineNumber: startLine,
+        })
+      );
     }
 
     // Pattern 2: Linear search in loops (hidden O(n²))
