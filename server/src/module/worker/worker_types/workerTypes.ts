@@ -1,4 +1,6 @@
-export type JobTask = "freeTierAnalysis" | "paidTierAnalysis" | "payloadNormalizer" | "ExtractUnitPartOfCode";
+import { ComplexityNotation } from "../../../compiler/interfaces/complexityGeneratorInterface";
+
+export type JobTask = "freeTierAnalysis" | "paidTierAnalysis" | "payloadNormalizer" | "ExtractUnitPartOfCode" | "AIReasoning" | "TimeComplexityGenerator" | "SpaceComplexityGenerator";
 
 export interface Job {
   id: string | number;
@@ -12,3 +14,4 @@ export interface JobResult {
   result: any;
   note?: string;
 }
+

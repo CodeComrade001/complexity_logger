@@ -3,7 +3,7 @@
 // Detailed explanations that are easy to understand
 // ============================================================================
 
-import { COMPLEXITY_PATTERNS_FREE, ComplexityReason } from "../../interfaces/complexityGeneratorInterface";
+import { COMPLEXITY_PATTERNS_FREE, ComplexityReason } from "../../../interfaces/complexityGeneratorInterface";
 
 export class FreeTierReasonGenerator {
 

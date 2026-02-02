@@ -4,10 +4,11 @@ import {
   ComplexityNotation,
   ComplexityReason,
   ComplexityResult,
+  PaidComplexityReason,
   TierLevel
 } from "../../interfaces/complexityGeneratorInterface";
-import { FastAnalyzer } from "./fast_analyzer";
-import { EnhancedAnalyzer } from "./enhanced_analyzer";
+import { FastAnalyzer } from "./freeTierResources/fast_analyzer";
+import { EnhancedAnalyzer } from "./paidTierResources/enhanced_analyzer";
 import { dataSets } from "../../utils/datasets";
 import { normalizedPayloadData } from "../complexityOrchestratorHelpers/complexityOrchestratorInterface";
 import { fetchUnitPartOfCodeArrayTargets } from "../../interfaces/fetchUnitPartOfCodeProps";
@@ -57,7 +58,7 @@ export class ComplexityOrchestrator_v1 {
   ): Promise<AnalysisSummary> {
     const resultsByUnit = this.processUnits(
       fetchPartOfCodeResult,
-      (node, unitType, idx) => this.analyzeDeepNode(node, unitType, `${unitType}_${idx}`)
+      async (node, unitType, idx) => await this.analyzeDeepNode(node, unitType, `${unitType}_${idx}`)
     );
 
     return this.buildSummary(
@@ -71,11 +72,11 @@ export class ComplexityOrchestrator_v1 {
   // FAST ANALYSIS (FREE TIER)
   // ========================================
 
-  private analyzeFastNode(
+  private async analyzeFastNode(
     node: any,
     kind: fetchUnitPartOfCodeArrayTargets,
     nameHint?: string
-  ): ComplexityResult {
+  ): Promise<ComplexityResult> {
     const name = this.extractNodeName(node, nameHint);
     const startLine = this.getStartLine(node);
     const endLine = this.getEndLine(node);
@@ -108,29 +109,33 @@ export class ComplexityOrchestrator_v1 {
   // DEEP ANALYSIS (PAID TIER)
   // ========================================
 
-  private analyzeDeepNode(
+  private async analyzeDeepNode(
     node: Node,
     kind: fetchUnitPartOfCodeArrayTargets,
     nameHint?: string
-  ): ComplexityResult {
+  ): Promise<ComplexityResult> {
     const name = this.extractNodeName(node, nameHint);
     const startLine = this.getStartLine(node);
     const endLine = this.getEndLine(node);
     const text = this.extractNodeText(node);
 
-    const reasons: ComplexityReason[] = [];
+    const reasons: PaidComplexityReason[] = [];
 
     // Phase 1: Collect AST signals using EnhancedAnalyzer
     const asyncWeight = EnhancedAnalyzer.detectAsyncPattern(node, startLine, reasons);
     const signals = EnhancedAnalyzer.collectASTSignals(node, name, this.keywordSet);
 
     // Phase 2: Calculate scores from signals
-    const scores = EnhancedAnalyzer.calculateScores(signals, asyncWeight, startLine, reasons);
+    const scores = EnhancedAnalyzer.calculateScores(signals, asyncWeight, startLine);
 
     // Phase 3: Classify complexity
-    const classification = EnhancedAnalyzer.classifyComplexity(signals, scores, reasons);
+    const classification = EnhancedAnalyzer.classifyComplexity(signals, scores);
 
     const uniqueKeywords = Array.from(new Set(signals.matchedKeywords)) as string[];
+    const aiReason = await EnhancedAnalyzer.generateAIReason(
+      classification,
+      signals)
+    reasons.push(aiReason);
 
     return {
       id: `${name || "anon"}:${startLine}`,
@@ -188,7 +193,7 @@ export class ComplexityOrchestrator_v1 {
 
   private processUnits(
     fetchPartOfCodeResult: normalizedPayloadData,
-    analyzeNode: (node: any, unitType: UnitTarget, idx: number) => ComplexityResult
+    analyzeNode: (node: any, unitType: UnitTarget, idx: number) => Promise<ComplexityResult>
   ): Record<UnitTarget, any[]> {
     const resultsByUnit: Record<UnitTarget, any[]> = {} as any;
 
@@ -196,8 +201,8 @@ export class ComplexityOrchestrator_v1 {
       if (unitType === "nameOfFile") continue;
 
       const typedUnit = unitType as UnitTarget;
-      resultsByUnit[typedUnit] = this.ensureArray(nodes).map((node: any, idx: number) =>
-        analyzeNode(node, typedUnit, idx)
+      resultsByUnit[typedUnit] = this.ensureArray(nodes).map(async (node: any, idx: number) =>
+        await analyzeNode(node, typedUnit, idx)
       );
     }
 

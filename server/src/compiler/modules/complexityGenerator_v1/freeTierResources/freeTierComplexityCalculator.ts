@@ -1,11 +1,12 @@
 
 // ============================================================================
-// COMPLEXITY CALCULATOR
+// FREE TIER COMPLEXITY CALCULATOR
 // ============================================================================
 
-import { CalculatorComplexityResult, ComplexityReason, RISK_THRESHOLDS, Uppercase_RiskLevelType } from "../../interfaces/complexityGeneratorInterface";
+import { CalculatorComplexityResult, ComplexityReason, RISK_THRESHOLDS, Uppercase_RiskLevelType } from "../../../interfaces/complexityGeneratorInterface";
 
-export class ComplexityCalculator {
+
+export class FreeTierComplexityCalculator {
 
   /**
    * TIME COMPLEXITY — heuristic upper-bound classification
@@ -90,7 +91,7 @@ export class ComplexityCalculator {
    * SPACE COMPLEXITY — conservative and honest
    */
   static calculateSpaceComplexity(
-    allocationsInLoop: number, hasRecursion: boolean, maxLoopDepth: number, hasDeepClone: boolean, hasAccumulation: boolean): CalculatorComplexityResult {
+    allocationsInLoop: number, hasRecursion: boolean, _maxLoopDepth: number, hasDeepClone: boolean, hasAccumulation: boolean): CalculatorComplexityResult {
 
     const flags: string[] = [];
     let confidence = 100;
