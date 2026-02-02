@@ -4,10 +4,11 @@ import {
   ComplexityClassification,
   ComplexityReason,
   ComplexityScores,
+  PaidComplexityReason,
   WEIGHTS
-} from "../../interfaces/complexityGeneratorInterface";
-import { PaidTierReasonGenerator } from "./paidTierReason";
-import { ComplexityCalculator } from "./calculator";
+} from "../../../interfaces/complexityGeneratorInterface";
+import { PaidTierComplexityCalculator } from "./paidTierComplexityCalculator";
+import { AIComplexityExplainer } from "./aI_ReasonGenerator";
 
 /**
  * Enhanced (Paid Tier) AST-based analysis logic
@@ -21,7 +22,7 @@ export class EnhancedAnalyzer {
   static collectASTSignals(
     node: Node,
     functionName: string | null,
-    keywordSet: Set<string>
+    keywordSet: Set<string>,
   ): ASTSignals {
     const signals: ASTSignals = {
       maxLoopDepth: 0,
@@ -41,14 +42,9 @@ export class EnhancedAnalyzer {
       const kind = n.getKind();
 
       // Loop detection and depth tracking
-      if (this.isLoopNode(kind)) {
-        currentLoopDepth++;
-        if (currentLoopDepth > signals.maxLoopDepth) {
-          signals.maxLoopDepth = currentLoopDepth;
-        }
-        n.forEachChild(visit);
-        currentLoopDepth--;
-        return;
+      if (this.isLoopNode(n)) {
+        currentLoopDepth = this.estimateLoopNestingDepth(n)
+        return currentLoopDepth;
       }
 
       // Call expression analysis
@@ -76,8 +72,7 @@ export class EnhancedAnalyzer {
 
       // Array mutation detection
       if (kind === SyntaxKind.PropertyAccessExpression) {
-        const propText = n.getText();
-        if (this.isAccumulationMethod(propText) && currentLoopDepth > 0) {
+        if (this.isAccumulationMethod(n) && currentLoopDepth > 0) {
           signals.hasAccumulation = true;
         }
       }
@@ -100,45 +95,161 @@ export class EnhancedAnalyzer {
     return signals;
   }
 
+  private static estimateLoopNestingDepth(node: Node): number {
+    let maxDepth = 0;
+
+    // Recursive function to walk the tree
+    const walk = (currentNode: Node, currentDepth: number) => {
+      // 1. Identify if this specific node is a loop construct
+      const isLoop = this.isLoopNode(currentNode);
+
+      // 2. If it's a loop, increment depth for this branch
+      const depthAtNode = isLoop ? currentDepth + 1 : currentDepth;
+      maxDepth = Math.max(maxDepth, depthAtNode);
+
+      // 3. Continue walking down to children
+      currentNode.forEachChild(child => walk(child, depthAtNode));
+    };
+
+    walk(node, 0);
+    return maxDepth;
+  }
+
+  /**
+   * Checks if node is a loop construct
+   */
+
+
+  private static isLoopNode(node: Node): boolean {
+    // Check for native syntax loops (for, while, do-while)
+    const loopKinds = [
+      SyntaxKind.ForStatement,
+      SyntaxKind.ForInStatement,
+      SyntaxKind.ForOfStatement,
+      SyntaxKind.WhileStatement,
+      SyntaxKind.DoStatement
+    ];
+
+    if (loopKinds.includes(node.getKind())) {
+      return true;
+    }
+
+    // Detect functional loops: array.forEach, .map, .filter, etc.
+    if (Node.isCallExpression(node)) {
+      const expression = node.getExpression();
+      if (Node.isPropertyAccessExpression(expression)) {
+        const methodName = expression.getName();
+        const functionalLoops = ['forEach', 'map', 'filter', 'reduce', 'some', 'every'];
+        return functionalLoops.includes(methodName);
+      }
+    }
+
+    return false;
+  }
+
+  // ========================================
+  // PHASE 4 — AI EXPLANATION (PAID ONLY)
+  // ========================================
+
+  static async generateAIReason(
+    classification: ComplexityClassification,
+    signals: ASTSignals
+  ): Promise<PaidComplexityReason> {
+    const ai = new AIComplexityExplainer();
+
+    const signalList = [
+      signals.maxLoopDepth > 1 && "nested loops",
+      signals.hasRecursion && "recursion",
+      signals.isBinaryRecursion && "binary recursion",
+      signals.hasSorting && "sorting",
+      signals.hasLinearSearch && "linear search",
+      signals.allocationsInLoop > 0 && "allocations in loops",
+      signals.hasDeepClone && "deep clone"
+    ].filter(Boolean) as string[];
+
+    const explanation = await ai.explainComplexity(
+      { time: classification.timeComplexity.notation, space: classification.spaceComplexity.notation },
+      signalList
+    );
+
+    return {
+      type: "time",
+      timeComplexity: classification.timeComplexity.notation,
+      spaceComplexity: classification.spaceComplexity.notation,
+      pattern: "ai-summary",
+      detail: explanation,
+      impact: classification.riskLevel.toLowerCase() as any,
+      confidence: classification.confidence
+    };
+  }
+
+
   /**
    * Analyzes call expressions for complexity patterns
    */
   private static analyzeCallExpression(
     node: Node,
     functionName: string | null,
-    currentLoopDepth: number,
+    _currentLoopDepth: number,
     signals: ASTSignals
   ): void {
-    const callText = (node as any).getExpression?.()?.getText?.() || "";
+    // Ensure we are actually dealing with a CallExpression
+    if (!Node.isCallExpression(node)) return;
 
-    // Array method detection
-    if (/\.(forEach|map|filter|reduce)$/.test(callText)) {
-      // Detected (scoring happens in Phase 2)
+    const expression = node.getExpression();
+    let methodName = "";
+
+    // Get the method name safely without text parsing
+    if (Node.isPropertyAccessExpression(expression)) {
+      methodName = expression.getName();
+    } else if (Node.isIdentifier(expression)) {
+      methodName = expression.getText();
     }
 
-    // Sorting detection
-    if (/\.sort$/.test(callText)) {
+    // 1. Array method & Logic detection
+    const arrayMethods = ["forEach", "map", "filter", "reduce"];
+    const searchMethods = ["includes", "indexOf", "find", "findIndex"];
+
+    if (arrayMethods.includes(methodName)) {
+      // Logic for Phase 2 scoring
+    }
+
+    if (methodName === "sort") {
       signals.hasSorting = true;
     }
 
-    // Linear search detection
-    if (/\.(includes|indexOf|find|findIndex)$/.test(callText)) {
+    if (searchMethods.includes(methodName)) {
       signals.hasLinearSearch = true;
     }
 
-    // JSON operations (deep clone detection)
-    if (callText.includes("JSON.stringify") || callText.includes("JSON.parse")) {
-      signals.hasDeepClone = true;
+    // 2. JSON operations (Checks for JSON.parse or JSON.stringify)
+    if (Node.isPropertyAccessExpression(expression)) {
+      const obj = expression.getExpression();
+      if (Node.isIdentifier(obj) && obj.getText() === "JSON") {
+        if (methodName === "parse" || methodName === "stringify") {
+          signals.hasDeepClone = true;
+        }
+      }
     }
 
-    // Recursion detection
-    if (functionName && node.getText().includes(`${functionName}(`)) {
+    // 3. Robust Recursion Detection
+    if (functionName && methodName === functionName) {
       signals.hasRecursion = true;
 
-      // Binary recursion check (two or more recursive calls)
-      const recursiveCalls = (node.getText().match(new RegExp(`${functionName}\\(`, "g")) || []).length;
-      if (recursiveCalls >= 2) {
-        signals.isBinaryRecursion = true;
+      // Check for Binary Recursion (count recursive calls within the same statement/expression)
+      // We look for descendants of the current node's parent that call the same function name
+      const parent = node.getParent();
+      if (parent) {
+        const recursiveCalls = parent
+          .getDescendantsOfKind(SyntaxKind.CallExpression)
+          .filter(c => {
+            const expr = c.getExpression();
+            return Node.isIdentifier(expr) && expr.getText() === functionName;
+          }).length;
+
+        if (recursiveCalls >= 2) {
+          signals.isBinaryRecursion = true;
+        }
       }
     }
   }
@@ -171,16 +282,15 @@ export class EnhancedAnalyzer {
     signals: ASTSignals,
     asyncWeight: number,
     startLine: number,
-    reasons: ComplexityReason[]
   ): ComplexityScores {
     let timeScore = asyncWeight;
     let spaceScore = 0;
 
     // Time scoring
-    timeScore += this.calculateTimeScore(signals, startLine, reasons);
+    timeScore += this.calculateTimeScore(signals, startLine);
 
     // Space scoring
-    spaceScore += this.calculateSpaceScore(signals, startLine, reasons);
+    spaceScore += this.calculateSpaceScore(signals, startLine);
 
     const totalScore = Math.round(timeScore + spaceScore);
 
@@ -193,7 +303,6 @@ export class EnhancedAnalyzer {
   private static calculateTimeScore(
     signals: ASTSignals,
     startLine: number,
-    reasons: ComplexityReason[]
   ): number {
     let score = 0;
 
@@ -209,33 +318,12 @@ export class EnhancedAnalyzer {
         score += (depth - 1) * WEIGHTS.NESTED_LOOP_FACTOR;
       }
 
-      // Reason selection
-      const reasonKey =
-        depth === 1
-          ? "single-loop"
-          : depth === 2
-            ? "nested-loop-2"
-            : depth === 3
-              ? "nested-loop-3"
-              : "many-loops";
 
-      reasons.push(
-        PaidTierReasonGenerator.generateTimeReason(reasonKey, {
-          loopDepth: depth,
-          lineNumber: startLine,
-        })
-      );
     }
 
     // Recursion scoring
     if (signals.hasRecursion && !signals.isBinaryRecursion) {
       score += WEIGHTS.RECURSION;
-
-      const pattern = signals.maxLoopDepth > 0 ? "divide-conquer" : "recursion-simple";
-      reasons.push(PaidTierReasonGenerator.generateTimeReason(pattern, {
-        isRecursive: true,
-        lineNumber: startLine
-      }));
     }
 
     // Binary recursion scoring
@@ -269,8 +357,7 @@ export class EnhancedAnalyzer {
    */
   private static calculateSpaceScore(
     signals: ASTSignals,
-    startLine: number,
-    reasons: ComplexityReason[]
+    _startLine: number,
   ): number {
     let score = 0;
 
@@ -318,56 +405,51 @@ export class EnhancedAnalyzer {
     }
   }
 
-  /**
-   * Checks if node is a loop construct
-   */
-  private static isLoopNode(kind: SyntaxKind): boolean {
-    return (
-      kind === SyntaxKind.ForStatement ||
-      kind === SyntaxKind.ForOfStatement ||
-      kind === SyntaxKind.ForInStatement ||
-      kind === SyntaxKind.WhileStatement ||
-      kind === SyntaxKind.DoStatement
-    );
-  }
 
   /**
-   * Checks if property is an accumulation method
-   */
-  private static isAccumulationMethod(propText: string): boolean {
-    return (
-      propText.endsWith(".push") ||
-      propText.endsWith(".concat") ||
-      propText.endsWith(".unshift")
-    );
+ * Checks if the node is an accumulation method call.
+ * Instead of string suffix matching, we check the actual property name.
+ */
+  private static isAccumulationMethod(node: Node): boolean {
+    // Ensure we are looking at a property access (e.g., array.push)
+    if (!Node.isPropertyAccessExpression(node)) {
+      return false;
+    }
+
+    const methodName = node.getName(); // Returns exactly "push", "concat", etc.
+    const accumulationMethods = ["push", "concat", "unshift"];
+
+    return accumulationMethods.includes(methodName);
   }
   // ========================================
   // CLASSIFICATION LOGIC
   // ========================================
 
   static classifyComplexity(
-    signals: any,
+    signals: ASTSignals,
     scores: any,
-    reasons: ComplexityReason[]
   ): ComplexityClassification {
-    const timeComplexityResult = ComplexityCalculator.calculateTimeComplexity(
+    const timeComplexityResult = PaidTierComplexityCalculator.calculateTimeComplexity(
       signals.maxLoopDepth,
       signals.hasRecursion,
       signals.isBinaryRecursion,
       signals.hasSorting,
-      signals.hasLinearSearch
+      signals.hasLinearSearch,
+      signals.hasDeepClone,
+      signals.hasAccumulation,
     );
 
-    const spaceComplexityResult = ComplexityCalculator.calculateSpaceComplexity(
+    const spaceComplexityResult = PaidTierComplexityCalculator.calculateSpaceComplexity(
+      signals.maxLoopDepth,
       signals.allocationsInLoop,
       signals.hasRecursion,
-      signals.maxLoopDepth,
+      signals.hasSorting,
       signals.hasDeepClone,
-      signals.hasAccumulation
+      signals.hasAccumulation,
     );
 
-    const riskLevel = ComplexityCalculator.determineRiskLevel(scores.totalScore);
-    const confidence = ComplexityCalculator.calculateOverallConfidence(reasons);
+    const riskLevel = PaidTierComplexityCalculator.determineRiskLevel(scores.totalScore);
+    const confidence = PaidTierComplexityCalculator.calculateOverallConfidence(signals, riskLevel);
 
     return {
       timeComplexity: timeComplexityResult,

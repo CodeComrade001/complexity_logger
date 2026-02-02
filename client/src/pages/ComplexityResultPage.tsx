@@ -21,6 +21,7 @@ export default function ComplexityResultPage() {
   const [activeReasonId, setActiveReasonId] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<string>("all");
   const [fileComplexityResult, setFileComplexityResult] = useState<FileComplexityReceivedPayload[]>([]);
+  console.log("Turbo Log  ~ ComplexityResultPage ~ fileComplexityResult:", fileComplexityResult);
   const { notify } = useNotification();
 
   // ============================================================================

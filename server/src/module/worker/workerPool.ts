@@ -9,7 +9,7 @@ interface WorkerTask {
 }
 
 export class WorkerPool {
-  private maxWorkers: number;
+  private maxWorkers: number = 10;
   private activeWorkers: number = 0;
   private queue: WorkerTask[] = [];
 

@@ -7,6 +7,8 @@ import { PayloadNormalizer } from "../../compiler/modules/complexityOrchestrator
 import { GetUnitPartOfCode } from "../../compiler/modules/fetchPartOfCode";
 import { FetchUnitPartOfCodeProps } from "../../compiler/interfaces/fetchUnitPartOfCodeProps";
 import { FileUploadModel } from "../model/fileInterface";
+import { AIComplexityExplainer } from "../../compiler/modules/complexityGenerator_v1/paidTierResources/aI_ReasonGenerator";
+import { ComplexityNotation } from "../../compiler/interfaces/complexityGeneratorInterface";
 
 
 // Listen for job messages
@@ -15,6 +17,7 @@ parentPort?.on("message", (job: Job) => {
   const complexityOrchestrator = new ComplexityOrchestrator_v1();
   const normalizer = new PayloadNormalizer();
   const extractor = new GetUnitPartOfCode();
+  const aiReasoning = new AIComplexityExplainer()
 
   switch (job.task) {
     case "freeTierAnalysis":
@@ -30,6 +33,14 @@ parentPort?.on("message", (job: Job) => {
       result = extractor.extract(job.data as FetchUnitPartOfCodeProps,
         job.data as FileUploadModel[],
         job.data as number);
+      break;
+    case "AIReasoning":
+      const { notation, signals } = job.data as {
+        notation: { time: ComplexityNotation, space: ComplexityNotation },
+        signals: string[]
+      };
+
+      result = aiReasoning.explainComplexity(notation, signals);
       break;
     default:
       result = null;

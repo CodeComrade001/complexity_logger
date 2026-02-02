@@ -3,8 +3,8 @@
 // FAST ANALYZER (FREE TIER - REGEX BASED)
 // ============================================================================
 
-import { ComplexityReason, ComplexityResult, WEIGHTS } from "../../interfaces/complexityGeneratorInterface";
-import { ComplexityCalculator } from "./calculator";
+import { ComplexityReason, ComplexityResult, WEIGHTS } from "../../../interfaces/complexityGeneratorInterface";
+import { FreeTierComplexityCalculator } from "./freeTierComplexityCalculator";
 import { FreeTierReasonGenerator } from "./freeTierReason";
 
 export class FastAnalyzer {
@@ -193,7 +193,7 @@ export class FastAnalyzer {
     }
 
     // Calculate final complexities
-    const timeComplexity = ComplexityCalculator.calculateTimeComplexity(
+    const timeComplexity = FreeTierComplexityCalculator.calculateTimeComplexity(
       nestingDepth,
       hasRecursion,
       likelyBinaryRecursion,
@@ -201,7 +201,7 @@ export class FastAnalyzer {
       hasLinearSearchInLoop || hasNestedArrayMethods
     );
 
-    const spaceComplexity = ComplexityCalculator.calculateSpaceComplexity(
+    const spaceComplexity = FreeTierComplexityCalculator.calculateSpaceComplexity(
       allocationMatches.length,
       hasRecursion,
       nestingDepth,
@@ -210,10 +210,10 @@ export class FastAnalyzer {
     );
 
     const totalScore = timeScore + spaceScore;
-    const riskLevel = ComplexityCalculator.determineRiskLevel(totalScore);
+    const riskLevel = FreeTierComplexityCalculator.determineRiskLevel(totalScore);
 
     // REDUCED confidence for free tier since it's regex-based estimates
-    const baseConfidence = ComplexityCalculator.calculateOverallConfidence(reasons);
+    const baseConfidence = FreeTierComplexityCalculator.calculateOverallConfidence(reasons);
     const confidence = Math.min(baseConfidence * 0.75, 0.70); // Cap at 70% for free tier
 
     return {
@@ -235,30 +235,53 @@ export class FastAnalyzer {
   private static estimateLoopNestingDepth(text: string): number {
     let maxDepth = 0;
     let currentDepth = 0;
+    const blockStack: boolean[] = [];
 
-    // Split by lines and track loop nesting only
     const lines = text.split('\n');
 
-    for (const line of lines) {
-      // Increment depth when we see loop keywords
-      if (/\b(for|while|do|forEach|map|filter|reduce)\b/.test(line)) {
+    for (let line of lines) {
+      // Remove strings and comments (basic heuristic)
+      line = line.replace(/\/\/.*$/g, ''); // remove single-line comments
+      line = line.replace(/\/\*.*\*\//g, ''); // remove block comments
+      line = line.replace(/(["'`]).*?\1/g, ''); // remove string literals
+
+      // Count all loop keywords in the line
+      const loopKeywords = line.match(/\b(for|while|do|forEach|map|filter|reduce)\b/g) || [];
+      const openBraces = (line.match(/\{/g) || []).length;
+      const closeBraces = (line.match(/\}/g) || []).length;
+
+      // Handle loop keywords
+      for (let i = 0; i < loopKeywords.length; i++) {
+        // If brace exists, push as loop block
+        if (openBraces > i) {
+          blockStack.push(true);
+        } else {
+          // No brace, assume next line is loop block, mark as "virtual" loop
+          blockStack.push(true);
+        }
         currentDepth++;
         maxDepth = Math.max(maxDepth, currentDepth);
       }
 
-      // Decrement depth on closing braces (rough estimate)
-      // Only count braces that likely close loop blocks
-      const openBraces = (line.match(/\{/g) || []).length;
-      const closeBraces = (line.match(/\}/g) || []).length;
+      // Track non-loop blocks for extra braces
+      const nonLoopBlocks = Math.max(0, openBraces - loopKeywords.length);
+      for (let i = 0; i < nonLoopBlocks; i++) {
+        blockStack.push(false);
+      }
 
-      // Simple heuristic: if more close braces, we're exiting blocks
-      if (closeBraces > openBraces) {
-        currentDepth = Math.max(0, currentDepth - (closeBraces - openBraces));
+      // Close blocks
+      for (let i = 0; i < closeBraces; i++) {
+        const isLoopBlock = blockStack.pop();
+        if (isLoopBlock) {
+          currentDepth = Math.max(0, currentDepth - 1);
+        }
       }
     }
 
     return maxDepth;
   }
+
+
 
 
 }
