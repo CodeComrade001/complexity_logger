@@ -1,4 +1,4 @@
-import { FileUploadModel } from "../module/model/fileInterface";
+import { FileUploadModel } from "../../module/model/fileInterface";
 import { COMPLEXITYGENERATORMAXFILES } from "./interfaces/fetchUnitPartOfCodeProps";
 import { CancelRunningTask } from "./modules/cancelTask";
 import { GetCodeChanges } from "./modules/codeChange";

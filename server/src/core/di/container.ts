@@ -1,7 +1,7 @@
 import fastify from "fastify";
 import { createPostgresPool } from "../../infra/db/postgres";
 import { createMongooseConnection } from "../../infra/db/mongo";
-import compiler_plugin from "../../compiler/plugins/compiler_plugin";
+import compiler_plugin from "../../compliers/TS_JS_Compiler/plugins/compiler_plugin";
 import fileRoute from "../../module";
 import cors from '@fastify/cors';
 import fastifyMultipart from "@fastify/multipart";
