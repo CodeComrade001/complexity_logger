@@ -1,7 +1,7 @@
 import { Project } from "ts-morph";
 import { BATCHSIZEVALUES, FetchUnitPartOfCodeProps } from "../interfaces/fetchUnitPartOfCodeProps";
 import { extractors } from "../utils/extractor";
-import { FileUploadModel } from "../../module/model/fileInterface";
+import { FileUploadModel } from "../../../module/model/fileInterface";
 
 
 export class GetUnitPartOfCode {

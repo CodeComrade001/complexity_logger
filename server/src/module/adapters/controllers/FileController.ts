@@ -1,7 +1,7 @@
 import { GetFileHealth } from "../../usecases/GetFileHealth";
 import { IFileRepository } from "../../ports/IFileRepository";
 import { GetFileAnalyzer } from "../../usecases/getFileAnalyzer";
-import Compiler from "../../../compiler/compiler";
+import Compiler from "../../../compliers/TS_JS_Compiler/compiler";
 import { GetFileData } from "../../usecases/GetFileData";
 import { GetSingleFileReport } from "../../usecases/getSingleFileReport";
 import { GetFilePatchApply } from "../../usecases/getFilePatchApply";

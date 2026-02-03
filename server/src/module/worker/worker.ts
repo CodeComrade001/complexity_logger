@@ -1,14 +1,14 @@
 import { parentPort } from "worker_threads";
 import { Job, JobResult } from "./worker_types/workerTypes";
 import { saveResult } from "../utils/fileStorage";
-import { FilePayload, normalizedPayloadData } from "../../compiler/modules/complexityOrchestratorHelpers/complexityOrchestratorInterface";
-import { ComplexityOrchestrator_v1 } from "../../compiler/modules/complexityGenerator_v1/complexity_orchestrator";
-import { PayloadNormalizer } from "../../compiler/modules/complexityOrchestratorHelpers/payloadNormalizer";
-import { GetUnitPartOfCode } from "../../compiler/modules/fetchPartOfCode";
-import { FetchUnitPartOfCodeProps } from "../../compiler/interfaces/fetchUnitPartOfCodeProps";
+import { FilePayload, normalizedPayloadData } from "../../compliers/TS_JS_Compiler/modules/complexityOrchestratorHelpers/complexityOrchestratorInterface";
+import { ComplexityOrchestrator_v1 } from "../../compliers/TS_JS_Compiler/modules/complexityGenerator_v1/complexity_orchestrator";
+import { PayloadNormalizer } from "../../compliers/TS_JS_Compiler/modules/complexityOrchestratorHelpers/payloadNormalizer";
+import { GetUnitPartOfCode } from "../../compliers/TS_JS_Compiler/modules/fetchPartOfCode";
+import { FetchUnitPartOfCodeProps } from "../../compliers/TS_JS_Compiler/interfaces/fetchUnitPartOfCodeProps";
 import { FileUploadModel } from "../model/fileInterface";
-import { AIComplexityExplainer } from "../../compiler/modules/complexityGenerator_v1/paidTierResources/aI_ReasonGenerator";
-import { ComplexityNotation } from "../../compiler/interfaces/complexityGeneratorInterface";
+import { AIComplexityExplainer } from "../../compliers/TS_JS_Compiler/modules/complexityGenerator_v1/paidTierResources/aI_ReasonGenerator";
+import { ComplexityNotation } from "../../compliers/TS_JS_Compiler/interfaces/complexityGeneratorInterface";
 
 
 // Listen for job messages
