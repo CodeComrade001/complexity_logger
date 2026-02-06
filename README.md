@@ -1,4 +1,3 @@
-Here’s a professional, clear README tailored to your **Log Complexity** project based on the files and instructions you’ve provided:
 
 ---
 
@@ -139,10 +138,4 @@ Key locations
 Operational notes
 - Upload API: `POST /api/file/repos/analyze` (multi‑language file analysis).
 - Backend enforces file/volume limits and uses Node16 module resolution requiring `.js` extensions on relative imports.
-
-Next steps
-- I can produce a one‑line resume summary, create a condensed `README_RESUME.md`, run linting, or commit this change—tell me which you'd prefer.
-
-
-
 
