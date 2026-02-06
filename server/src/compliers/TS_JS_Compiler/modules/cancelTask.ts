@@ -28,22 +28,18 @@ export interface CancelTaskProps {
 
 export class CancelRunningTask implements CancelTaskProps {
   pause() {
-    console.log("Task paused");
     return true;
   }
 
   force_stop() {
-    console.log("Task force-stopped");
     return true;
   }
 
   cancel() {
-    console.log("Task canceled");
     return true;
   }
 
   resume() {
-    console.log("Task resumed");
     return true;
   }
 }

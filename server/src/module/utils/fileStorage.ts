@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { JobResult } from "../worker/worker_types/workerTypes";
+import { JobResult } from "../worker/worker_types/workerTypes.js";
 
 const RESULTS_DIR = path.join("storage", "results");
 if (!fs.existsSync(RESULTS_DIR)) fs.mkdirSync(RESULTS_DIR, { recursive: true });

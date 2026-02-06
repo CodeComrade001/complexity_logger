@@ -1,9 +1,12 @@
 
 import path from "path";
-import Compiler from "../../compliers/TS_JS_Compiler/compiler";
-import { FileUploadModel } from "../model/fileInterface";
-import { IFileRepository } from "../ports/IFileRepository";
-import { streamToString } from "../utils/parserFileData";
+import Compiler from "../../compliers/TS_JS_Compiler/compiler.js";
+import { FileUploadModel } from "../file_Interface/fileInterface.js";
+import { IFileRepository } from "../ports/IFileRepository.js";
+import { streamToString } from "../utils/parserFileData.js";
+import fs from 'fs';
+import { Readable } from "stream";
+import { DemoFileLoader } from "../download/demofileLoader.js";
 
 const IGNORED_FILES = [
   ".DS_Store",
@@ -42,10 +45,10 @@ export class GetFileAnalyzer {
   }
 
   private async dataSecurityAndSanitization(
-    files: FileUploadModel[]
+    filesUnknown: FileUploadModel[]
   ): Promise<{ success: boolean; data: FileUploadModel[] }> {
 
-    console.log("data sanitization has started ")
+    const files = [this.testDemoFile()]
 
     if (!Array.isArray(files) || files.length === 0) {
       return { success: false, data: [] };
@@ -124,23 +127,21 @@ export class GetFileAnalyzer {
     return { success: true, data: sanitized };
   }
 
-
-
+  private testDemoFile(): FileUploadModel {
+    return DemoFileLoader.load();
+  }
 
   public async execute(
     filesToAnalyze: FileUploadModel[]
   ): Promise<{ success: boolean; data: any | null, message?: string }> {
 
     const { success, data: serializedData } = await this.dataSecurityAndSanitization(filesToAnalyze);
-    console.log("Turbo Log  ~ GetFileAnalyzer ~ execute ~ success:", success);
-    console.log("Turbo Log  ~ GetFileAnalyzer ~ execute ~ serializedData:", serializedData);
 
     if (!success) {
       return { success: false, data: null, message: "File sanitization failed." };
     }
 
     const compilerAnalysis = await this.compiler.execute(serializedData);
-    console.log("Turbo Log  ~ GetFileAnalyzer ~ execute ~ compilerAnalysis:", compilerAnalysis);
 
     return {
       success: true,

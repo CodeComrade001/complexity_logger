@@ -1,5 +1,6 @@
-import { IFileRepository } from "../ports/IFileRepository";
-import { IMongoRepository } from "../ports/IMongoRepository";
+import { IFileRepository } from "../ports/IFileRepository.js";
+
+import { IMongoRepository } from "../ports/IMongoRepository.js";
 
 export class GetFileHealth {
   constructor(
@@ -10,9 +11,7 @@ export class GetFileHealth {
   public async execute() {
     // ---- DB checks ----
     const pgHealth = await this.pgRepo.getHealth();
-    console.log("Turbo Log  ~ GetFileHealth ~ execute ~ pgHealth:", pgHealth);
     const mongoHealth = await this.mongoRepo.getHealth();
-    console.log("Turbo Log  ~ GetFileHealth ~ execute ~ mongoHealth:", mongoHealth);
 
 
 

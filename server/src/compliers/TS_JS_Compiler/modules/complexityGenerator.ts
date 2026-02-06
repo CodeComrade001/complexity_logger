@@ -1,8 +1,8 @@
-import { ComplexityOrchestrator_v1 } from "./complexityGenerator_v1/complexity_orchestrator";
-import { FilePayload } from "./complexityOrchestratorHelpers/complexityOrchestratorInterface";
-import { ErrorBoundary } from "./complexityOrchestratorHelpers/ErrorBoundary";
-import { PayloadNormalizer } from "./complexityOrchestratorHelpers/payloadNormalizer";
-import { TierRunner } from "./complexityOrchestratorHelpers/tierRunner";
+import { ComplexityOrchestrator_v1 } from "./complexityGenerator_v1/complexity_orchestrator.js";
+import { FilePayload } from "./complexityOrchestratorHelpers/complexityOrchestratorInterface.js";
+import { ErrorBoundary } from "./complexityOrchestratorHelpers/ErrorBoundary.js";
+import { PayloadNormalizer } from "./complexityOrchestratorHelpers/payloadNormalizer.js";
+import { TierRunner } from "./complexityOrchestratorHelpers/tierRunner.js";
 
 export class GetComplexityGenerator {
   private normalizer = new PayloadNormalizer();
@@ -25,7 +25,9 @@ export class GetComplexityGenerator {
       }
 
       const reportGenerated = await this.tierRunner.runFree(normalized);
+      console.log("Turbo Log  ~ GetComplexityGenerator ~ execute ~ reportGenerated:", reportGenerated);
       // const reportGenerated = await this.tierRunner.runPaid(normalized);
+      // console.log("Turbo Log  ~ GetComplexityGenerator ~ execute ~ reportGenerated:", reportGenerated);
 
       return {
         success: true,

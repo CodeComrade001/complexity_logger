@@ -1,14 +1,14 @@
 import { parentPort } from "worker_threads";
-import { Job, JobResult } from "./worker_types/workerTypes";
-import { saveResult } from "../utils/fileStorage";
-import { FilePayload, normalizedPayloadData } from "../../compliers/TS_JS_Compiler/modules/complexityOrchestratorHelpers/complexityOrchestratorInterface";
-import { ComplexityOrchestrator_v1 } from "../../compliers/TS_JS_Compiler/modules/complexityGenerator_v1/complexity_orchestrator";
-import { PayloadNormalizer } from "../../compliers/TS_JS_Compiler/modules/complexityOrchestratorHelpers/payloadNormalizer";
-import { GetUnitPartOfCode } from "../../compliers/TS_JS_Compiler/modules/fetchPartOfCode";
-import { FetchUnitPartOfCodeProps } from "../../compliers/TS_JS_Compiler/interfaces/fetchUnitPartOfCodeProps";
-import { FileUploadModel } from "../model/fileInterface";
-import { AIComplexityExplainer } from "../../compliers/TS_JS_Compiler/modules/complexityGenerator_v1/paidTierResources/aI_ReasonGenerator";
-import { ComplexityNotation } from "../../compliers/TS_JS_Compiler/interfaces/complexityGeneratorInterface";
+import { Job, JobResult } from "./worker_types/workerTypes.js";
+import { saveResult } from "../utils/fileStorage.js";
+import { FilePayload, normalizedPayloadData } from "../../compliers/TS_JS_Compiler/modules/complexityOrchestratorHelpers/complexityOrchestratorInterface.js";
+import { ComplexityOrchestrator_v1 } from "../../compliers/TS_JS_Compiler/modules/complexityGenerator_v1/complexity_orchestrator.js";
+import { PayloadNormalizer } from "../../compliers/TS_JS_Compiler/modules/complexityOrchestratorHelpers/payloadNormalizer.js";
+import { GetUnitPartOfCode } from "../../compliers/TS_JS_Compiler/modules/fetchPartOfCode.js";
+import { FetchUnitPartOfCodeProps } from "../../compliers/TS_JS_Compiler/interfaces/fetchUnitPartOfCodeProps.js";
+import { FileUploadModel } from "../file_Interface/fileInterface.js";
+import { AIComplexityExplainer } from "../../compliers/TS_JS_Compiler/modules/complexityGenerator_v1/paidTierResources/aI_ReasonGenerator.js";
+import { ComplexityNotation } from "../../compliers/TS_JS_Compiler/interfaces/complexityGeneratorInterface.js";
 
 
 // Listen for job messages

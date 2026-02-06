@@ -3,7 +3,7 @@
 // Professional-grade analysis with optimization insights
 // ============================================================================
 
-// import { COMPLEXITY_PATTERNS_PAID, PaidComplexityReason } from "../../../interfaces/complexityGeneratorInterface";
+// import { COMPLEXITY_PATTERNS_PAID, PaidComplexityReason } from "../../../interfaces/complexityGeneratorInterface.js";
 
 
 export class PaidTierReasonGenerator {

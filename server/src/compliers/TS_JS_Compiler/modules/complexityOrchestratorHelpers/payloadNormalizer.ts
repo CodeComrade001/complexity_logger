@@ -1,4 +1,4 @@
-import { FilePayload, normalizedPayloadData } from "./complexityOrchestratorInterface";
+import { FilePayload, normalizedPayloadData } from "./complexityOrchestratorInterface.js";
 
 export class PayloadNormalizer {
   normalize(payload: FilePayload): normalizedPayloadData | null {

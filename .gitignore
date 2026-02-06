@@ -41,6 +41,7 @@ build/Release
 node_modules/
 jspm_packages/
 
+
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
 
@@ -190,3 +191,7 @@ Thumbs.db
 # Package lock files (optional if you're not committing them)
 yarn.lock
 pnpm-lock.yaml
+
+
+# igonre models
+server/src/models/

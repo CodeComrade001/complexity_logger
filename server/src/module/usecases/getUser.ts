@@ -1,5 +1,5 @@
 
-import { IFileRepository } from "../ports/IFileRepository";
+import { IFileRepository } from "../ports/IFileRepository.js";
 
 export class GetUser {
   constructor(private repo: IFileRepository) { }

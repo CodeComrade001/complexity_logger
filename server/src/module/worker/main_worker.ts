@@ -1,11 +1,11 @@
 import fs from "fs";
 import { Worker } from "worker_threads";
-import { Job, JobResult } from "./worker_types/workerTypes";
-import { readResult, editResult } from "../utils/fileStorage";
-import { WorkerPool } from "./workerPool";
+import { Job, JobResult } from "./worker_types/workerTypes.js";
+import { readResult, editResult } from "../utils/fileStorage.js";
+import { WorkerPool } from "./workerPool.js";
 // Load jobs from JSON
 const jobs: Job[] = JSON.parse(fs.readFileSync("jobs.json", "utf-8"));
-const maxWorkers = 2;
+const maxWorkers = 30;
 const pool = new WorkerPool(maxWorkers);
 
 // Run a single job in a worker

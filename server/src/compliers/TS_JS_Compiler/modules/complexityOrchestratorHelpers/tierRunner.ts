@@ -1,5 +1,5 @@
-import { ComplexityOrchestrator_v1 } from "../complexityGenerator_v1/complexity_orchestrator";
-import { normalizedPayloadData } from "./complexityOrchestratorInterface";
+import { ComplexityOrchestrator_v1 } from "../complexityGenerator_v1/complexity_orchestrator.js";
+import { normalizedPayloadData } from "./complexityOrchestratorInterface.js";
 
 export class TierRunner {
   constructor(

@@ -1,4 +1,4 @@
-import { ASTSignals, CalculatorComplexityResult, ComplexityReason, RISK_THRESHOLDS, Uppercase_RiskLevelType } from "../../../interfaces/complexityGeneratorInterface";
+import { ASTSignals, CalculatorComplexityResult, ComplexityReason, RISK_THRESHOLDS, Uppercase_RiskLevelType, WEIGHTS } from "../../../interfaces/complexityGeneratorInterface.js";
 
 export class PaidTierComplexityCalculator {
 
@@ -164,8 +164,31 @@ export class PaidTierComplexityCalculator {
   /**
    * Confidence aggregation — no averaging
    */
-  static calculateOverallConfidence(signals: ASTSignals, risklevel: Uppercase_RiskLevelType): number {
+  static calculateOverallConfidence(signals: ASTSignals): number {
+    let confidence = 100;
 
-    return 50
+    if (signals.maxLoopDepth > 0) {
+      confidence -= WEIGHTS.LOOP;
+      confidence -= signals.maxLoopDepth * WEIGHTS.NESTED_LOOP_FACTOR;
+    }
+
+    if (signals.hasRecursion) {
+      confidence -= signals.isBinaryRecursion
+        ? WEIGHTS.BINARY_RECURSION
+        : WEIGHTS.RECURSION;
+    }
+
+    if (signals.hasSorting) confidence -= WEIGHTS.SORT;
+    if (signals.hasLinearSearch) confidence -= WEIGHTS.SEARCH_LINEAR;
+
+    confidence -= signals.allocationsInLoop * WEIGHTS.ALLOCATION;
+
+    if (signals.hasDeepClone) confidence -= WEIGHTS.DEEP_CLONE;
+    if (signals.hasAccumulation) confidence -= WEIGHTS.ACCUMULATOR;
+
+    confidence -= signals.matchedKeywords.length * WEIGHTS.KEYWORD_HIT;
+
+    return Math.max(0, Math.min(100, Math.round(confidence)));
   }
+
 }
