@@ -1,5 +1,5 @@
 
-import { IFileRepository } from "../ports/IFileRepository";
+import { IFileRepository } from "../ports/IFileRepository.js";
 
 export class GetSingleFileReport {
   constructor(private repo: IFileRepository) { }

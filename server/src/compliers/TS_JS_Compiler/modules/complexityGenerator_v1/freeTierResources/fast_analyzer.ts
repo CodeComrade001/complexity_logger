@@ -3,9 +3,9 @@
 // FAST ANALYZER (FREE TIER - REGEX BASED)
 // ============================================================================
 
-import { ComplexityReason, ComplexityResult, WEIGHTS } from "../../../interfaces/complexityGeneratorInterface";
-import { FreeTierComplexityCalculator } from "./freeTierComplexityCalculator";
-import { FreeTierReasonGenerator } from "./freeTierReason";
+import { ComplexityReason, ComplexityResult, WEIGHTS } from "../../../interfaces/complexityGeneratorInterface.js";
+import { FreeTierComplexityCalculator } from "./freeTierComplexityCalculator.js";
+import { FreeTierReasonGenerator } from "./freeTierReason.js";
 
 export class FastAnalyzer {
 

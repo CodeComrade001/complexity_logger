@@ -1,13 +1,13 @@
-import { GetFileHealth } from "../../usecases/GetFileHealth";
-import { IFileRepository } from "../../ports/IFileRepository";
-import { GetFileAnalyzer } from "../../usecases/getFileAnalyzer";
-import Compiler from "../../../compliers/TS_JS_Compiler/compiler";
-import { GetFileData } from "../../usecases/GetFileData";
-import { GetSingleFileReport } from "../../usecases/getSingleFileReport";
-import { GetFilePatchApply } from "../../usecases/getFilePatchApply";
-import { GetUser } from "../../usecases/getUser";
-import { IMongoRepository } from "../../ports/IMongoRepository";
-import { FileUploadModel } from "../../model/fileInterface";
+import { GetFileHealth } from "../../usecases/GetFileHealth.js";
+import { IFileRepository } from "../../ports/IFileRepository.js";
+import { GetFileAnalyzer } from "../../usecases/getFileAnalyzer.js";
+import Compiler from "../../../compliers/TS_JS_Compiler/compiler.js";
+import { GetFileData } from "../../usecases/GetFileData.js";
+import { GetSingleFileReport } from "../../usecases/getSingleFileReport.js";
+import { GetFilePatchApply } from "../../usecases/getFilePatchApply.js";
+import { GetUser } from "../../usecases/getUser.js";
+import { IMongoRepository } from "../../ports/IMongoRepository.js";
+import { FileUploadModel } from "../../file_Interface/fileInterface.js";
 
 // The controller adapter is thin: it only calls use-cases and maps results to HTTP-friendly objects.
 // Keep it simple: no DB, no heavy logic.
@@ -41,24 +41,43 @@ export class FileController {
     return reply.code(200).send(result);
   }
 
+  // Handle file upload and analysis - for production use
+  // public async getFileAnalyzer(request: any, reply: any) {
+  //   try {
+  //     const files: FileUploadModel[] = [];
+
+  //     for await (const part of request.parts()) {
+  //       if (part.type === "file") {
+  //         files.push({
+  //           name: part.filename,
+  //           size: part.file.bytesRead,
+  //           language: "typescript", // or read from fields
+  //           file: part.file,        // Readable stream ✅
+  //         });
+  //       }
+  //     }
+
+  //     if (!files || files.length === 0) {
+  //       return { success: false, message: "No files provided for analysis" };
+  //     }
+  //     const { success, data, message } = await this.getFileAnalyzerUsecase.execute(files);
+  //     if (!success) {
+  //       return reply.code(400).send({ success: false, message: message || "File analysis failed." });
+  //     }
+  //     return reply.code(200).send(data);
+  //   } catch (err) {
+  //     console.error("Error in getFileAnalyzer:", err);
+  //     return reply.code(500).send({ success: false, message: "Internal server error" });
+  //   }
+  // }
+
+
+  //these is for testing purpose remember to delete later
   public async getFileAnalyzer(request: any, reply: any) {
     try {
       const files: FileUploadModel[] = [];
 
-      for await (const part of request.parts()) {
-        if (part.type === "file") {
-          files.push({
-            name: part.filename,
-            size: part.file.bytesRead,
-            language: "typescript", // or read from fields
-            file: part.file,        // Readable stream ✅
-          });
-        }
-      }
 
-      if (!files || files.length === 0) {
-        return { success: false, message: "No files provided for analysis" };
-      }
       const { success, data, message } = await this.getFileAnalyzerUsecase.execute(files);
       if (!success) {
         return reply.code(400).send({ success: false, message: message || "File analysis failed." });

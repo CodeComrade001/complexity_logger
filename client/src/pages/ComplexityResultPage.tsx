@@ -30,8 +30,10 @@ export default function ComplexityResultPage() {
   // Change Strategy: If API structure changes, update only this function
   // ============================================================================
   const allFunctions: UIFunction[] = fileComplexityResult.flatMap(payload => {
+    // console.log("Turbo Log  ~ ComplexityResultPage ~ payload:", payload);
     // Navigate API structure: payload.data.freeComplexityReport
-    if (!payload.data?.freeComplexityReport) return [];
+    if (!payload.success && !payload.data?.freeComplexityReport) return [];
+
 
     const report = payload.data.freeComplexityReport;
     const fileName = report.nameOfFile;
@@ -294,10 +296,10 @@ export default function ComplexityResultPage() {
 
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="px-2 py-0.5 text-xs font-mono border rounded">
-                    Time: {fn.timeComplexity.notation}
+                    Time: {fn.timeComplexity.notation || "Null"}
                   </span>
                   <span className="px-2 py-0.5 text-xs font-mono border rounded">
-                    Space: {fn.spaceComplexity.notation}
+                    Space: {fn.spaceComplexity.notation || "Null"}
                   </span>
                   <span className="px-2 py-0.5 text-xs border rounded">
                     Score: {fn.totalScore}
@@ -380,10 +382,10 @@ export default function ComplexityResultPage() {
 
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-xs font-mono px-2 py-0.5 border rounded">
-                        Time : {fn.timeComplexity.notation}
+                        Time : {fn.timeComplexity.notation || "Null"}
                       </span>
                       <span className="text-xs font-mono px-2 py-0.5 border rounded">
-                        Space: {fn.spaceComplexity.notation}
+                        Space: {fn.spaceComplexity.notation || "Null"}
                       </span>
                       <span className="text-xs px-2 py-0.5 border rounded">
                         Score: {fn.totalScore}
@@ -447,8 +449,8 @@ export default function ComplexityResultPage() {
                     <td className="p-3 font-mono text-xs">{fn.name}()</td>
                     <td className="p-3 text-xs text-muted">{fn.fileName}</td>
                     <td className="p-3 text-xs">{fn.startLine}–{fn.endLine}</td>
-                    <td className="p-3 font-mono text-xs">{fn.timeComplexity.notation}</td>
-                    <td className="p-3 font-mono text-xs">{fn.spaceComplexity.notation}</td>
+                    <td className="p-3 font-mono text-xs">{fn.timeComplexity.notation || "Null"}</td>
+                    <td className="p-3 font-mono text-xs">{fn.spaceComplexity.notation || "Null"}</td>
                     <td className="p-3 font-bold text-center">{fn.totalScore}</td>
                     <td className="p-3">
                       <div className={cn("flex items-center gap-1 text-xs", getRiskBadgeClass(fn.riskLevel))}>

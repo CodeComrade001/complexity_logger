@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyPluginOptions } from "fastify";
-import { FileController } from "../adapters/controllers/FileController";
-import { PostgresFileRepository } from "../adapters/repositories/PostgresFileRepository";
-import { MongoFileRepository } from "../adapters/repositories/MongoFileRepository";
+import { FileController } from "../adapters/controllers/FileController.js";
+import { PostgresFileRepository } from "../adapters/repositories/PostgresFileRepository.js";
+import { MongoFileRepository } from "../adapters/repositories/MongoFileRepository.js";
 
 /**
  * This plugin uses the DI-provided resources on fastify (postgres pool / mongoose model).

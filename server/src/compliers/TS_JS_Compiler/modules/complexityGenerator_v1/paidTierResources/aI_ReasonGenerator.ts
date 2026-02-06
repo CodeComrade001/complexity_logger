@@ -1,6 +1,7 @@
 import { getLlama, LlamaChatSession } from "node-llama-cpp";
 import path from "path";
-import { ComplexityNotation } from "../../../interfaces/complexityGeneratorInterface";
+import { ComplexityNotation } from "../../../interfaces/complexityGeneratorInterface.js";
+import { fileURLToPath } from "url";
 
 
 export class AIComplexityExplainer {
@@ -12,18 +13,22 @@ export class AIComplexityExplainer {
   }
 
   private async init() {
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
     const llama = await getLlama();
 
     const model = await llama.loadModel({
-      modelPath: path.join(
+      modelPath: path.resolve(
         __dirname,
-        "models",
-        "qwen2.5-0.5b-instruct.gguf"
-      )
+        "../../../../../models/TinyLlama-1.1B-Tarot-Chat-v1.0.Q4_K_S.gguf"
+      ),
+      gpuLayers: 0  // Force CPU only
     });
 
     const context = await model.createContext({
-      contextSize: 256
+      contextSize: 512,
+      // contextSize: 126,
+      // threads: 2
     });
 
     this.session = new LlamaChatSession({

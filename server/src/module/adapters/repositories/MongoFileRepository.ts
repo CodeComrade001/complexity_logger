@@ -1,5 +1,5 @@
 // import type { Model } from "mongoose";
-import { IMongoRepository } from "../../ports/IMongoRepository";
+import { IMongoRepository } from "../../ports/IMongoRepository.js";
 import { Mongoose } from "mongoose";
 
 export class MongoFileRepository implements IMongoRepository {

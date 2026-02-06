@@ -1,4 +1,3 @@
-import { ComplexityNotation } from "../../../compliers/TS_JS_Compiler/interfaces/complexityGeneratorInterface";
 
 export type JobTask = "freeTierAnalysis" | "paidTierAnalysis" | "payloadNormalizer" | "ExtractUnitPartOfCode" | "AIReasoning" | "TimeComplexityGenerator" | "SpaceComplexityGenerator";
 

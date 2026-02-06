@@ -1,4 +1,4 @@
-import { fetchUnitPartOfCodeArrayTargets } from "./fetchUnitPartOfCodeProps";
+import { fetchUnitPartOfCodeArrayTargets } from "./fetchUnitPartOfCodeProps.js";
 
 export type TierLevel = "free" | "paid";
 

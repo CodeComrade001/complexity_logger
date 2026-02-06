@@ -1,0 +1,59 @@
+{
+  "compilerAnalysis": {
+    "success": true,
+    "data": [
+      {
+        "success": true,
+        "message": "Complexity analysis complete",
+        "data": {
+          "freeComplexityReport": {
+            "nameOfFile": "demo1.ts",
+            "success": true,
+            "generatedAt": "2026-02-04T09:12:25.205Z",
+            "tierUsed": "free",
+            "summary": {
+              "itemsAnalyzed": 14,
+              "totalScore": null,
+              "avgScore": null,
+              "avgTimeComplexity": "O(1)",
+              "avgSpaceComplexity": "O(1)",
+              "criticalRiskCount": 0,
+              "highRiskCount": 0,
+              "mediumRiskCount": 0,
+              "lowRiskCount": 14
+            },
+            "details": {
+              "functions": [],
+              "arrows": [
+                {},
+                {}
+              ],
+              "methods": [
+                {},
+                {},
+                {},
+                {},
+                {},
+                {},
+                {},
+                {},
+                {},
+                {},
+                {}
+              ],
+              "constructors": [],
+              "getters": [],
+              "setters": [],
+              "callbacks": [],
+              "handlers": [],
+              "staticBlocks": [],
+              "topLevelStatements": [
+                {}
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}

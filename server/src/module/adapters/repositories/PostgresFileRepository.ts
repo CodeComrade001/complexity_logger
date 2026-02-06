@@ -1,5 +1,5 @@
 import type { Pool } from "pg";
-import { IFileRepository } from "../../ports/IFileRepository";
+import { IFileRepository } from "../../ports/IFileRepository.js";
 
 export class PostgresFileRepository implements IFileRepository {
   constructor(private pool: Pool) { }

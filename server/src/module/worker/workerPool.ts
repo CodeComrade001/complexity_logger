@@ -1,6 +1,6 @@
 // workerPool.ts
 import { Worker } from "worker_threads";
-import { Job, JobResult } from "./worker_types/workerTypes";
+import { Job, JobResult } from "./worker_types/workerTypes.js";
 
 interface WorkerTask {
   job: Job;
@@ -9,7 +9,7 @@ interface WorkerTask {
 }
 
 export class WorkerPool {
-  private maxWorkers: number = 10;
+  private maxWorkers: number;
   private activeWorkers: number = 0;
   private queue: WorkerTask[] = [];
 
@@ -32,7 +32,7 @@ export class WorkerPool {
     if (!task) return;
 
     this.activeWorkers++;
-    const worker = new Worker("./worker.js");
+    const worker = new Worker("./worker.ts");
 
     worker.on("message", (msg: JobResult) => {
       task.resolve(msg);

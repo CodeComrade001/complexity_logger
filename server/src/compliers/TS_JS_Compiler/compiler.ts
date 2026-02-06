@@ -1,11 +1,10 @@
-import { FileUploadModel } from "../../module/model/fileInterface";
-import { COMPLEXITYGENERATORMAXFILES } from "./interfaces/fetchUnitPartOfCodeProps";
-import { CancelRunningTask } from "./modules/cancelTask";
-import { GetCodeChanges } from "./modules/codeChange";
-import { GetComplexityGenerator } from "./modules/complexityGenerator";
-import { CodeParts } from "./modules/complexityOrchestratorHelpers/complexityOrchestratorInterface";
-import { GetUnitPartOfCode } from "./modules/fetchPartOfCode";
-
+import { FileUploadModel } from "../../module/file_Interface/fileInterface.js";
+import { COMPLEXITYGENERATORMAXFILES } from "./interfaces/fetchUnitPartOfCodeProps.js";
+import { CancelRunningTask } from "./modules/cancelTask.js";
+import { GetCodeChanges } from "./modules/codeChange.js";
+import { GetComplexityGenerator } from "./modules/complexityGenerator.js";
+import { CodeParts } from "./modules/complexityOrchestratorHelpers/complexityOrchestratorInterface.js";
+import { GetUnitPartOfCode } from "./modules/fetchPartOfCode.js";
 export type ComplexityGeneratorPayload = Record<string, CodeParts>;
 
 
@@ -29,6 +28,8 @@ export default class Compiler {
 
 
   private async fetchPartOfCode(allFilesToAnalyze: FileUploadModel[]) {
+
+
     const fetchedPart = await this.getUnitPartOfCode.extract({
       targets: [
         "functions",
@@ -81,13 +82,14 @@ export default class Compiler {
   // }
 
 
+
+
   public async execute(allFilesToAnalyze: FileUploadModel[]) {
     const { success, data } = await this.fetchPartOfCode(allFilesToAnalyze);
     if (!success)
       return { success: false, message: "parse tree generator failed" };
 
     const complexityReport = await this.complexityGenerator(data);
-
 
     return { success: true, data: complexityReport }
   }

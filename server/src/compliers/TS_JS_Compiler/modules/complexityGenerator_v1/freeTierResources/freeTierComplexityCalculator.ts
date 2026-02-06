@@ -3,7 +3,7 @@
 // FREE TIER COMPLEXITY CALCULATOR
 // ============================================================================
 
-import { CalculatorComplexityResult, ComplexityReason, RISK_THRESHOLDS, Uppercase_RiskLevelType } from "../../../interfaces/complexityGeneratorInterface";
+import { CalculatorComplexityResult, ComplexityReason, RISK_THRESHOLDS, Uppercase_RiskLevelType } from "../../../interfaces/complexityGeneratorInterface.js";
 
 
 export class FreeTierComplexityCalculator {

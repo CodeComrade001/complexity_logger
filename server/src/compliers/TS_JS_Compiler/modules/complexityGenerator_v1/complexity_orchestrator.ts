@@ -6,12 +6,12 @@ import {
   ComplexityResult,
   PaidComplexityReason,
   TierLevel
-} from "../../interfaces/complexityGeneratorInterface";
-import { FastAnalyzer } from "./freeTierResources/fast_analyzer";
-import { EnhancedAnalyzer } from "./paidTierResources/enhanced_analyzer";
-import { dataSets } from "../../utils/datasets";
-import { normalizedPayloadData } from "../complexityOrchestratorHelpers/complexityOrchestratorInterface";
-import { fetchUnitPartOfCodeArrayTargets } from "../../interfaces/fetchUnitPartOfCodeProps";
+} from "../../interfaces/complexityGeneratorInterface.js";
+import { FastAnalyzer } from "./freeTierResources/fast_analyzer.js";
+import { EnhancedAnalyzer } from "./paidTierResources/enhanced_analyzer.js";
+import { dataSets } from "../../utils/datasets.js";
+import { normalizedPayloadData } from "../complexityOrchestratorHelpers/complexityOrchestratorInterface.js";
+import { fetchUnitPartOfCodeArrayTargets } from "../../interfaces/fetchUnitPartOfCodeProps.js";
 
 type UnitTarget = fetchUnitPartOfCodeArrayTargets;
 
@@ -43,7 +43,7 @@ export class ComplexityOrchestrator_v1 {
   ): Promise<AnalysisSummary> {
     const resultsByUnit = this.processUnits(
       fetchPartOfCodeResult,
-      (node, unitType, idx) => this.analyzeFastNode(node, unitType, `${unitType}_${idx}`)
+      async (node, unitType, idx) => await this.analyzeFastNode(node, unitType, `${unitType}_${idx}`)
     );
 
     return this.buildSummary(
@@ -82,8 +82,8 @@ export class ComplexityOrchestrator_v1 {
     const endLine = this.getEndLine(node);
     const text = this.extractNodeText(node);
 
-    const fastResult = FastAnalyzer.analyze(text, name || "", startLine);
-    const matchedKeywords = this.findKeywordMatches(text);
+    const fastResult = await FastAnalyzer.analyze(text, name || "", startLine);
+    const matchedKeywords = await this.findKeywordMatches(text);
 
     return {
       id: `${name || "anon"}:${startLine}`,
@@ -122,14 +122,14 @@ export class ComplexityOrchestrator_v1 {
     const reasons: PaidComplexityReason[] = [];
 
     // Phase 1: Collect AST signals using EnhancedAnalyzer
-    const asyncWeight = EnhancedAnalyzer.detectAsyncPattern(node, startLine, reasons);
-    const signals = EnhancedAnalyzer.collectASTSignals(node, name, this.keywordSet);
+    const asyncWeight = await EnhancedAnalyzer.detectAsyncPattern(node, startLine, reasons);
+    const signals = await EnhancedAnalyzer.collectASTSignals(node, name, this.keywordSet);
 
     // Phase 2: Calculate scores from signals
-    const scores = EnhancedAnalyzer.calculateScores(signals, asyncWeight, startLine);
+    const scores = await EnhancedAnalyzer.calculateScores(signals, asyncWeight, startLine);
 
     // Phase 3: Classify complexity
-    const classification = EnhancedAnalyzer.classifyComplexity(signals, scores);
+    const classification = await EnhancedAnalyzer.classifyComplexity(signals, scores);
 
     const uniqueKeywords = Array.from(new Set(signals.matchedKeywords)) as string[];
     const aiReason = await EnhancedAnalyzer.generateAIReason(
@@ -291,7 +291,7 @@ export class ComplexityOrchestrator_v1 {
   }
 
   private calculateAverageComplexity(complexities: ComplexityNotation[]): string {
-    if (complexities.length === 0) return "O(1)";
+    if (complexities.length === 0) return "O(1).js";
 
     const complexityOrder: ComplexityNotation[] = [
       "O(1)", "O(log n)", "O(n)", "O(n log n)", "O(n^k)", "O(2^n)", "UNKNOWN"

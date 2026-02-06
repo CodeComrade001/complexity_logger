@@ -6,9 +6,9 @@ import {
   ComplexityScores,
   PaidComplexityReason,
   WEIGHTS
-} from "../../../interfaces/complexityGeneratorInterface";
-import { PaidTierComplexityCalculator } from "./paidTierComplexityCalculator";
-import { AIComplexityExplainer } from "./aI_ReasonGenerator";
+} from "../../../interfaces/complexityGeneratorInterface.js";
+import { PaidTierComplexityCalculator } from "./paidTierComplexityCalculator.js";
+import { AIComplexityExplainer } from "./aI_ReasonGenerator.js";
 
 /**
  * Enhanced (Paid Tier) AST-based analysis logic
@@ -449,7 +449,7 @@ export class EnhancedAnalyzer {
     );
 
     const riskLevel = PaidTierComplexityCalculator.determineRiskLevel(scores.totalScore);
-    const confidence = PaidTierComplexityCalculator.calculateOverallConfidence(signals, riskLevel);
+    const confidence = PaidTierComplexityCalculator.calculateOverallConfidence(signals);
 
     return {
       timeComplexity: timeComplexityResult,
