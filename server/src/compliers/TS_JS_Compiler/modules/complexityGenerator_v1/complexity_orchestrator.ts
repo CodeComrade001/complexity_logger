@@ -1,25 +1,28 @@
 import { Node } from "ts-morph";
 import {
   AnalysisSummary,
+  ASTSignals,
+  ComplexityClassification,
   ComplexityNotation,
-  ComplexityReason,
   ComplexityResult,
   PaidComplexityReason,
   TierLevel
 } from "../../interfaces/complexityGeneratorInterface.js";
 import { FastAnalyzer } from "./freeTierResources/fast_analyzer.js";
 import { EnhancedAnalyzer } from "./paidTierResources/enhanced_analyzer.js";
-import { dataSets } from "../../utils/datasets.js";
 import { normalizedPayloadData } from "../complexityOrchestratorHelpers/complexityOrchestratorInterface.js";
 import { fetchUnitPartOfCodeArrayTargets } from "../../interfaces/fetchUnitPartOfCodeProps.js";
+import { AIComplexityExplainer } from "./paidTierResources/aI_ReasonGenerator.js";
 
 type UnitTarget = fetchUnitPartOfCodeArrayTargets;
 
 export class ComplexityOrchestrator_v1 {
   private keywordSet: Set<string>;
+  private aiExplainer: AIComplexityExplainer;
 
-  constructor(keywordSet?: Set<string>) {
-    this.keywordSet = keywordSet || this.buildKeywordSet();
+  constructor(keywordSet: Set<string>, aiExplainer: AIComplexityExplainer) {
+    this.keywordSet = keywordSet;
+    this.aiExplainer = aiExplainer;
   }
 
   // ========================================
@@ -41,7 +44,7 @@ export class ComplexityOrchestrator_v1 {
   private async analyzeFast(
     fetchPartOfCodeResult: normalizedPayloadData
   ): Promise<AnalysisSummary> {
-    const resultsByUnit = this.processUnits(
+    const resultsByUnit = await this.processUnits(
       fetchPartOfCodeResult,
       async (node, unitType, idx) => await this.analyzeFastNode(node, unitType, `${unitType}_${idx}`)
     );
@@ -56,7 +59,7 @@ export class ComplexityOrchestrator_v1 {
   private async analyzeDeep(
     fetchPartOfCodeResult: normalizedPayloadData
   ): Promise<AnalysisSummary> {
-    const resultsByUnit = this.processUnits(
+    const resultsByUnit = await this.processUnits(
       fetchPartOfCodeResult,
       async (node, unitType, idx) => await this.analyzeDeepNode(node, unitType, `${unitType}_${idx}`)
     );
@@ -112,7 +115,7 @@ export class ComplexityOrchestrator_v1 {
   private async analyzeDeepNode(
     node: Node,
     kind: fetchUnitPartOfCodeArrayTargets,
-    nameHint?: string
+    nameHint?: string,
   ): Promise<ComplexityResult> {
     const name = this.extractNodeName(node, nameHint);
     const startLine = this.getStartLine(node);
@@ -131,10 +134,11 @@ export class ComplexityOrchestrator_v1 {
     // Phase 3: Classify complexity
     const classification = await EnhancedAnalyzer.classifyComplexity(signals, scores);
 
-    const uniqueKeywords = Array.from(new Set(signals.matchedKeywords)) as string[];
-    const aiReason = await EnhancedAnalyzer.generateAIReason(
-      classification,
-      signals)
+    const uniqueKeywords = await Array.from(new Set(signals.matchedKeywords)) as string[];
+
+    const aiReason = await this.generateAIReason(classification, signals);
+    console.log("Turbo Log  ~ ComplexityOrchestrator_v1 ~ analyzeDeepNode ~ aiReason:", aiReason);
+
     reasons.push(aiReason);
 
     return {
@@ -158,52 +162,65 @@ export class ComplexityOrchestrator_v1 {
   }
 
   // ========================================
-  // CLASSIFICATION LOGIC
+  // AI HELPER LOGIC
   // ========================================
+  private async generateAIReason(
+    classification: ComplexityClassification,
+    signals: ASTSignals
+  ): Promise<PaidComplexityReason> {
+
+    const signalList = [
+      signals.maxLoopDepth > 1 && "nested loops",
+      signals.hasRecursion && "recursion",
+      signals.isBinaryRecursion && "binary recursion",
+      signals.hasSorting && "sorting",
+      signals.hasLinearSearch && "linear search",
+      signals.allocationsInLoop > 0 && "allocations in loops",
+      signals.hasDeepClone && "deep clone"
+    ].filter(Boolean) as string[];
+
+    const explanation = await this.aiExplainer.explainComplexity(
+      {
+        time: classification.timeComplexity.notation,
+        space: classification.spaceComplexity.notation
+      },
+      signalList
+    );
+
+    return {
+      type: "time",
+      timeComplexity: classification.timeComplexity.notation,
+      spaceComplexity: classification.spaceComplexity.notation,
+      pattern: "ai-summary",
+      detail: explanation,
+      impact: classification.riskLevel.toLowerCase() as any,
+      confidence: classification.confidence
+    };
+  }
 
 
   // ========================================
   // HELPER METHODS
   // ========================================
 
-  private buildKeywordSet(): Set<string> {
-    return new Set([
-      ...dataSets.loops,
-      ...dataSets.nestedLoopSignals,
-      ...dataSets.recursion,
-      ...dataSets.divideAndConquer,
-      ...dataSets.dataIteration,
-      ...dataSets.expensiveBuiltins,
-      ...dataSets.memoryAllocations,
-      ...dataSets.temporaryStructures,
-      ...dataSets.recursionSpace,
-      ...dataSets.dataDuplication,
-      ...dataSets.branches,
-      ...dataSets.inputDependent,
-      ...dataSets.directCodePatterns,
-      ...dataSets.hiddenCostOps,
-      ...dataSets.spaceImpactOps,
-      ...dataSets.algorithmicFactors,
-      ...dataSets.inputFactors,
-      ...dataSets.runtimeFactors,
-      ...dataSets.architectureFactors,
-      ...dataSets.languageSpecific
-    ]);
-  }
 
-  private processUnits(
+
+  private async processUnits(
     fetchPartOfCodeResult: normalizedPayloadData,
     analyzeNode: (node: any, unitType: UnitTarget, idx: number) => Promise<ComplexityResult>
-  ): Record<UnitTarget, any[]> {
+  ): Promise<Record<UnitTarget, any[]>> {
     const resultsByUnit: Record<UnitTarget, any[]> = {} as any;
 
     for (const [unitType, nodes] of Object.entries(fetchPartOfCodeResult)) {
       if (unitType === "nameOfFile") continue;
 
       const typedUnit = unitType as UnitTarget;
-      resultsByUnit[typedUnit] = this.ensureArray(nodes).map(async (node: any, idx: number) =>
-        await analyzeNode(node, typedUnit, idx)
+      resultsByUnit[typedUnit] = await Promise.all(
+        this.ensureArray(nodes).map((node, idx) =>
+          analyzeNode(node, typedUnit, idx)
+        )
       );
+
     }
 
     return resultsByUnit;
@@ -305,4 +322,7 @@ export class ComplexityOrchestrator_v1 {
 
     return complexityOrder[maxIndex];
   }
+
+
+
 }

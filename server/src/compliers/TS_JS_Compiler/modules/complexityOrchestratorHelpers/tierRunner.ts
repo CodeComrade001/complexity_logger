@@ -2,16 +2,19 @@ import { ComplexityOrchestrator_v1 } from "../complexityGenerator_v1/complexity_
 import { normalizedPayloadData } from "./complexityOrchestratorInterface.js";
 
 export class TierRunner {
+  private engine: ComplexityOrchestrator_v1;
+
   constructor(
-    private engine: ComplexityOrchestrator_v1
-  ) { }
+    engine: ComplexityOrchestrator_v1
+  ) {
+    this.engine = engine
+  }
 
   async runFree(data: normalizedPayloadData) {
     return this.engine.executeFreeTier(data);
   }
 
   async runPaid(data: normalizedPayloadData) {
-    // placeholder – different logic later
     return this.engine.executePaidTier(data);
   }
 }

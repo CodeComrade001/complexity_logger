@@ -153,9 +153,9 @@ export class EnhancedAnalyzer {
 
   static async generateAIReason(
     classification: ComplexityClassification,
-    signals: ASTSignals
+    signals: ASTSignals,
+    aiExplainer: AIComplexityExplainer
   ): Promise<PaidComplexityReason> {
-    const ai = new AIComplexityExplainer();
 
     const signalList = [
       signals.maxLoopDepth > 1 && "nested loops",
@@ -167,7 +167,7 @@ export class EnhancedAnalyzer {
       signals.hasDeepClone && "deep clone"
     ].filter(Boolean) as string[];
 
-    const explanation = await ai.explainComplexity(
+    const explanation = await aiExplainer.explainComplexity(
       { time: classification.timeComplexity.notation, space: classification.spaceComplexity.notation },
       signalList
     );
