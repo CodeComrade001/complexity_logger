@@ -62,13 +62,16 @@ export class AIComplexityExplainer {
   ): Promise<string> {
     await this.ready();
 
-    return this.prompt(
+    const response = await this.prompt(
       `Time Complexity: ${notation.time}
        Space Complexity: ${notation.space}
         Signals: ${signals.join(", ")}
         Explain in ONE detailed senior dev concise sentence.`,
       35
     );
+    console.log("Turbo Log  ~ AIComplexityExplainer ~ explainComplexity ~ response:", response);
+
+    return response;
   }
 
   // // ---------- classification ----------
