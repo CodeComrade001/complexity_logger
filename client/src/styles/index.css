@@ -1,8 +1,0 @@
-@import "./variables.css";
-@import "./base.css";
-@import "./utilities.css";
-@import "./components.css";
-
-/* Tailwind layers */
-@import "tailwindcss";
-@plugin "tailwindcss-animate";
