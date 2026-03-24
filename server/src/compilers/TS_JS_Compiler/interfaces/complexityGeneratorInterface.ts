@@ -1,6 +1,80 @@
+import { SyntaxKind } from "ts-morph";
 import { fetchUnitPartOfCodeArrayTargets } from "./fetchUnitPartOfCodeProps.js";
 
 export type TierLevel = "free" | "paid";
+export type Risk = "LOW" | "MEDIUM" | "HIGH";
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SIGNAL PROFILE
+// Raw counts extracted from a single AST traversal.
+// Every downstream model reads only from this — no re-traversals.
+// ─────────────────────────────────────────────────────────────────────────────
+export interface SignalProfile {
+  // ── Time-complexity signals ──────────────────────────────────────────────
+  loops: number;             // total loop constructs found
+  nestedLoops: number;       // deepest nesting depth of loops (e.g. 2 = O(n²))
+  conditionals: number;      // if / switch / ternary count
+  recursion: boolean;        // does the function call itself?
+  recursionDoubled: boolean; // are there ≥2 recursive calls in one expression? → O(2ⁿ)
+  hasBreakOrContinue: boolean;  // break/continue can reduce effective complexity
+  conditionDoubled: boolean; // compound conditions (&&/||) → may double comparisons
+  isConstantBody: boolean;   // body has no loops/recursion → O(1) candidate
+  isConstantWithReturn: boolean; // single early return, no branching at all
+
+  // ── Space-complexity signals ─────────────────────────────────────────────
+  allocations: number;       // `new X`, array literals, object literals assigned
+  variables: number;         // total variable declarations
+  usesDataStructures: boolean;       // Array / Map / Set / object usage
+  usesNestedDataStructures: boolean; // array-of-arrays, map-of-maps, etc.
+  loopWithAllocation: boolean;       // memory allocated inside a loop → O(n) space
+  recursionWithAllocation: boolean;  // memory allocated in a recursive path → O(n) stack
+
+  // ── Dataset-size hints (static inference) ───────────────────────────────
+  // We cannot know actual runtime sizes, but we can infer from parameter names
+  // and common patterns whether the algorithm appears to treat input as large.
+  dataSizeHint: "SMALL" | "MEDIUM" | "LARGE";
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// COMPLEXITY PROFILE  (derived from SignalProfile)
+// ─────────────────────────────────────────────────────────────────────────────
+export interface ComplexityProfile {
+  timeNotation: ComplexityNotation;   // Big-O string  e.g. "O(n²)"
+  spaceNotation: ComplexityNotation;
+  timeScore: number;      // 1-10 severity score
+  spaceScore: number;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GROWTH PROFILE  (with risk)
+// ─────────────────────────────────────────────────────────────────────────────
+export interface GrowthProfile {
+  time: ComplexityNotation;
+  space: ComplexityNotation;
+  timeScore: number;
+  spaceScore: number;
+  totalScore: number;
+  riskLevel: Risk;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LOOP STATEMENT KINDS  (used in traversal)
+// ─────────────────────────────────────────────────────────────────────────────
+export const LOOP_KINDS = new Set([
+  SyntaxKind.ForStatement,
+  SyntaxKind.ForOfStatement,
+  SyntaxKind.ForInStatement,
+  SyntaxKind.WhileStatement,
+  SyntaxKind.DoStatement,
+]);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ALLOCATION KINDS  (new X, [], {}, Array(), Map(), Set() calls)
+// ─────────────────────────────────────────────────────────────────────────────
+export const ALLOCATION_CONSTRUCTOR_NAMES = new Set([
+  "Array", "Map", "Set", "WeakMap", "WeakSet", "Object", "Buffer",
+]);
+
 
 export type ComplexityNotation =
   | "O(1)"
@@ -11,6 +85,7 @@ export type ComplexityNotation =
   | "O(n³)"
   | "O(n^k)"
   | "O(2^n)"
+  | "O(2ⁿ)"
   | "O(n!)"      // <--- ADD THIS
   | "O(sqrt n)"  // <--- OPTIONAL BUT PRO
   | "UNKNOWN";
@@ -21,14 +96,49 @@ export type Uppercase_RiskLevelType = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 export type Lowercase_RiskLevelType = "low" | "medium" | "high" | "critical" | "unknown";
 // Signal collection results from AST traversal
 export interface ASTSignals {
+  /** * Signals O(n^x) where x = depth. 
+   * Detected by: Counting nested 'ForStatement', 'WhileStatement', or '.forEach' calls.
+   */
   maxLoopDepth: number;
+
+  /** * Signals O(n) or O(n²) Space. 
+   * Detected by: 'ArrayExpression' ([]) or 'new Array()' inside a loop block.
+   */
   allocationsInLoop: number;
+
+  /** * Signals O(n) or O(2^n) Time/Space. 
+   * Detected by: A 'FunctionDeclaration' identifier appearing within its own 'BlockStatement'.
+   */
   hasRecursion: boolean;
+
+  /** * Signals O(2^n) Exponential growth. 
+   * Detected by: Two or more recursive calls within the same return statement (e.g., fib(n-1) + fib(n-2)).
+   */
   isBinaryRecursion: boolean;
+
+  /** * Signals O(n log n) Time. 
+   * Detected by: Calls to '.sort()' or implementations of Merge/Quick sort patterns.
+   */
   hasSorting: boolean;
+
+  /** * Signals O(n) Time. 
+   * Detected by: '.find()', '.indexOf()', '.includes()', or a loop with an 'if (arr[i] === target)'.
+   */
   hasLinearSearch: boolean;
+
+  /** * Signals O(n) Space and Time (Hidden). 
+   * Detected by: 'JSON.parse(JSON.stringify())' or structuredClone().
+   */
   hasDeepClone: boolean;
+
+  /** * Signals O(n) Time. 
+   * Detected by: += operators inside loops or '.reduce()' calls.
+   */
   hasAccumulation: boolean;
+
+  /** * Raw metadata for debugging. 
+   * Stores specific strings like "push", "slice", "splice", "concat".
+   */
   matchedKeywords: string[];
 }
 

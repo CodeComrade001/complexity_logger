@@ -195,3 +195,5 @@ pnpm-lock.yaml
 
 # igonre models
 server/src/models/
+/server/src/disposable_files/manual-storge
+/server/src/module/download/result.json

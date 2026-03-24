@@ -5,11 +5,16 @@ import { readResult, editResult } from "../utils/fileStorage.js";
 import { WorkerPool } from "./workerPool.js";
 // Load jobs from JSON
 const jobs: Job[] = JSON.parse(fs.readFileSync("jobs.json", "utf-8"));
-const maxWorkers = 30;
+const maxWorkers = 5;
 const pool = new WorkerPool(maxWorkers);
 
 // Run a single job in a worker
-function runJob(job: Job): Promise<JobResult> {
+export async function runJob(job: Job): Promise<JobResult> {
+
+  //test job 
+  console.log("Turbo Log  ~ runJob ~ job:", job);
+
+
   return new Promise((resolve, reject) => {
     const worker = new Worker("./worker.ts");
 
@@ -29,7 +34,10 @@ function runJob(job: Job): Promise<JobResult> {
 
 // Run all jobs in parallel
 export async function runAllJobsParallel(jobsArray: Job[]): Promise<JobResult[]> {
-  const promises = jobsArray.map((job) => pool.run(job));
+  //test job array
+  console.log("Turbo Log  ~ runAllJobsParallel ~ jobsArray:", jobsArray);
+
+  const promises = jobsArray.map((job: Job) => pool.run(job));
   return Promise.all(promises);
 }
 
@@ -45,6 +53,6 @@ export async function runAllJobsParallel(jobsArray: Job[]): Promise<JobResult[]>
   console.log("Read stored result:", storedResult);
 
   // Example editing a result
-  const updated = editResult(firstJob.id, { note: "Checked and verified" });
+  const updated = editResult(firstJob.id, { ...storedResult });
   console.log("Edited result:", updated);
 })();

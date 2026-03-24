@@ -1,6 +1,7 @@
 // workerPool.ts
 import { Worker } from "worker_threads";
 import { Job, JobResult } from "./worker_types/workerTypes.js";
+import path from "path";
 
 interface WorkerTask {
   job: Job;
@@ -32,7 +33,9 @@ export class WorkerPool {
     if (!task) return;
 
     this.activeWorkers++;
-    const worker = new Worker("./worker.ts");
+    // Use absolute path for worker
+    const workerPath = path.resolve("./worker.js");
+    const worker = new Worker(workerPath);
 
     worker.on("message", (msg: JobResult) => {
       task.resolve(msg);

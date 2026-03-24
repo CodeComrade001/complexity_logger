@@ -1,6 +1,6 @@
 
 import path from "path";
-import Compiler from "../../compliers/TS_JS_Compiler/compiler.js";
+import Compiler from "../../compilers/TS_JS_Compiler/compiler.js";
 import { FileUploadModel } from "../file_Interface/fileInterface.js";
 import { IFileRepository } from "../ports/IFileRepository.js";
 import { streamToString } from "../utils/parserFileData.js";

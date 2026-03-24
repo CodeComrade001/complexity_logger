@@ -13,16 +13,20 @@ import { EnhancedAnalyzer } from "./paidTierResources/enhanced_analyzer.js";
 import { normalizedPayloadData } from "../complexityOrchestratorHelpers/complexityOrchestratorInterface.js";
 import { fetchUnitPartOfCodeArrayTargets } from "../../interfaces/fetchUnitPartOfCodeProps.js";
 import { AIComplexityExplainer } from "./paidTierResources/aI_ReasonGenerator.js";
+import { EnhancedAnalyzer_v2 } from "./paidTierResources/enhancedAnalyzer_v2.js";
+import { tempManualStorage } from "../../../../disposable_files/manual-storge.js";
 
 type UnitTarget = fetchUnitPartOfCodeArrayTargets;
 
 export class ComplexityOrchestrator_v1 {
   private keywordSet: Set<string>;
   private aiExplainer: AIComplexityExplainer;
+  private enhancedAnalyzer: EnhancedAnalyzer_v2
 
-  constructor(keywordSet: Set<string>, aiExplainer: AIComplexityExplainer) {
+  constructor(keywordSet: Set<string>, aiExplainer: AIComplexityExplainer, enhancedAnalyzer: EnhancedAnalyzer_v2) {
     this.keywordSet = keywordSet;
     this.aiExplainer = aiExplainer;
+    this.enhancedAnalyzer = enhancedAnalyzer
   }
 
   // ========================================
@@ -124,22 +128,61 @@ export class ComplexityOrchestrator_v1 {
 
     const reasons: PaidComplexityReason[] = [];
 
-    // Phase 1: Collect AST signals using EnhancedAnalyzer
-    const asyncWeight = await EnhancedAnalyzer.detectAsyncPattern(node, startLine, reasons);
-    const signals = await EnhancedAnalyzer.collectASTSignals(node, name, this.keywordSet);
 
-    // Phase 2: Calculate scores from signals
-    const scores = await EnhancedAnalyzer.calculateScores(signals, asyncWeight, startLine);
+    /*//////////////////////////////////////////////////////////////
+      THESE IS AND OUTDATED VERSION THAT WILL BE DELETED LATER JUST LEAVE IT TO PREVENT CODE ERROES 
+    //////////////////////////////////////////////////////////////*/
 
-    // Phase 3: Classify complexity
-    const classification = await EnhancedAnalyzer.classifyComplexity(signals, scores);
+    // const asyncWeight = await EnhancedAnalyzer.detectAsyncPattern(node, startLine, reasons);
+    // const signals = await EnhancedAnalyzer.collectASTSignals(node, name, this.keywordSet);
 
-    const uniqueKeywords = await Array.from(new Set(signals.matchedKeywords)) as string[];
+    // // Phase 2: Calculate scores from signals
+    // const scores = await EnhancedAnalyzer.calculateScores(signals, asyncWeight, startLine);
 
-    const aiReason = await this.generateAIReason(classification, signals);
-    console.log("Turbo Log  ~ ComplexityOrchestrator_v1 ~ analyzeDeepNode ~ aiReason:", aiReason);
+    // // Phase 3: Classify complexity
+    // const classification = await EnhancedAnalyzer.classifyComplexity(signals, scores);
 
-    reasons.push(aiReason);
+    // const uniqueKeywords = await Array.from(new Set(signals.matchedKeywords)) as string[];
+
+    // const aiReason = await this.generateAIReason(classification, signals);
+    // console.log("Turbo Log  ~ ComplexityOrchestrator_v1 ~ analyzeDeepNode ~ aiReason:", aiReason);
+
+    // reasons.push(aiReason);
+
+
+    /*//////////////////////////////////////////////////////////////
+                          NEW VERSION IMPLEMENTATION
+        //////////////////////////////////////////////////////////////*/
+
+
+    const { success, result: newComplexityEnhancer } = this.enhancedAnalyzer.run(node, name, this.keywordSet)
+    console.log("Turbo Log  ~ ComplexityOrchestrator_v1 ~ analyzeDeepNode ~ newComplexityEnhancer:", newComplexityEnhancer);
+    if (!success || newComplexityEnhancer == undefined) {
+      throw new Error("Paid complexity failed to run")
+    }
+
+    const resultFormat = {
+      id: `${name || "anon"}:${startLine}`,
+      kind,
+      name,
+      startLine,
+      endLine,
+      text,
+      timeComplexity: newComplexityEnhancer.timeComplexity,
+      spaceComplexity: newComplexityEnhancer.spaceComplexity,
+      timeScore: Math.round(newComplexityEnhancer.timeScore),
+      spaceScore: Math.round(newComplexityEnhancer.spaceScore),
+      totalScore: newComplexityEnhancer.totalScore,
+      riskLevel: newComplexityEnhancer.riskLevel,
+      confidence: newComplexityEnhancer.confidence,
+      reasons,
+      matchedKeywords: ["No key word added for now"],
+      tierUsed: "paid"
+    };
+
+    // temprarily store result
+    await tempManualStorage(resultFormat, "paid-complexity-result.json")
+
 
     return {
       id: `${name || "anon"}:${startLine}`,
@@ -148,17 +191,17 @@ export class ComplexityOrchestrator_v1 {
       startLine,
       endLine,
       text,
-      timeComplexity: classification.timeComplexity,
-      spaceComplexity: classification.spaceComplexity,
-      timeScore: Math.round(scores.timeScore),
-      spaceScore: Math.round(scores.spaceScore),
-      totalScore: scores.totalScore,
-      riskLevel: classification.riskLevel,
-      confidence: classification.confidence,
+      timeComplexity: newComplexityEnhancer.timeComplexity,
+      spaceComplexity: newComplexityEnhancer.spaceComplexity,
+      timeScore: Math.round(newComplexityEnhancer.timeScore),
+      spaceScore: Math.round(newComplexityEnhancer.spaceScore),
+      totalScore: newComplexityEnhancer.totalScore,
+      riskLevel: newComplexityEnhancer.riskLevel,
+      confidence: newComplexityEnhancer.confidence,
       reasons,
-      matchedKeywords: uniqueKeywords,
+      matchedKeywords: ["No key word added for now"],
       tierUsed: "paid"
-    };
+    }
   }
 
   // ========================================
