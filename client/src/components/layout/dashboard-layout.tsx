@@ -8,17 +8,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <ProtectedRoute>
-      <ThemeProvider defaultTheme="dark" storageKey="complexity-theme">
-        <DashboardContent>{children}</DashboardContent>
-      </ThemeProvider>
-    </ProtectedRoute>
+    // <ProtectedRoute>
+    <DashboardContent>{children}</DashboardContent>
+    // </ProtectedRoute>
   );
 }
 
 function DashboardContent({ children }: { children: React.ReactNode }) {
   const { theme, setTheme } = useTheme();
-  
+
   const style = {
     "--sidebar-width": "16rem",
     "--sidebar-width-icon": "4rem",
@@ -37,34 +35,39 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                 <span>Search projects (Cmd+K)</span>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-4">
               <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-foreground">
                 <Bell className="w-5 h-5" />
                 <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full animate-pulse"></span>
               </Button>
-              
-              <Button 
-                variant="ghost" 
-                size="icon" 
+
+              <Button
+                variant="ghost"
+                size="icon"
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="text-muted-foreground hover:text-foreground"
+                className=" bg-primary text-white hover:text-foreground"
               >
-                <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                {theme === "dark" ?
+                  (
+                    <Moon className="absolute  h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                  ) : (
+                    <Sun className="h-[1.2rem] w-[1.2rem]  rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-100" />
+                  )
+                }
               </Button>
-              
+
               <div className="h-6 w-px bg-border mx-1"></div>
-              
+
               <Avatar className="h-8 w-8 border border-border hover:border-primary transition-colors cursor-pointer">
                 <AvatarImage src="https://i.pravatar.cc/150?u=dev" />
                 <AvatarFallback>DV</AvatarFallback>
               </Avatar>
             </div>
           </header>
-          
-          <main className="flex-1 overflow-auto p-4 md:p-8 bg-background">
-            <div className="max-w-6xl mx-auto pb-20">
+
+          <main className="flex-1 pb-4 p-4 md:p-8 bg-background">
+            <div className="max-w-1xl mx-auto sm:overflow-auto pb-4">
               {children}
             </div>
           </main>

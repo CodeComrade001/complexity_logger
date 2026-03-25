@@ -12,8 +12,8 @@
     "noEmit": true,
     "jsx": "preserve",
     "lib": [
-      "esnext",
-      "dom",
+      "ES2021",
+      "DOM",
       "dom.iterable"
     ],
     "composite": true,
