@@ -10,31 +10,34 @@ export type Risk = "LOW" | "MEDIUM" | "HIGH";
 // Every downstream model reads only from this — no re-traversals.
 // ─────────────────────────────────────────────────────────────────────────────
 export interface SignalProfile {
-  // ── Time-complexity signals ──────────────────────────────────────────────
-  loops: number;             // total loop constructs found
-  nestedLoops: number;       // deepest nesting depth of loops (e.g. 2 = O(n²))
-  conditionals: number;      // if / switch / ternary count
-  recursion: boolean;        // does the function call itself?
-  recursionDoubled: boolean; // are there ≥2 recursive calls in one expression? → O(2ⁿ)
-  hasBreakOrContinue: boolean;  // break/continue can reduce effective complexity
-  conditionDoubled: boolean; // compound conditions (&&/||) → may double comparisons
-  isConstantBody: boolean;   // body has no loops/recursion → O(1) candidate
-  isConstantWithReturn: boolean; // single early return, no branching at all
-
-  // ── Space-complexity signals ─────────────────────────────────────────────
-  allocations: number;       // `new X`, array literals, object literals assigned
-  variables: number;         // total variable declarations
-  usesDataStructures: boolean;       // Array / Map / Set / object usage
-  usesNestedDataStructures: boolean; // array-of-arrays, map-of-maps, etc.
-  loopWithAllocation: boolean;       // memory allocated inside a loop → O(n) space
-  recursionWithAllocation: boolean;  // memory allocated in a recursive path → O(n) stack
-
-  // ── Dataset-size hints (static inference) ───────────────────────────────
-  // We cannot know actual runtime sizes, but we can infer from parameter names
-  // and common patterns whether the algorithm appears to treat input as large.
+  // ==================== EXISTING PROPERTIES ====================
+  loops: number;
+  nestedLoops: number;
+  conditionals: number;
+  recursion: boolean;
+  recursionDoubled: boolean;
+  hasBreakOrContinue: boolean;
+  conditionDoubled: boolean;
+  isConstantBody: boolean;
+  isConstantWithReturn: boolean;
+  allocations: number;
+  variables: number;
+  usesDataStructures: boolean;
+  usesNestedDataStructures: boolean;
+  loopWithAllocation: boolean;
+  recursionWithAllocation: boolean;
   dataSizeHint: "SMALL" | "MEDIUM" | "LARGE";
-}
 
+  // ==================== NEW PROPERTIES (ADD THESE) ====================
+  hasEarlyReturn: boolean;        // Detects return statements inside loops
+  // Used for: Binary search pattern detection
+
+  hasLoopInRecursion: boolean;    // Detects loops inside recursive functions
+  // Used for: Factorial complexity detection
+
+  hasFilterOrSlice: boolean;      // Detects .filter() or .slice() method calls
+  // Used for: Divide-and-conquer and factorial patterns
+}
 // ─────────────────────────────────────────────────────────────────────────────
 // COMPLEXITY PROFILE  (derived from SignalProfile)
 // ─────────────────────────────────────────────────────────────────────────────

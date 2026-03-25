@@ -57,6 +57,7 @@ export class EnhancedAnalyzer_v2 {
     let recursionCallCount = 0;    // total recursive call-sites found
     let recursionDoubled = false;
     let hasBreakOrContinue = false;
+    let hasEarlyReturn = false;    // NEW: detects return statements in loops
     let conditionDoubled = false;
     let allocations = 0;
     let variables = 0;
@@ -64,6 +65,9 @@ export class EnhancedAnalyzer_v2 {
     let usesNestedDataStructures = false;
     let loopWithAllocation = false;
     let recursionWithAllocation = false;
+    let hasLoopInRecursion = false; // NEW: loop inside recursive function
+    let hasFilterOrSlice = false;   // NEW: detects filtering/slicing patterns
+    let recursionDepth = 0;         // NEW: track how deep recursion goes
 
     // ── Stack to track current loop-nesting depth ───────────────────────────
     let currentLoopDepth = 0;
@@ -101,6 +105,9 @@ export class EnhancedAnalyzer_v2 {
         currentLoopDepth++;
         maxLoopDepth = Math.max(maxLoopDepth, currentLoopDepth);
         insideLoop = true;
+
+        // Track if we're in a loop inside a recursive function
+        if (insideRecursion) hasLoopInRecursion = true;
       }
 
       // ── CONDITIONAL detection ──────────────────────────────────────────
@@ -124,6 +131,11 @@ export class EnhancedAnalyzer_v2 {
         kind === SyntaxKind.ContinueStatement
       ) {
         hasBreakOrContinue = true;
+      }
+
+      // ── EARLY RETURN detection (inside loops) ──────────────────────────
+      if (kind === SyntaxKind.ReturnStatement && insideLoop) {
+        hasEarlyReturn = true;
       }
 
       // ── VARIABLE DECLARATION detection ────────────────────────────────
@@ -154,12 +166,23 @@ export class EnhancedAnalyzer_v2 {
         usesDataStructures = true;
       }
 
+      // ── FILTER/SLICE detection (factorial pattern indicator) ───────────
+      if (kind === SyntaxKind.CallExpression) {
+        const callNode = n as CallExpression;
+        const callText = callNode.getExpression().getText();
+
+        if (callText.includes("filter") || callText.includes("slice")) {
+          hasFilterOrSlice = true;
+        }
+      }
+
       // ── RECURSIVE CALL detection ───────────────────────────────────────
       if (kind === SyntaxKind.CallExpression) {
         const callNode = n as CallExpression;
         if (isSelfCall(callNode)) {
           recursion = true;
           recursionCallCount++;
+          recursionDepth = Math.max(recursionDepth, 1);
           insideRecursion = true;
         }
       }
@@ -214,6 +237,7 @@ export class EnhancedAnalyzer_v2 {
       recursion,
       recursionDoubled,
       hasBreakOrContinue,
+      hasEarlyReturn,
       conditionDoubled,
       isConstantBody,
       isConstantWithReturn,
@@ -223,6 +247,8 @@ export class EnhancedAnalyzer_v2 {
       usesNestedDataStructures,
       loopWithAllocation,
       recursionWithAllocation,
+      hasLoopInRecursion,
+      hasFilterOrSlice,
       dataSizeHint,
     };
   }
@@ -269,16 +295,34 @@ export class EnhancedAnalyzer_v2 {
       timeNotation = "O(2ⁿ)";
       timeScore = 9;
 
+    } else if (signals.recursion && signals.hasLoopInRecursion && signals.hasFilterOrSlice) {
+      // Factorial pattern: recursion + loop + filtering remaining elements
+      // Classic permutation/combination generation
+      timeNotation = "O(n!)";
+      timeScore = 10;
+
     } else if (signals.recursion && signals.nestedLoops >= 2) {
       // Recursive + deeply nested loops → very expensive, treat as O(n³)
       timeNotation = "O(n³)";
       timeScore = 8;
 
-    } else if (signals.recursion && signals.loops > 0) {
-      // Recursive with a loop inside → at minimum O(n log n) / O(n²)
-      // We conservatively emit O(n²) unless break/continue hints otherwise
-      timeNotation = signals.hasBreakOrContinue ? "O(n log n)" : "O(n²)";
-      timeScore = signals.hasBreakOrContinue ? 5 : 7;
+    } else if (signals.recursion && signals.hasLoopInRecursion) {
+      // Recursion with a loop inside → likely O(n²)
+      timeNotation = "O(n²)";
+      timeScore = 7;
+
+    } else if (signals.recursion && signals.allocations > 0) {
+      // Recursion with allocations (like merge sort with slice)
+      // If it's dividing the problem, it's likely O(n log n)
+      // We infer this from the presence of slice/split operations
+
+      if (signals.hasFilterOrSlice) {
+        timeNotation = "O(n log n)";
+        timeScore = 5;
+      } else {
+        timeNotation = "O(n²)";
+        timeScore = 7;
+      }
 
     } else if (signals.recursion) {
       // Pure recursion (single branch) → O(n) on the call stack
@@ -296,11 +340,12 @@ export class EnhancedAnalyzer_v2 {
       timeScore = 7;
 
     } else if (signals.loops > 0) {
-      // Single loop.  If there's a halving pattern (break/continue + conditionals)
-      // we infer O(log n); otherwise plain O(n).
+      // Single loop. Check for logarithmic patterns:
+      // - Has conditionals AND (break/continue OR early return)
+      // - Single loop only
       const likelyLogN =
-        signals.hasBreakOrContinue &&
         signals.conditionals > 0 &&
+        (signals.hasBreakOrContinue || signals.hasEarlyReturn) &&
         signals.loops === 1;
 
       timeNotation = likelyLogN ? "O(log n)" : "O(n)";
