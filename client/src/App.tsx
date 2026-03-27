@@ -1,5 +1,4 @@
 import { Switch, Route, Router as WouterRouter } from "wouter";
-import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 import Landing from "@/pages/landing";
@@ -13,6 +12,7 @@ import "./index.css"
 import { NotificationProvider } from "./context/useNotification";
 import { ThemeProvider } from "./components/theme-provider";
 import ComplexityResultPage from "./pages/dashboard/fullComplexityResultPage";
+import { Toaster } from "sonner";
 
 
 function Router() {
@@ -39,9 +39,9 @@ function App() {
   return (
     <ThemeProvider>
       <NotificationProvider>
+        <Toaster position="top-right" />
         <TooltipProvider>
           <Router />
-          <Toaster />
         </TooltipProvider>
       </NotificationProvider>
     </ThemeProvider>

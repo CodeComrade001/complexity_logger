@@ -9,6 +9,8 @@ export type Risk = "LOW" | "MEDIUM" | "HIGH";
 // Raw counts extracted from a single AST traversal.
 // Every downstream model reads only from this — no re-traversals.
 // ─────────────────────────────────────────────────────────────────────────────
+// In: interfaces/complexityGeneratorInterface.ts
+
 export interface SignalProfile {
   // ==================== EXISTING PROPERTIES ====================
   loops: number;
@@ -17,6 +19,7 @@ export interface SignalProfile {
   recursion: boolean;
   recursionDoubled: boolean;
   hasBreakOrContinue: boolean;
+  hasEarlyReturn: boolean;               // ← Added in previous update
   conditionDoubled: boolean;
   isConstantBody: boolean;
   isConstantWithReturn: boolean;
@@ -26,17 +29,17 @@ export interface SignalProfile {
   usesNestedDataStructures: boolean;
   loopWithAllocation: boolean;
   recursionWithAllocation: boolean;
+  hasLoopInRecursion: boolean;           // ← Added in previous update
+  hasFilterOrSlice: boolean;             // ← Added in previous update
   dataSizeHint: "SMALL" | "MEDIUM" | "LARGE";
 
   // ==================== NEW PROPERTIES (ADD THESE) ====================
-  hasEarlyReturn: boolean;        // Detects return statements inside loops
-  // Used for: Binary search pattern detection
-
-  hasLoopInRecursion: boolean;    // Detects loops inside recursive functions
-  // Used for: Factorial complexity detection
-
-  hasFilterOrSlice: boolean;      // Detects .filter() or .slice() method calls
-  // Used for: Divide-and-conquer and factorial patterns
+  hasLinearSearchInLoop: boolean;        // NEW: .includes/.indexOf in loops
+  hasNestedArrayMethods: boolean;        // NEW: nested array method chains
+  hasSorting: boolean;                   // NEW: .sort() detection
+  hasJSONOperations: boolean;            // NEW: JSON.parse/stringify
+  hasSpreadOperator: boolean;            // NEW: spread operator usage
+  functionalLoopCount: number;           // NEW: count of functional loops
 }
 // ─────────────────────────────────────────────────────────────────────────────
 // COMPLEXITY PROFILE  (derived from SignalProfile)
@@ -83,6 +86,7 @@ export type ComplexityNotation =
   | "O(1)"
   | "O(log n)"
   | "O(n)"
+  | "O(n!)"
   | "O(n log n)"
   | "O(n²)"
   | "O(n³)"

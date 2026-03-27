@@ -1,0 +1,4162 @@
+[
+  {
+    "id": "arrows_0:56",
+    "kind": "arrows",
+    "name": "arrows_0",
+    "startLine": 56,
+    "endLine": 56,
+    "text": "(a, b) => a - b",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "arrows_1:117",
+    "kind": "arrows",
+    "name": "arrows_1",
+    "startLine": 117,
+    "endLine": 117,
+    "text": "(_, idx) => idx !== i",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_0:8",
+    "kind": "methods",
+    "name": "methods_0",
+    "startLine": 8,
+    "endLine": 10,
+    "text": "constantOperation(): number {\r\n    return 1 + 1;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_1:18",
+    "kind": "methods",
+    "name": "methods_1",
+    "startLine": 18,
+    "endLine": 29,
+    "text": "logarithmicSearch(arr: number[], target: number): number {\r\n    let left = 0, right = arr.length - 1;\r\n\r\n    while (left <= right) {\r\n      let mid = Math.floor((left + right) / 2);\r\n      if (arr[mid] === target) return mid;\r\n      if (arr[mid] < target) left = mid + 1;\r\n      else right = mid - 1;\r\n    }\r\n\r\n    return -1;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(log n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 2,
+    "spaceScore": 1,
+    "totalScore": 2,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_2:36",
+    "kind": "methods",
+    "name": "methods_2",
+    "startLine": 36,
+    "endLine": 41,
+    "text": "linearSearch(arr: number[], target: number): number {\r\n    for (let i = 0; i < arr.length; i++) {\r\n      if (arr[i] === target) return i;\r\n    }\r\n    return -1;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(log n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 2,
+    "spaceScore": 1,
+    "totalScore": 2,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_3:49",
+    "kind": "methods",
+    "name": "methods_3",
+    "startLine": 49,
+    "endLine": 57,
+    "text": "nLogNExample(arr: number[]): number[] {\r\n    if (arr.length <= 1) return arr;\r\n\r\n    const mid = Math.floor(arr.length / 2);\r\n    const left = this.nLogNExample(arr.slice(0, mid));\r\n    const right = this.nLogNExample(arr.slice(mid));\r\n\r\n    return [...left, ...right].sort((a, b) => a - b);\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 2,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_4:64",
+    "kind": "methods",
+    "name": "methods_4",
+    "startLine": 64,
+    "endLine": 74,
+    "text": "quadraticPairs(arr: number[]): number[][] {\r\n    const pairs: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      for (let j = 0; j < arr.length; j++) {\r\n        pairs.push([arr[i], arr[j]]);\r\n      }\r\n    }\r\n\r\n    return pairs;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n²)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 7,
+    "spaceScore": 4,
+    "totalScore": 6,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_5:81",
+    "kind": "methods",
+    "name": "methods_5",
+    "startLine": 81,
+    "endLine": 91,
+    "text": "cubicLoop(n: number): number {\r\n    let count = 0;\r\n    for (let i = 0; i < n; i++) {\r\n      for (let j = 0; j < n; j++) {\r\n        for (let k = 0; k < n; k++) {\r\n          count++;\r\n        }\r\n      }\r\n    }\r\n    return count;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n³)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 8,
+    "spaceScore": 1,
+    "totalScore": 6,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_6:99",
+    "kind": "methods",
+    "name": "methods_6",
+    "startLine": 99,
+    "endLine": 102,
+    "text": "exponentialFibonacci(n: number): number {\r\n    if (n <= 1) return n;\r\n    return this.exponentialFibonacci(n - 1) + this.exponentialFibonacci(n - 2);\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_7:110",
+    "kind": "methods",
+    "name": "methods_7",
+    "startLine": 110,
+    "endLine": 126,
+    "text": "factorialPermutations(arr: number[]): number[][] {\r\n    if (arr.length === 0) return [[]];\r\n\r\n    const result: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      const current = arr[i];\r\n      const remaining = arr.filter((_, idx) => idx !== i);\r\n      const perms = this.factorialPermutations(remaining);\r\n\r\n      for (const perm of perms) {\r\n        result.push([current, ...perm]);\r\n      }\r\n    }\r\n\r\n    return result;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n³)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n²)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 8,
+    "spaceScore": 7,
+    "totalScore": 8,
+    "riskLevel": "HIGH",
+    "confidence": 70,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_8:133",
+    "kind": "methods",
+    "name": "methods_8",
+    "startLine": 133,
+    "endLine": 135,
+    "text": "linearSpace(n: number): number[] {\r\n    return new Array(n).fill(0);\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 2,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_9:142",
+    "kind": "methods",
+    "name": "methods_9",
+    "startLine": 142,
+    "endLine": 149,
+    "text": "quadraticSpace(n: number): number[][] {\r\n    const grid: number[][] = [];\r\n    for (let i = 0; i < n; i++) {\r\n      const row = new Array(n).fill(0);\r\n      grid.push(row);\r\n    }\r\n    return grid;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 4,
+    "spaceScore": 4,
+    "totalScore": 4,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "topLevelStatements_0:2",
+    "kind": "topLevelStatements",
+    "name": "topLevelStatements_0",
+    "startLine": 2,
+    "endLine": 153,
+    "text": "export class ComplexityShowcase {\r\n\r\n  /**\r\n   * O(1) Time — Constant\r\n   * O(1) Space — Constant\r\n   */\r\n  constantOperation(): number {\r\n    return 1 + 1;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(log n) Time — Logarithmic\r\n   * O(1) Space — Constant\r\n   * Example: Binary Search\r\n   */\r\n  logarithmicSearch(arr: number[], target: number): number {\r\n    let left = 0, right = arr.length - 1;\r\n\r\n    while (left <= right) {\r\n      let mid = Math.floor((left + right) / 2);\r\n      if (arr[mid] === target) return mid;\r\n      if (arr[mid] < target) left = mid + 1;\r\n      else right = mid - 1;\r\n    }\r\n\r\n    return -1;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n) Time — Linear\r\n   * O(1) Space — Constant\r\n   */\r\n  linearSearch(arr: number[], target: number): number {\r\n    for (let i = 0; i < arr.length; i++) {\r\n      if (arr[i] === target) return i;\r\n    }\r\n    return -1;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n log n) Time — Linearithmic\r\n   * O(log n) Space — Recursion stack\r\n   * Example: Merge Sort (showing structure only)\r\n   */\r\n  nLogNExample(arr: number[]): number[] {\r\n    if (arr.length <= 1) return arr;\r\n\r\n    const mid = Math.floor(arr.length / 2);\r\n    const left = this.nLogNExample(arr.slice(0, mid));\r\n    const right = this.nLogNExample(arr.slice(mid));\r\n\r\n    return [...left, ...right].sort((a, b) => a - b);\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n²) Time — Quadratic\r\n   * O(1) Space — Constant\r\n   */\r\n  quadraticPairs(arr: number[]): number[][] {\r\n    const pairs: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      for (let j = 0; j < arr.length; j++) {\r\n        pairs.push([arr[i], arr[j]]);\r\n      }\r\n    }\r\n\r\n    return pairs;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n³) Time — Cubic\r\n   * O(1) Space — Constant\r\n   */\r\n  cubicLoop(n: number): number {\r\n    let count = 0;\r\n    for (let i = 0; i < n; i++) {\r\n      for (let j = 0; j < n; j++) {\r\n        for (let k = 0; k < n; k++) {\r\n          count++;\r\n        }\r\n      }\r\n    }\r\n    return count;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(2ⁿ) Time — Exponential\r\n   * O(n) Space — Call stack grows with depth\r\n   * Example: Fibonacci (naive recursion)\r\n   */\r\n  exponentialFibonacci(n: number): number {\r\n    if (n <= 1) return n;\r\n    return this.exponentialFibonacci(n - 1) + this.exponentialFibonacci(n - 2);\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n!) Time — Factorial\r\n   * O(n) Space — Recursion depth\r\n   * Example: Generate all permutations\r\n   */\r\n  factorialPermutations(arr: number[]): number[][] {\r\n    if (arr.length === 0) return [[]];\r\n\r\n    const result: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      const current = arr[i];\r\n      const remaining = arr.filter((_, idx) => idx !== i);\r\n      const perms = this.factorialPermutations(remaining);\r\n\r\n      for (const perm of perms) {\r\n        result.push([current, ...perm]);\r\n      }\r\n    }\r\n\r\n    return result;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n) Space — Linear\r\n   * Creates a new array of size n\r\n   */\r\n  linearSpace(n: number): number[] {\r\n    return new Array(n).fill(0);\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n²) Space — Quadratic\r\n   * Creates a 2D grid\r\n   */\r\n  quadraticSpace(n: number): number[][] {\r\n    const grid: number[][] = [];\r\n    for (let i = 0; i < n; i++) {\r\n      const row = new Array(n).fill(0);\r\n      grid.push(row);\r\n    }\r\n    return grid;\r\n  }\r\n\r\n\r\n\r\n}",
+    "timeComplexity": {
+      "notation": "O(n log n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n²)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 5,
+    "spaceScore": 7,
+    "totalScore": 6,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "arrows_0:56",
+    "kind": "arrows",
+    "name": "arrows_0",
+    "startLine": 56,
+    "endLine": 56,
+    "text": "(a, b) => a - b",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "arrows_1:117",
+    "kind": "arrows",
+    "name": "arrows_1",
+    "startLine": 117,
+    "endLine": 117,
+    "text": "(_, idx) => idx !== i",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_0:8",
+    "kind": "methods",
+    "name": "methods_0",
+    "startLine": 8,
+    "endLine": 10,
+    "text": "constantOperation(): number {\r\n    return 1 + 1;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_1:18",
+    "kind": "methods",
+    "name": "methods_1",
+    "startLine": 18,
+    "endLine": 29,
+    "text": "logarithmicSearch(arr: number[], target: number): number {\r\n    let left = 0, right = arr.length - 1;\r\n\r\n    while (left <= right) {\r\n      let mid = Math.floor((left + right) / 2);\r\n      if (arr[mid] === target) return mid;\r\n      if (arr[mid] < target) left = mid + 1;\r\n      else right = mid - 1;\r\n    }\r\n\r\n    return -1;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(log n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 2,
+    "spaceScore": 1,
+    "totalScore": 2,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_2:36",
+    "kind": "methods",
+    "name": "methods_2",
+    "startLine": 36,
+    "endLine": 41,
+    "text": "linearSearch(arr: number[], target: number): number {\r\n    for (let i = 0; i < arr.length; i++) {\r\n      if (arr[i] === target) return i;\r\n    }\r\n    return -1;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(log n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 2,
+    "spaceScore": 1,
+    "totalScore": 2,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_3:49",
+    "kind": "methods",
+    "name": "methods_3",
+    "startLine": 49,
+    "endLine": 57,
+    "text": "nLogNExample(arr: number[]): number[] {\r\n    if (arr.length <= 1) return arr;\r\n\r\n    const mid = Math.floor(arr.length / 2);\r\n    const left = this.nLogNExample(arr.slice(0, mid));\r\n    const right = this.nLogNExample(arr.slice(mid));\r\n\r\n    return [...left, ...right].sort((a, b) => a - b);\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 2,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_4:64",
+    "kind": "methods",
+    "name": "methods_4",
+    "startLine": 64,
+    "endLine": 74,
+    "text": "quadraticPairs(arr: number[]): number[][] {\r\n    const pairs: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      for (let j = 0; j < arr.length; j++) {\r\n        pairs.push([arr[i], arr[j]]);\r\n      }\r\n    }\r\n\r\n    return pairs;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n²)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 7,
+    "spaceScore": 4,
+    "totalScore": 6,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_5:81",
+    "kind": "methods",
+    "name": "methods_5",
+    "startLine": 81,
+    "endLine": 91,
+    "text": "cubicLoop(n: number): number {\r\n    let count = 0;\r\n    for (let i = 0; i < n; i++) {\r\n      for (let j = 0; j < n; j++) {\r\n        for (let k = 0; k < n; k++) {\r\n          count++;\r\n        }\r\n      }\r\n    }\r\n    return count;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n³)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 8,
+    "spaceScore": 1,
+    "totalScore": 6,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_6:99",
+    "kind": "methods",
+    "name": "methods_6",
+    "startLine": 99,
+    "endLine": 102,
+    "text": "exponentialFibonacci(n: number): number {\r\n    if (n <= 1) return n;\r\n    return this.exponentialFibonacci(n - 1) + this.exponentialFibonacci(n - 2);\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_7:110",
+    "kind": "methods",
+    "name": "methods_7",
+    "startLine": 110,
+    "endLine": 126,
+    "text": "factorialPermutations(arr: number[]): number[][] {\r\n    if (arr.length === 0) return [[]];\r\n\r\n    const result: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      const current = arr[i];\r\n      const remaining = arr.filter((_, idx) => idx !== i);\r\n      const perms = this.factorialPermutations(remaining);\r\n\r\n      for (const perm of perms) {\r\n        result.push([current, ...perm]);\r\n      }\r\n    }\r\n\r\n    return result;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n³)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n²)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 8,
+    "spaceScore": 7,
+    "totalScore": 8,
+    "riskLevel": "HIGH",
+    "confidence": 70,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_8:133",
+    "kind": "methods",
+    "name": "methods_8",
+    "startLine": 133,
+    "endLine": 135,
+    "text": "linearSpace(n: number): number[] {\r\n    return new Array(n).fill(0);\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 2,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_9:142",
+    "kind": "methods",
+    "name": "methods_9",
+    "startLine": 142,
+    "endLine": 149,
+    "text": "quadraticSpace(n: number): number[][] {\r\n    const grid: number[][] = [];\r\n    for (let i = 0; i < n; i++) {\r\n      const row = new Array(n).fill(0);\r\n      grid.push(row);\r\n    }\r\n    return grid;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 4,
+    "spaceScore": 4,
+    "totalScore": 4,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "topLevelStatements_0:2",
+    "kind": "topLevelStatements",
+    "name": "topLevelStatements_0",
+    "startLine": 2,
+    "endLine": 153,
+    "text": "export class ComplexityShowcase {\r\n\r\n  /**\r\n   * O(1) Time — Constant\r\n   * O(1) Space — Constant\r\n   */\r\n  constantOperation(): number {\r\n    return 1 + 1;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(log n) Time — Logarithmic\r\n   * O(1) Space — Constant\r\n   * Example: Binary Search\r\n   */\r\n  logarithmicSearch(arr: number[], target: number): number {\r\n    let left = 0, right = arr.length - 1;\r\n\r\n    while (left <= right) {\r\n      let mid = Math.floor((left + right) / 2);\r\n      if (arr[mid] === target) return mid;\r\n      if (arr[mid] < target) left = mid + 1;\r\n      else right = mid - 1;\r\n    }\r\n\r\n    return -1;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n) Time — Linear\r\n   * O(1) Space — Constant\r\n   */\r\n  linearSearch(arr: number[], target: number): number {\r\n    for (let i = 0; i < arr.length; i++) {\r\n      if (arr[i] === target) return i;\r\n    }\r\n    return -1;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n log n) Time — Linearithmic\r\n   * O(log n) Space — Recursion stack\r\n   * Example: Merge Sort (showing structure only)\r\n   */\r\n  nLogNExample(arr: number[]): number[] {\r\n    if (arr.length <= 1) return arr;\r\n\r\n    const mid = Math.floor(arr.length / 2);\r\n    const left = this.nLogNExample(arr.slice(0, mid));\r\n    const right = this.nLogNExample(arr.slice(mid));\r\n\r\n    return [...left, ...right].sort((a, b) => a - b);\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n²) Time — Quadratic\r\n   * O(1) Space — Constant\r\n   */\r\n  quadraticPairs(arr: number[]): number[][] {\r\n    const pairs: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      for (let j = 0; j < arr.length; j++) {\r\n        pairs.push([arr[i], arr[j]]);\r\n      }\r\n    }\r\n\r\n    return pairs;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n³) Time — Cubic\r\n   * O(1) Space — Constant\r\n   */\r\n  cubicLoop(n: number): number {\r\n    let count = 0;\r\n    for (let i = 0; i < n; i++) {\r\n      for (let j = 0; j < n; j++) {\r\n        for (let k = 0; k < n; k++) {\r\n          count++;\r\n        }\r\n      }\r\n    }\r\n    return count;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(2ⁿ) Time — Exponential\r\n   * O(n) Space — Call stack grows with depth\r\n   * Example: Fibonacci (naive recursion)\r\n   */\r\n  exponentialFibonacci(n: number): number {\r\n    if (n <= 1) return n;\r\n    return this.exponentialFibonacci(n - 1) + this.exponentialFibonacci(n - 2);\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n!) Time — Factorial\r\n   * O(n) Space — Recursion depth\r\n   * Example: Generate all permutations\r\n   */\r\n  factorialPermutations(arr: number[]): number[][] {\r\n    if (arr.length === 0) return [[]];\r\n\r\n    const result: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      const current = arr[i];\r\n      const remaining = arr.filter((_, idx) => idx !== i);\r\n      const perms = this.factorialPermutations(remaining);\r\n\r\n      for (const perm of perms) {\r\n        result.push([current, ...perm]);\r\n      }\r\n    }\r\n\r\n    return result;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n) Space — Linear\r\n   * Creates a new array of size n\r\n   */\r\n  linearSpace(n: number): number[] {\r\n    return new Array(n).fill(0);\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n²) Space — Quadratic\r\n   * Creates a 2D grid\r\n   */\r\n  quadraticSpace(n: number): number[][] {\r\n    const grid: number[][] = [];\r\n    for (let i = 0; i < n; i++) {\r\n      const row = new Array(n).fill(0);\r\n      grid.push(row);\r\n    }\r\n    return grid;\r\n  }\r\n\r\n\r\n\r\n}",
+    "timeComplexity": {
+      "notation": "O(n log n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n²)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 5,
+    "spaceScore": 7,
+    "totalScore": 6,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "arrows_0:56",
+    "kind": "arrows",
+    "name": "arrows_0",
+    "startLine": 56,
+    "endLine": 56,
+    "text": "(a, b) => a - b",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "arrows_1:117",
+    "kind": "arrows",
+    "name": "arrows_1",
+    "startLine": 117,
+    "endLine": 117,
+    "text": "(_, idx) => idx !== i",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_0:8",
+    "kind": "methods",
+    "name": "methods_0",
+    "startLine": 8,
+    "endLine": 10,
+    "text": "constantOperation(): number {\r\n    return 1 + 1;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_1:18",
+    "kind": "methods",
+    "name": "methods_1",
+    "startLine": 18,
+    "endLine": 29,
+    "text": "logarithmicSearch(arr: number[], target: number): number {\r\n    let left = 0, right = arr.length - 1;\r\n\r\n    while (left <= right) {\r\n      let mid = Math.floor((left + right) / 2);\r\n      if (arr[mid] === target) return mid;\r\n      if (arr[mid] < target) left = mid + 1;\r\n      else right = mid - 1;\r\n    }\r\n\r\n    return -1;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(log n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 2,
+    "spaceScore": 1,
+    "totalScore": 2,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_2:36",
+    "kind": "methods",
+    "name": "methods_2",
+    "startLine": 36,
+    "endLine": 41,
+    "text": "linearSearch(arr: number[], target: number): number {\r\n    for (let i = 0; i < arr.length; i++) {\r\n      if (arr[i] === target) return i;\r\n    }\r\n    return -1;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(log n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 2,
+    "spaceScore": 1,
+    "totalScore": 2,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_3:49",
+    "kind": "methods",
+    "name": "methods_3",
+    "startLine": 49,
+    "endLine": 57,
+    "text": "nLogNExample(arr: number[]): number[] {\r\n    if (arr.length <= 1) return arr;\r\n\r\n    const mid = Math.floor(arr.length / 2);\r\n    const left = this.nLogNExample(arr.slice(0, mid));\r\n    const right = this.nLogNExample(arr.slice(mid));\r\n\r\n    return [...left, ...right].sort((a, b) => a - b);\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 2,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_4:64",
+    "kind": "methods",
+    "name": "methods_4",
+    "startLine": 64,
+    "endLine": 74,
+    "text": "quadraticPairs(arr: number[]): number[][] {\r\n    const pairs: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      for (let j = 0; j < arr.length; j++) {\r\n        pairs.push([arr[i], arr[j]]);\r\n      }\r\n    }\r\n\r\n    return pairs;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n²)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 7,
+    "spaceScore": 4,
+    "totalScore": 6,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_5:81",
+    "kind": "methods",
+    "name": "methods_5",
+    "startLine": 81,
+    "endLine": 91,
+    "text": "cubicLoop(n: number): number {\r\n    let count = 0;\r\n    for (let i = 0; i < n; i++) {\r\n      for (let j = 0; j < n; j++) {\r\n        for (let k = 0; k < n; k++) {\r\n          count++;\r\n        }\r\n      }\r\n    }\r\n    return count;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n³)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 8,
+    "spaceScore": 1,
+    "totalScore": 6,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_6:99",
+    "kind": "methods",
+    "name": "methods_6",
+    "startLine": 99,
+    "endLine": 102,
+    "text": "exponentialFibonacci(n: number): number {\r\n    if (n <= 1) return n;\r\n    return this.exponentialFibonacci(n - 1) + this.exponentialFibonacci(n - 2);\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_7:110",
+    "kind": "methods",
+    "name": "methods_7",
+    "startLine": 110,
+    "endLine": 126,
+    "text": "factorialPermutations(arr: number[]): number[][] {\r\n    if (arr.length === 0) return [[]];\r\n\r\n    const result: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      const current = arr[i];\r\n      const remaining = arr.filter((_, idx) => idx !== i);\r\n      const perms = this.factorialPermutations(remaining);\r\n\r\n      for (const perm of perms) {\r\n        result.push([current, ...perm]);\r\n      }\r\n    }\r\n\r\n    return result;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n³)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n²)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 8,
+    "spaceScore": 7,
+    "totalScore": 8,
+    "riskLevel": "HIGH",
+    "confidence": 70,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_8:133",
+    "kind": "methods",
+    "name": "methods_8",
+    "startLine": 133,
+    "endLine": 135,
+    "text": "linearSpace(n: number): number[] {\r\n    return new Array(n).fill(0);\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 2,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_9:142",
+    "kind": "methods",
+    "name": "methods_9",
+    "startLine": 142,
+    "endLine": 149,
+    "text": "quadraticSpace(n: number): number[][] {\r\n    const grid: number[][] = [];\r\n    for (let i = 0; i < n; i++) {\r\n      const row = new Array(n).fill(0);\r\n      grid.push(row);\r\n    }\r\n    return grid;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 4,
+    "spaceScore": 4,
+    "totalScore": 4,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "topLevelStatements_0:2",
+    "kind": "topLevelStatements",
+    "name": "topLevelStatements_0",
+    "startLine": 2,
+    "endLine": 153,
+    "text": "export class ComplexityShowcase {\r\n\r\n  /**\r\n   * O(1) Time — Constant\r\n   * O(1) Space — Constant\r\n   */\r\n  constantOperation(): number {\r\n    return 1 + 1;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(log n) Time — Logarithmic\r\n   * O(1) Space — Constant\r\n   * Example: Binary Search\r\n   */\r\n  logarithmicSearch(arr: number[], target: number): number {\r\n    let left = 0, right = arr.length - 1;\r\n\r\n    while (left <= right) {\r\n      let mid = Math.floor((left + right) / 2);\r\n      if (arr[mid] === target) return mid;\r\n      if (arr[mid] < target) left = mid + 1;\r\n      else right = mid - 1;\r\n    }\r\n\r\n    return -1;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n) Time — Linear\r\n   * O(1) Space — Constant\r\n   */\r\n  linearSearch(arr: number[], target: number): number {\r\n    for (let i = 0; i < arr.length; i++) {\r\n      if (arr[i] === target) return i;\r\n    }\r\n    return -1;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n log n) Time — Linearithmic\r\n   * O(log n) Space — Recursion stack\r\n   * Example: Merge Sort (showing structure only)\r\n   */\r\n  nLogNExample(arr: number[]): number[] {\r\n    if (arr.length <= 1) return arr;\r\n\r\n    const mid = Math.floor(arr.length / 2);\r\n    const left = this.nLogNExample(arr.slice(0, mid));\r\n    const right = this.nLogNExample(arr.slice(mid));\r\n\r\n    return [...left, ...right].sort((a, b) => a - b);\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n²) Time — Quadratic\r\n   * O(1) Space — Constant\r\n   */\r\n  quadraticPairs(arr: number[]): number[][] {\r\n    const pairs: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      for (let j = 0; j < arr.length; j++) {\r\n        pairs.push([arr[i], arr[j]]);\r\n      }\r\n    }\r\n\r\n    return pairs;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n³) Time — Cubic\r\n   * O(1) Space — Constant\r\n   */\r\n  cubicLoop(n: number): number {\r\n    let count = 0;\r\n    for (let i = 0; i < n; i++) {\r\n      for (let j = 0; j < n; j++) {\r\n        for (let k = 0; k < n; k++) {\r\n          count++;\r\n        }\r\n      }\r\n    }\r\n    return count;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(2ⁿ) Time — Exponential\r\n   * O(n) Space — Call stack grows with depth\r\n   * Example: Fibonacci (naive recursion)\r\n   */\r\n  exponentialFibonacci(n: number): number {\r\n    if (n <= 1) return n;\r\n    return this.exponentialFibonacci(n - 1) + this.exponentialFibonacci(n - 2);\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n!) Time — Factorial\r\n   * O(n) Space — Recursion depth\r\n   * Example: Generate all permutations\r\n   */\r\n  factorialPermutations(arr: number[]): number[][] {\r\n    if (arr.length === 0) return [[]];\r\n\r\n    const result: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      const current = arr[i];\r\n      const remaining = arr.filter((_, idx) => idx !== i);\r\n      const perms = this.factorialPermutations(remaining);\r\n\r\n      for (const perm of perms) {\r\n        result.push([current, ...perm]);\r\n      }\r\n    }\r\n\r\n    return result;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n) Space — Linear\r\n   * Creates a new array of size n\r\n   */\r\n  linearSpace(n: number): number[] {\r\n    return new Array(n).fill(0);\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n²) Space — Quadratic\r\n   * Creates a 2D grid\r\n   */\r\n  quadraticSpace(n: number): number[][] {\r\n    const grid: number[][] = [];\r\n    for (let i = 0; i < n; i++) {\r\n      const row = new Array(n).fill(0);\r\n      grid.push(row);\r\n    }\r\n    return grid;\r\n  }\r\n\r\n\r\n\r\n}",
+    "timeComplexity": {
+      "notation": "O(n log n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n²)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 5,
+    "spaceScore": 7,
+    "totalScore": 6,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "arrows_0:56",
+    "kind": "arrows",
+    "name": "arrows_0",
+    "startLine": 56,
+    "endLine": 56,
+    "text": "(a, b) => a - b",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "arrows_1:117",
+    "kind": "arrows",
+    "name": "arrows_1",
+    "startLine": 117,
+    "endLine": 117,
+    "text": "(_, idx) => idx !== i",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_0:8",
+    "kind": "methods",
+    "name": "methods_0",
+    "startLine": 8,
+    "endLine": 10,
+    "text": "constantOperation(): number {\r\n    return 1 + 1;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_1:18",
+    "kind": "methods",
+    "name": "methods_1",
+    "startLine": 18,
+    "endLine": 29,
+    "text": "logarithmicSearch(arr: number[], target: number): number {\r\n    let left = 0, right = arr.length - 1;\r\n\r\n    while (left <= right) {\r\n      let mid = Math.floor((left + right) / 2);\r\n      if (arr[mid] === target) return mid;\r\n      if (arr[mid] < target) left = mid + 1;\r\n      else right = mid - 1;\r\n    }\r\n\r\n    return -1;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(log n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 2,
+    "spaceScore": 1,
+    "totalScore": 2,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_2:36",
+    "kind": "methods",
+    "name": "methods_2",
+    "startLine": 36,
+    "endLine": 41,
+    "text": "linearSearch(arr: number[], target: number): number {\r\n    for (let i = 0; i < arr.length; i++) {\r\n      if (arr[i] === target) return i;\r\n    }\r\n    return -1;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(log n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 2,
+    "spaceScore": 1,
+    "totalScore": 2,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_3:49",
+    "kind": "methods",
+    "name": "methods_3",
+    "startLine": 49,
+    "endLine": 57,
+    "text": "nLogNExample(arr: number[]): number[] {\r\n    if (arr.length <= 1) return arr;\r\n\r\n    const mid = Math.floor(arr.length / 2);\r\n    const left = this.nLogNExample(arr.slice(0, mid));\r\n    const right = this.nLogNExample(arr.slice(mid));\r\n\r\n    return [...left, ...right].sort((a, b) => a - b);\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 2,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_4:64",
+    "kind": "methods",
+    "name": "methods_4",
+    "startLine": 64,
+    "endLine": 74,
+    "text": "quadraticPairs(arr: number[]): number[][] {\r\n    const pairs: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      for (let j = 0; j < arr.length; j++) {\r\n        pairs.push([arr[i], arr[j]]);\r\n      }\r\n    }\r\n\r\n    return pairs;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n²)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 7,
+    "spaceScore": 4,
+    "totalScore": 6,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_5:81",
+    "kind": "methods",
+    "name": "methods_5",
+    "startLine": 81,
+    "endLine": 91,
+    "text": "cubicLoop(n: number): number {\r\n    let count = 0;\r\n    for (let i = 0; i < n; i++) {\r\n      for (let j = 0; j < n; j++) {\r\n        for (let k = 0; k < n; k++) {\r\n          count++;\r\n        }\r\n      }\r\n    }\r\n    return count;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n³)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 8,
+    "spaceScore": 1,
+    "totalScore": 6,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_6:99",
+    "kind": "methods",
+    "name": "methods_6",
+    "startLine": 99,
+    "endLine": 102,
+    "text": "exponentialFibonacci(n: number): number {\r\n    if (n <= 1) return n;\r\n    return this.exponentialFibonacci(n - 1) + this.exponentialFibonacci(n - 2);\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_7:110",
+    "kind": "methods",
+    "name": "methods_7",
+    "startLine": 110,
+    "endLine": 126,
+    "text": "factorialPermutations(arr: number[]): number[][] {\r\n    if (arr.length === 0) return [[]];\r\n\r\n    const result: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      const current = arr[i];\r\n      const remaining = arr.filter((_, idx) => idx !== i);\r\n      const perms = this.factorialPermutations(remaining);\r\n\r\n      for (const perm of perms) {\r\n        result.push([current, ...perm]);\r\n      }\r\n    }\r\n\r\n    return result;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n³)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n²)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 8,
+    "spaceScore": 7,
+    "totalScore": 8,
+    "riskLevel": "HIGH",
+    "confidence": 70,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_8:133",
+    "kind": "methods",
+    "name": "methods_8",
+    "startLine": 133,
+    "endLine": 135,
+    "text": "linearSpace(n: number): number[] {\r\n    return new Array(n).fill(0);\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 2,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_9:142",
+    "kind": "methods",
+    "name": "methods_9",
+    "startLine": 142,
+    "endLine": 149,
+    "text": "quadraticSpace(n: number): number[][] {\r\n    const grid: number[][] = [];\r\n    for (let i = 0; i < n; i++) {\r\n      const row = new Array(n).fill(0);\r\n      grid.push(row);\r\n    }\r\n    return grid;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 4,
+    "spaceScore": 4,
+    "totalScore": 4,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "topLevelStatements_0:2",
+    "kind": "topLevelStatements",
+    "name": "topLevelStatements_0",
+    "startLine": 2,
+    "endLine": 153,
+    "text": "export class ComplexityShowcase {\r\n\r\n  /**\r\n   * O(1) Time — Constant\r\n   * O(1) Space — Constant\r\n   */\r\n  constantOperation(): number {\r\n    return 1 + 1;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(log n) Time — Logarithmic\r\n   * O(1) Space — Constant\r\n   * Example: Binary Search\r\n   */\r\n  logarithmicSearch(arr: number[], target: number): number {\r\n    let left = 0, right = arr.length - 1;\r\n\r\n    while (left <= right) {\r\n      let mid = Math.floor((left + right) / 2);\r\n      if (arr[mid] === target) return mid;\r\n      if (arr[mid] < target) left = mid + 1;\r\n      else right = mid - 1;\r\n    }\r\n\r\n    return -1;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n) Time — Linear\r\n   * O(1) Space — Constant\r\n   */\r\n  linearSearch(arr: number[], target: number): number {\r\n    for (let i = 0; i < arr.length; i++) {\r\n      if (arr[i] === target) return i;\r\n    }\r\n    return -1;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n log n) Time — Linearithmic\r\n   * O(log n) Space — Recursion stack\r\n   * Example: Merge Sort (showing structure only)\r\n   */\r\n  nLogNExample(arr: number[]): number[] {\r\n    if (arr.length <= 1) return arr;\r\n\r\n    const mid = Math.floor(arr.length / 2);\r\n    const left = this.nLogNExample(arr.slice(0, mid));\r\n    const right = this.nLogNExample(arr.slice(mid));\r\n\r\n    return [...left, ...right].sort((a, b) => a - b);\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n²) Time — Quadratic\r\n   * O(1) Space — Constant\r\n   */\r\n  quadraticPairs(arr: number[]): number[][] {\r\n    const pairs: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      for (let j = 0; j < arr.length; j++) {\r\n        pairs.push([arr[i], arr[j]]);\r\n      }\r\n    }\r\n\r\n    return pairs;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n³) Time — Cubic\r\n   * O(1) Space — Constant\r\n   */\r\n  cubicLoop(n: number): number {\r\n    let count = 0;\r\n    for (let i = 0; i < n; i++) {\r\n      for (let j = 0; j < n; j++) {\r\n        for (let k = 0; k < n; k++) {\r\n          count++;\r\n        }\r\n      }\r\n    }\r\n    return count;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(2ⁿ) Time — Exponential\r\n   * O(n) Space — Call stack grows with depth\r\n   * Example: Fibonacci (naive recursion)\r\n   */\r\n  exponentialFibonacci(n: number): number {\r\n    if (n <= 1) return n;\r\n    return this.exponentialFibonacci(n - 1) + this.exponentialFibonacci(n - 2);\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n!) Time — Factorial\r\n   * O(n) Space — Recursion depth\r\n   * Example: Generate all permutations\r\n   */\r\n  factorialPermutations(arr: number[]): number[][] {\r\n    if (arr.length === 0) return [[]];\r\n\r\n    const result: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      const current = arr[i];\r\n      const remaining = arr.filter((_, idx) => idx !== i);\r\n      const perms = this.factorialPermutations(remaining);\r\n\r\n      for (const perm of perms) {\r\n        result.push([current, ...perm]);\r\n      }\r\n    }\r\n\r\n    return result;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n) Space — Linear\r\n   * Creates a new array of size n\r\n   */\r\n  linearSpace(n: number): number[] {\r\n    return new Array(n).fill(0);\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n²) Space — Quadratic\r\n   * Creates a 2D grid\r\n   */\r\n  quadraticSpace(n: number): number[][] {\r\n    const grid: number[][] = [];\r\n    for (let i = 0; i < n; i++) {\r\n      const row = new Array(n).fill(0);\r\n      grid.push(row);\r\n    }\r\n    return grid;\r\n  }\r\n\r\n\r\n\r\n}",
+    "timeComplexity": {
+      "notation": "O(n log n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n²)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 5,
+    "spaceScore": 7,
+    "totalScore": 6,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "arrows_0:56",
+    "kind": "arrows",
+    "name": "arrows_0",
+    "startLine": 56,
+    "endLine": 56,
+    "text": "(a, b) => a - b",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "arrows_1:117",
+    "kind": "arrows",
+    "name": "arrows_1",
+    "startLine": 117,
+    "endLine": 117,
+    "text": "(_, idx) => idx !== i",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_0:8",
+    "kind": "methods",
+    "name": "methods_0",
+    "startLine": 8,
+    "endLine": 10,
+    "text": "constantOperation(): number {\r\n    return 1 + 1;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_1:18",
+    "kind": "methods",
+    "name": "methods_1",
+    "startLine": 18,
+    "endLine": 29,
+    "text": "logarithmicSearch(arr: number[], target: number): number {\r\n    let left = 0, right = arr.length - 1;\r\n\r\n    while (left <= right) {\r\n      let mid = Math.floor((left + right) / 2);\r\n      if (arr[mid] === target) return mid;\r\n      if (arr[mid] < target) left = mid + 1;\r\n      else right = mid - 1;\r\n    }\r\n\r\n    return -1;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(log n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 2,
+    "spaceScore": 1,
+    "totalScore": 2,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_2:36",
+    "kind": "methods",
+    "name": "methods_2",
+    "startLine": 36,
+    "endLine": 41,
+    "text": "linearSearch(arr: number[], target: number): number {\r\n    for (let i = 0; i < arr.length; i++) {\r\n      if (arr[i] === target) return i;\r\n    }\r\n    return -1;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(log n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 2,
+    "spaceScore": 1,
+    "totalScore": 2,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_3:49",
+    "kind": "methods",
+    "name": "methods_3",
+    "startLine": 49,
+    "endLine": 57,
+    "text": "nLogNExample(arr: number[]): number[] {\r\n    if (arr.length <= 1) return arr;\r\n\r\n    const mid = Math.floor(arr.length / 2);\r\n    const left = this.nLogNExample(arr.slice(0, mid));\r\n    const right = this.nLogNExample(arr.slice(mid));\r\n\r\n    return [...left, ...right].sort((a, b) => a - b);\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 2,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_4:64",
+    "kind": "methods",
+    "name": "methods_4",
+    "startLine": 64,
+    "endLine": 74,
+    "text": "quadraticPairs(arr: number[]): number[][] {\r\n    const pairs: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      for (let j = 0; j < arr.length; j++) {\r\n        pairs.push([arr[i], arr[j]]);\r\n      }\r\n    }\r\n\r\n    return pairs;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n²)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 7,
+    "spaceScore": 4,
+    "totalScore": 6,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_5:81",
+    "kind": "methods",
+    "name": "methods_5",
+    "startLine": 81,
+    "endLine": 91,
+    "text": "cubicLoop(n: number): number {\r\n    let count = 0;\r\n    for (let i = 0; i < n; i++) {\r\n      for (let j = 0; j < n; j++) {\r\n        for (let k = 0; k < n; k++) {\r\n          count++;\r\n        }\r\n      }\r\n    }\r\n    return count;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n³)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 8,
+    "spaceScore": 1,
+    "totalScore": 6,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_6:99",
+    "kind": "methods",
+    "name": "methods_6",
+    "startLine": 99,
+    "endLine": 102,
+    "text": "exponentialFibonacci(n: number): number {\r\n    if (n <= 1) return n;\r\n    return this.exponentialFibonacci(n - 1) + this.exponentialFibonacci(n - 2);\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_7:110",
+    "kind": "methods",
+    "name": "methods_7",
+    "startLine": 110,
+    "endLine": 126,
+    "text": "factorialPermutations(arr: number[]): number[][] {\r\n    if (arr.length === 0) return [[]];\r\n\r\n    const result: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      const current = arr[i];\r\n      const remaining = arr.filter((_, idx) => idx !== i);\r\n      const perms = this.factorialPermutations(remaining);\r\n\r\n      for (const perm of perms) {\r\n        result.push([current, ...perm]);\r\n      }\r\n    }\r\n\r\n    return result;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n³)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n²)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 8,
+    "spaceScore": 7,
+    "totalScore": 8,
+    "riskLevel": "HIGH",
+    "confidence": 70,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_8:133",
+    "kind": "methods",
+    "name": "methods_8",
+    "startLine": 133,
+    "endLine": 135,
+    "text": "linearSpace(n: number): number[] {\r\n    return new Array(n).fill(0);\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 2,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_9:142",
+    "kind": "methods",
+    "name": "methods_9",
+    "startLine": 142,
+    "endLine": 149,
+    "text": "quadraticSpace(n: number): number[][] {\r\n    const grid: number[][] = [];\r\n    for (let i = 0; i < n; i++) {\r\n      const row = new Array(n).fill(0);\r\n      grid.push(row);\r\n    }\r\n    return grid;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 4,
+    "spaceScore": 4,
+    "totalScore": 4,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "topLevelStatements_0:2",
+    "kind": "topLevelStatements",
+    "name": "topLevelStatements_0",
+    "startLine": 2,
+    "endLine": 153,
+    "text": "export class ComplexityShowcase {\r\n\r\n  /**\r\n   * O(1) Time — Constant\r\n   * O(1) Space — Constant\r\n   */\r\n  constantOperation(): number {\r\n    return 1 + 1;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(log n) Time — Logarithmic\r\n   * O(1) Space — Constant\r\n   * Example: Binary Search\r\n   */\r\n  logarithmicSearch(arr: number[], target: number): number {\r\n    let left = 0, right = arr.length - 1;\r\n\r\n    while (left <= right) {\r\n      let mid = Math.floor((left + right) / 2);\r\n      if (arr[mid] === target) return mid;\r\n      if (arr[mid] < target) left = mid + 1;\r\n      else right = mid - 1;\r\n    }\r\n\r\n    return -1;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n) Time — Linear\r\n   * O(1) Space — Constant\r\n   */\r\n  linearSearch(arr: number[], target: number): number {\r\n    for (let i = 0; i < arr.length; i++) {\r\n      if (arr[i] === target) return i;\r\n    }\r\n    return -1;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n log n) Time — Linearithmic\r\n   * O(log n) Space — Recursion stack\r\n   * Example: Merge Sort (showing structure only)\r\n   */\r\n  nLogNExample(arr: number[]): number[] {\r\n    if (arr.length <= 1) return arr;\r\n\r\n    const mid = Math.floor(arr.length / 2);\r\n    const left = this.nLogNExample(arr.slice(0, mid));\r\n    const right = this.nLogNExample(arr.slice(mid));\r\n\r\n    return [...left, ...right].sort((a, b) => a - b);\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n²) Time — Quadratic\r\n   * O(1) Space — Constant\r\n   */\r\n  quadraticPairs(arr: number[]): number[][] {\r\n    const pairs: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      for (let j = 0; j < arr.length; j++) {\r\n        pairs.push([arr[i], arr[j]]);\r\n      }\r\n    }\r\n\r\n    return pairs;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n³) Time — Cubic\r\n   * O(1) Space — Constant\r\n   */\r\n  cubicLoop(n: number): number {\r\n    let count = 0;\r\n    for (let i = 0; i < n; i++) {\r\n      for (let j = 0; j < n; j++) {\r\n        for (let k = 0; k < n; k++) {\r\n          count++;\r\n        }\r\n      }\r\n    }\r\n    return count;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(2ⁿ) Time — Exponential\r\n   * O(n) Space — Call stack grows with depth\r\n   * Example: Fibonacci (naive recursion)\r\n   */\r\n  exponentialFibonacci(n: number): number {\r\n    if (n <= 1) return n;\r\n    return this.exponentialFibonacci(n - 1) + this.exponentialFibonacci(n - 2);\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n!) Time — Factorial\r\n   * O(n) Space — Recursion depth\r\n   * Example: Generate all permutations\r\n   */\r\n  factorialPermutations(arr: number[]): number[][] {\r\n    if (arr.length === 0) return [[]];\r\n\r\n    const result: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      const current = arr[i];\r\n      const remaining = arr.filter((_, idx) => idx !== i);\r\n      const perms = this.factorialPermutations(remaining);\r\n\r\n      for (const perm of perms) {\r\n        result.push([current, ...perm]);\r\n      }\r\n    }\r\n\r\n    return result;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n) Space — Linear\r\n   * Creates a new array of size n\r\n   */\r\n  linearSpace(n: number): number[] {\r\n    return new Array(n).fill(0);\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n²) Space — Quadratic\r\n   * Creates a 2D grid\r\n   */\r\n  quadraticSpace(n: number): number[][] {\r\n    const grid: number[][] = [];\r\n    for (let i = 0; i < n; i++) {\r\n      const row = new Array(n).fill(0);\r\n      grid.push(row);\r\n    }\r\n    return grid;\r\n  }\r\n\r\n\r\n\r\n}",
+    "timeComplexity": {
+      "notation": "O(n log n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n²)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 5,
+    "spaceScore": 7,
+    "totalScore": 6,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "arrows_0:56",
+    "kind": "arrows",
+    "name": "arrows_0",
+    "startLine": 56,
+    "endLine": 56,
+    "text": "(a, b) => a - b",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "arrows_1:117",
+    "kind": "arrows",
+    "name": "arrows_1",
+    "startLine": 117,
+    "endLine": 117,
+    "text": "(_, idx) => idx !== i",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_0:8",
+    "kind": "methods",
+    "name": "methods_0",
+    "startLine": 8,
+    "endLine": 10,
+    "text": "constantOperation(): number {\r\n    return 1 + 1;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_1:18",
+    "kind": "methods",
+    "name": "methods_1",
+    "startLine": 18,
+    "endLine": 29,
+    "text": "logarithmicSearch(arr: number[], target: number): number {\r\n    let left = 0, right = arr.length - 1;\r\n\r\n    while (left <= right) {\r\n      let mid = Math.floor((left + right) / 2);\r\n      if (arr[mid] === target) return mid;\r\n      if (arr[mid] < target) left = mid + 1;\r\n      else right = mid - 1;\r\n    }\r\n\r\n    return -1;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(log n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 2,
+    "spaceScore": 1,
+    "totalScore": 2,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_2:36",
+    "kind": "methods",
+    "name": "methods_2",
+    "startLine": 36,
+    "endLine": 41,
+    "text": "linearSearch(arr: number[], target: number): number {\r\n    for (let i = 0; i < arr.length; i++) {\r\n      if (arr[i] === target) return i;\r\n    }\r\n    return -1;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(log n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 2,
+    "spaceScore": 1,
+    "totalScore": 2,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_3:49",
+    "kind": "methods",
+    "name": "methods_3",
+    "startLine": 49,
+    "endLine": 57,
+    "text": "nLogNExample(arr: number[]): number[] {\r\n    if (arr.length <= 1) return arr;\r\n\r\n    const mid = Math.floor(arr.length / 2);\r\n    const left = this.nLogNExample(arr.slice(0, mid));\r\n    const right = this.nLogNExample(arr.slice(mid));\r\n\r\n    return [...left, ...right].sort((a, b) => a - b);\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 2,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_4:64",
+    "kind": "methods",
+    "name": "methods_4",
+    "startLine": 64,
+    "endLine": 74,
+    "text": "quadraticPairs(arr: number[]): number[][] {\r\n    const pairs: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      for (let j = 0; j < arr.length; j++) {\r\n        pairs.push([arr[i], arr[j]]);\r\n      }\r\n    }\r\n\r\n    return pairs;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n²)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 7,
+    "spaceScore": 4,
+    "totalScore": 6,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_5:81",
+    "kind": "methods",
+    "name": "methods_5",
+    "startLine": 81,
+    "endLine": 91,
+    "text": "cubicLoop(n: number): number {\r\n    let count = 0;\r\n    for (let i = 0; i < n; i++) {\r\n      for (let j = 0; j < n; j++) {\r\n        for (let k = 0; k < n; k++) {\r\n          count++;\r\n        }\r\n      }\r\n    }\r\n    return count;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n³)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 8,
+    "spaceScore": 1,
+    "totalScore": 6,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_6:99",
+    "kind": "methods",
+    "name": "methods_6",
+    "startLine": 99,
+    "endLine": 102,
+    "text": "exponentialFibonacci(n: number): number {\r\n    if (n <= 1) return n;\r\n    return this.exponentialFibonacci(n - 1) + this.exponentialFibonacci(n - 2);\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_7:110",
+    "kind": "methods",
+    "name": "methods_7",
+    "startLine": 110,
+    "endLine": 126,
+    "text": "factorialPermutations(arr: number[]): number[][] {\r\n    if (arr.length === 0) return [[]];\r\n\r\n    const result: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      const current = arr[i];\r\n      const remaining = arr.filter((_, idx) => idx !== i);\r\n      const perms = this.factorialPermutations(remaining);\r\n\r\n      for (const perm of perms) {\r\n        result.push([current, ...perm]);\r\n      }\r\n    }\r\n\r\n    return result;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n³)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n²)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 8,
+    "spaceScore": 7,
+    "totalScore": 8,
+    "riskLevel": "HIGH",
+    "confidence": 70,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_8:133",
+    "kind": "methods",
+    "name": "methods_8",
+    "startLine": 133,
+    "endLine": 135,
+    "text": "linearSpace(n: number): number[] {\r\n    return new Array(n).fill(0);\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 2,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_9:142",
+    "kind": "methods",
+    "name": "methods_9",
+    "startLine": 142,
+    "endLine": 149,
+    "text": "quadraticSpace(n: number): number[][] {\r\n    const grid: number[][] = [];\r\n    for (let i = 0; i < n; i++) {\r\n      const row = new Array(n).fill(0);\r\n      grid.push(row);\r\n    }\r\n    return grid;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 4,
+    "spaceScore": 4,
+    "totalScore": 4,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "topLevelStatements_0:2",
+    "kind": "topLevelStatements",
+    "name": "topLevelStatements_0",
+    "startLine": 2,
+    "endLine": 153,
+    "text": "export class ComplexityShowcase {\r\n\r\n  /**\r\n   * O(1) Time — Constant\r\n   * O(1) Space — Constant\r\n   */\r\n  constantOperation(): number {\r\n    return 1 + 1;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(log n) Time — Logarithmic\r\n   * O(1) Space — Constant\r\n   * Example: Binary Search\r\n   */\r\n  logarithmicSearch(arr: number[], target: number): number {\r\n    let left = 0, right = arr.length - 1;\r\n\r\n    while (left <= right) {\r\n      let mid = Math.floor((left + right) / 2);\r\n      if (arr[mid] === target) return mid;\r\n      if (arr[mid] < target) left = mid + 1;\r\n      else right = mid - 1;\r\n    }\r\n\r\n    return -1;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n) Time — Linear\r\n   * O(1) Space — Constant\r\n   */\r\n  linearSearch(arr: number[], target: number): number {\r\n    for (let i = 0; i < arr.length; i++) {\r\n      if (arr[i] === target) return i;\r\n    }\r\n    return -1;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n log n) Time — Linearithmic\r\n   * O(log n) Space — Recursion stack\r\n   * Example: Merge Sort (showing structure only)\r\n   */\r\n  nLogNExample(arr: number[]): number[] {\r\n    if (arr.length <= 1) return arr;\r\n\r\n    const mid = Math.floor(arr.length / 2);\r\n    const left = this.nLogNExample(arr.slice(0, mid));\r\n    const right = this.nLogNExample(arr.slice(mid));\r\n\r\n    return [...left, ...right].sort((a, b) => a - b);\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n²) Time — Quadratic\r\n   * O(1) Space — Constant\r\n   */\r\n  quadraticPairs(arr: number[]): number[][] {\r\n    const pairs: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      for (let j = 0; j < arr.length; j++) {\r\n        pairs.push([arr[i], arr[j]]);\r\n      }\r\n    }\r\n\r\n    return pairs;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n³) Time — Cubic\r\n   * O(1) Space — Constant\r\n   */\r\n  cubicLoop(n: number): number {\r\n    let count = 0;\r\n    for (let i = 0; i < n; i++) {\r\n      for (let j = 0; j < n; j++) {\r\n        for (let k = 0; k < n; k++) {\r\n          count++;\r\n        }\r\n      }\r\n    }\r\n    return count;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(2ⁿ) Time — Exponential\r\n   * O(n) Space — Call stack grows with depth\r\n   * Example: Fibonacci (naive recursion)\r\n   */\r\n  exponentialFibonacci(n: number): number {\r\n    if (n <= 1) return n;\r\n    return this.exponentialFibonacci(n - 1) + this.exponentialFibonacci(n - 2);\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n!) Time — Factorial\r\n   * O(n) Space — Recursion depth\r\n   * Example: Generate all permutations\r\n   */\r\n  factorialPermutations(arr: number[]): number[][] {\r\n    if (arr.length === 0) return [[]];\r\n\r\n    const result: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      const current = arr[i];\r\n      const remaining = arr.filter((_, idx) => idx !== i);\r\n      const perms = this.factorialPermutations(remaining);\r\n\r\n      for (const perm of perms) {\r\n        result.push([current, ...perm]);\r\n      }\r\n    }\r\n\r\n    return result;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n) Space — Linear\r\n   * Creates a new array of size n\r\n   */\r\n  linearSpace(n: number): number[] {\r\n    return new Array(n).fill(0);\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n²) Space — Quadratic\r\n   * Creates a 2D grid\r\n   */\r\n  quadraticSpace(n: number): number[][] {\r\n    const grid: number[][] = [];\r\n    for (let i = 0; i < n; i++) {\r\n      const row = new Array(n).fill(0);\r\n      grid.push(row);\r\n    }\r\n    return grid;\r\n  }\r\n\r\n\r\n\r\n}",
+    "timeComplexity": {
+      "notation": "O(n log n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n²)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 5,
+    "spaceScore": 7,
+    "totalScore": 6,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "arrows_0:56",
+    "kind": "arrows",
+    "name": "arrows_0",
+    "startLine": 56,
+    "endLine": 56,
+    "text": "(a, b) => a - b",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "arrows_1:117",
+    "kind": "arrows",
+    "name": "arrows_1",
+    "startLine": 117,
+    "endLine": 117,
+    "text": "(_, idx) => idx !== i",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_0:8",
+    "kind": "methods",
+    "name": "methods_0",
+    "startLine": 8,
+    "endLine": 10,
+    "text": "constantOperation(): number {\r\n    return 1 + 1;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_1:18",
+    "kind": "methods",
+    "name": "methods_1",
+    "startLine": 18,
+    "endLine": 29,
+    "text": "logarithmicSearch(arr: number[], target: number): number {\r\n    let left = 0, right = arr.length - 1;\r\n\r\n    while (left <= right) {\r\n      let mid = Math.floor((left + right) / 2);\r\n      if (arr[mid] === target) return mid;\r\n      if (arr[mid] < target) left = mid + 1;\r\n      else right = mid - 1;\r\n    }\r\n\r\n    return -1;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(log n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 2,
+    "spaceScore": 1,
+    "totalScore": 2,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_2:36",
+    "kind": "methods",
+    "name": "methods_2",
+    "startLine": 36,
+    "endLine": 41,
+    "text": "linearSearch(arr: number[], target: number): number {\r\n    for (let i = 0; i < arr.length; i++) {\r\n      if (arr[i] === target) return i;\r\n    }\r\n    return -1;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(log n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 2,
+    "spaceScore": 1,
+    "totalScore": 2,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_3:49",
+    "kind": "methods",
+    "name": "methods_3",
+    "startLine": 49,
+    "endLine": 57,
+    "text": "nLogNExample(arr: number[]): number[] {\r\n    if (arr.length <= 1) return arr;\r\n\r\n    const mid = Math.floor(arr.length / 2);\r\n    const left = this.nLogNExample(arr.slice(0, mid));\r\n    const right = this.nLogNExample(arr.slice(mid));\r\n\r\n    return [...left, ...right].sort((a, b) => a - b);\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 2,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_4:64",
+    "kind": "methods",
+    "name": "methods_4",
+    "startLine": 64,
+    "endLine": 74,
+    "text": "quadraticPairs(arr: number[]): number[][] {\r\n    const pairs: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      for (let j = 0; j < arr.length; j++) {\r\n        pairs.push([arr[i], arr[j]]);\r\n      }\r\n    }\r\n\r\n    return pairs;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n²)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 7,
+    "spaceScore": 4,
+    "totalScore": 6,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_5:81",
+    "kind": "methods",
+    "name": "methods_5",
+    "startLine": 81,
+    "endLine": 91,
+    "text": "cubicLoop(n: number): number {\r\n    let count = 0;\r\n    for (let i = 0; i < n; i++) {\r\n      for (let j = 0; j < n; j++) {\r\n        for (let k = 0; k < n; k++) {\r\n          count++;\r\n        }\r\n      }\r\n    }\r\n    return count;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n³)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 8,
+    "spaceScore": 1,
+    "totalScore": 6,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_6:99",
+    "kind": "methods",
+    "name": "methods_6",
+    "startLine": 99,
+    "endLine": 102,
+    "text": "exponentialFibonacci(n: number): number {\r\n    if (n <= 1) return n;\r\n    return this.exponentialFibonacci(n - 1) + this.exponentialFibonacci(n - 2);\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_7:110",
+    "kind": "methods",
+    "name": "methods_7",
+    "startLine": 110,
+    "endLine": 126,
+    "text": "factorialPermutations(arr: number[]): number[][] {\r\n    if (arr.length === 0) return [[]];\r\n\r\n    const result: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      const current = arr[i];\r\n      const remaining = arr.filter((_, idx) => idx !== i);\r\n      const perms = this.factorialPermutations(remaining);\r\n\r\n      for (const perm of perms) {\r\n        result.push([current, ...perm]);\r\n      }\r\n    }\r\n\r\n    return result;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n³)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n²)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 8,
+    "spaceScore": 7,
+    "totalScore": 8,
+    "riskLevel": "HIGH",
+    "confidence": 70,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_8:133",
+    "kind": "methods",
+    "name": "methods_8",
+    "startLine": 133,
+    "endLine": 135,
+    "text": "linearSpace(n: number): number[] {\r\n    return new Array(n).fill(0);\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 2,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_9:142",
+    "kind": "methods",
+    "name": "methods_9",
+    "startLine": 142,
+    "endLine": 149,
+    "text": "quadraticSpace(n: number): number[][] {\r\n    const grid: number[][] = [];\r\n    for (let i = 0; i < n; i++) {\r\n      const row = new Array(n).fill(0);\r\n      grid.push(row);\r\n    }\r\n    return grid;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 4,
+    "spaceScore": 4,
+    "totalScore": 4,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "topLevelStatements_0:2",
+    "kind": "topLevelStatements",
+    "name": "topLevelStatements_0",
+    "startLine": 2,
+    "endLine": 153,
+    "text": "export class ComplexityShowcase {\r\n\r\n  /**\r\n   * O(1) Time — Constant\r\n   * O(1) Space — Constant\r\n   */\r\n  constantOperation(): number {\r\n    return 1 + 1;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(log n) Time — Logarithmic\r\n   * O(1) Space — Constant\r\n   * Example: Binary Search\r\n   */\r\n  logarithmicSearch(arr: number[], target: number): number {\r\n    let left = 0, right = arr.length - 1;\r\n\r\n    while (left <= right) {\r\n      let mid = Math.floor((left + right) / 2);\r\n      if (arr[mid] === target) return mid;\r\n      if (arr[mid] < target) left = mid + 1;\r\n      else right = mid - 1;\r\n    }\r\n\r\n    return -1;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n) Time — Linear\r\n   * O(1) Space — Constant\r\n   */\r\n  linearSearch(arr: number[], target: number): number {\r\n    for (let i = 0; i < arr.length; i++) {\r\n      if (arr[i] === target) return i;\r\n    }\r\n    return -1;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n log n) Time — Linearithmic\r\n   * O(log n) Space — Recursion stack\r\n   * Example: Merge Sort (showing structure only)\r\n   */\r\n  nLogNExample(arr: number[]): number[] {\r\n    if (arr.length <= 1) return arr;\r\n\r\n    const mid = Math.floor(arr.length / 2);\r\n    const left = this.nLogNExample(arr.slice(0, mid));\r\n    const right = this.nLogNExample(arr.slice(mid));\r\n\r\n    return [...left, ...right].sort((a, b) => a - b);\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n²) Time — Quadratic\r\n   * O(1) Space — Constant\r\n   */\r\n  quadraticPairs(arr: number[]): number[][] {\r\n    const pairs: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      for (let j = 0; j < arr.length; j++) {\r\n        pairs.push([arr[i], arr[j]]);\r\n      }\r\n    }\r\n\r\n    return pairs;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n³) Time — Cubic\r\n   * O(1) Space — Constant\r\n   */\r\n  cubicLoop(n: number): number {\r\n    let count = 0;\r\n    for (let i = 0; i < n; i++) {\r\n      for (let j = 0; j < n; j++) {\r\n        for (let k = 0; k < n; k++) {\r\n          count++;\r\n        }\r\n      }\r\n    }\r\n    return count;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(2ⁿ) Time — Exponential\r\n   * O(n) Space — Call stack grows with depth\r\n   * Example: Fibonacci (naive recursion)\r\n   */\r\n  exponentialFibonacci(n: number): number {\r\n    if (n <= 1) return n;\r\n    return this.exponentialFibonacci(n - 1) + this.exponentialFibonacci(n - 2);\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n!) Time — Factorial\r\n   * O(n) Space — Recursion depth\r\n   * Example: Generate all permutations\r\n   */\r\n  factorialPermutations(arr: number[]): number[][] {\r\n    if (arr.length === 0) return [[]];\r\n\r\n    const result: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      const current = arr[i];\r\n      const remaining = arr.filter((_, idx) => idx !== i);\r\n      const perms = this.factorialPermutations(remaining);\r\n\r\n      for (const perm of perms) {\r\n        result.push([current, ...perm]);\r\n      }\r\n    }\r\n\r\n    return result;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n) Space — Linear\r\n   * Creates a new array of size n\r\n   */\r\n  linearSpace(n: number): number[] {\r\n    return new Array(n).fill(0);\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n²) Space — Quadratic\r\n   * Creates a 2D grid\r\n   */\r\n  quadraticSpace(n: number): number[][] {\r\n    const grid: number[][] = [];\r\n    for (let i = 0; i < n; i++) {\r\n      const row = new Array(n).fill(0);\r\n      grid.push(row);\r\n    }\r\n    return grid;\r\n  }\r\n\r\n\r\n\r\n}",
+    "timeComplexity": {
+      "notation": "O(n log n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n²)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 5,
+    "spaceScore": 7,
+    "totalScore": 6,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "arrows_0:56",
+    "kind": "arrows",
+    "name": "arrows_0",
+    "startLine": 56,
+    "endLine": 56,
+    "text": "(a, b) => a - b",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "arrows_1:117",
+    "kind": "arrows",
+    "name": "arrows_1",
+    "startLine": 117,
+    "endLine": 117,
+    "text": "(_, idx) => idx !== i",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_0:8",
+    "kind": "methods",
+    "name": "methods_0",
+    "startLine": 8,
+    "endLine": 10,
+    "text": "constantOperation(): number {\r\n    return 1 + 1;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_1:18",
+    "kind": "methods",
+    "name": "methods_1",
+    "startLine": 18,
+    "endLine": 29,
+    "text": "logarithmicSearch(arr: number[], target: number): number {\r\n    let left = 0, right = arr.length - 1;\r\n\r\n    while (left <= right) {\r\n      let mid = Math.floor((left + right) / 2);\r\n      if (arr[mid] === target) return mid;\r\n      if (arr[mid] < target) left = mid + 1;\r\n      else right = mid - 1;\r\n    }\r\n\r\n    return -1;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(log n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 2,
+    "spaceScore": 1,
+    "totalScore": 2,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_2:36",
+    "kind": "methods",
+    "name": "methods_2",
+    "startLine": 36,
+    "endLine": 41,
+    "text": "linearSearch(arr: number[], target: number): number {\r\n    for (let i = 0; i < arr.length; i++) {\r\n      if (arr[i] === target) return i;\r\n    }\r\n    return -1;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(log n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 2,
+    "spaceScore": 1,
+    "totalScore": 2,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_3:49",
+    "kind": "methods",
+    "name": "methods_3",
+    "startLine": 49,
+    "endLine": 57,
+    "text": "nLogNExample(arr: number[]): number[] {\r\n    if (arr.length <= 1) return arr;\r\n\r\n    const mid = Math.floor(arr.length / 2);\r\n    const left = this.nLogNExample(arr.slice(0, mid));\r\n    const right = this.nLogNExample(arr.slice(mid));\r\n\r\n    return [...left, ...right].sort((a, b) => a - b);\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 2,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_4:64",
+    "kind": "methods",
+    "name": "methods_4",
+    "startLine": 64,
+    "endLine": 74,
+    "text": "quadraticPairs(arr: number[]): number[][] {\r\n    const pairs: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      for (let j = 0; j < arr.length; j++) {\r\n        pairs.push([arr[i], arr[j]]);\r\n      }\r\n    }\r\n\r\n    return pairs;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n²)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 7,
+    "spaceScore": 4,
+    "totalScore": 6,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_5:81",
+    "kind": "methods",
+    "name": "methods_5",
+    "startLine": 81,
+    "endLine": 91,
+    "text": "cubicLoop(n: number): number {\r\n    let count = 0;\r\n    for (let i = 0; i < n; i++) {\r\n      for (let j = 0; j < n; j++) {\r\n        for (let k = 0; k < n; k++) {\r\n          count++;\r\n        }\r\n      }\r\n    }\r\n    return count;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n³)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 8,
+    "spaceScore": 1,
+    "totalScore": 6,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_6:99",
+    "kind": "methods",
+    "name": "methods_6",
+    "startLine": 99,
+    "endLine": 102,
+    "text": "exponentialFibonacci(n: number): number {\r\n    if (n <= 1) return n;\r\n    return this.exponentialFibonacci(n - 1) + this.exponentialFibonacci(n - 2);\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_7:110",
+    "kind": "methods",
+    "name": "methods_7",
+    "startLine": 110,
+    "endLine": 126,
+    "text": "factorialPermutations(arr: number[]): number[][] {\r\n    if (arr.length === 0) return [[]];\r\n\r\n    const result: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      const current = arr[i];\r\n      const remaining = arr.filter((_, idx) => idx !== i);\r\n      const perms = this.factorialPermutations(remaining);\r\n\r\n      for (const perm of perms) {\r\n        result.push([current, ...perm]);\r\n      }\r\n    }\r\n\r\n    return result;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n³)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n²)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 8,
+    "spaceScore": 7,
+    "totalScore": 8,
+    "riskLevel": "HIGH",
+    "confidence": 70,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_8:133",
+    "kind": "methods",
+    "name": "methods_8",
+    "startLine": 133,
+    "endLine": 135,
+    "text": "linearSpace(n: number): number[] {\r\n    return new Array(n).fill(0);\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 2,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_9:142",
+    "kind": "methods",
+    "name": "methods_9",
+    "startLine": 142,
+    "endLine": 149,
+    "text": "quadraticSpace(n: number): number[][] {\r\n    const grid: number[][] = [];\r\n    for (let i = 0; i < n; i++) {\r\n      const row = new Array(n).fill(0);\r\n      grid.push(row);\r\n    }\r\n    return grid;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 4,
+    "spaceScore": 4,
+    "totalScore": 4,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "topLevelStatements_0:2",
+    "kind": "topLevelStatements",
+    "name": "topLevelStatements_0",
+    "startLine": 2,
+    "endLine": 153,
+    "text": "export class ComplexityShowcase {\r\n\r\n  /**\r\n   * O(1) Time — Constant\r\n   * O(1) Space — Constant\r\n   */\r\n  constantOperation(): number {\r\n    return 1 + 1;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(log n) Time — Logarithmic\r\n   * O(1) Space — Constant\r\n   * Example: Binary Search\r\n   */\r\n  logarithmicSearch(arr: number[], target: number): number {\r\n    let left = 0, right = arr.length - 1;\r\n\r\n    while (left <= right) {\r\n      let mid = Math.floor((left + right) / 2);\r\n      if (arr[mid] === target) return mid;\r\n      if (arr[mid] < target) left = mid + 1;\r\n      else right = mid - 1;\r\n    }\r\n\r\n    return -1;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n) Time — Linear\r\n   * O(1) Space — Constant\r\n   */\r\n  linearSearch(arr: number[], target: number): number {\r\n    for (let i = 0; i < arr.length; i++) {\r\n      if (arr[i] === target) return i;\r\n    }\r\n    return -1;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n log n) Time — Linearithmic\r\n   * O(log n) Space — Recursion stack\r\n   * Example: Merge Sort (showing structure only)\r\n   */\r\n  nLogNExample(arr: number[]): number[] {\r\n    if (arr.length <= 1) return arr;\r\n\r\n    const mid = Math.floor(arr.length / 2);\r\n    const left = this.nLogNExample(arr.slice(0, mid));\r\n    const right = this.nLogNExample(arr.slice(mid));\r\n\r\n    return [...left, ...right].sort((a, b) => a - b);\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n²) Time — Quadratic\r\n   * O(1) Space — Constant\r\n   */\r\n  quadraticPairs(arr: number[]): number[][] {\r\n    const pairs: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      for (let j = 0; j < arr.length; j++) {\r\n        pairs.push([arr[i], arr[j]]);\r\n      }\r\n    }\r\n\r\n    return pairs;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n³) Time — Cubic\r\n   * O(1) Space — Constant\r\n   */\r\n  cubicLoop(n: number): number {\r\n    let count = 0;\r\n    for (let i = 0; i < n; i++) {\r\n      for (let j = 0; j < n; j++) {\r\n        for (let k = 0; k < n; k++) {\r\n          count++;\r\n        }\r\n      }\r\n    }\r\n    return count;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(2ⁿ) Time — Exponential\r\n   * O(n) Space — Call stack grows with depth\r\n   * Example: Fibonacci (naive recursion)\r\n   */\r\n  exponentialFibonacci(n: number): number {\r\n    if (n <= 1) return n;\r\n    return this.exponentialFibonacci(n - 1) + this.exponentialFibonacci(n - 2);\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n!) Time — Factorial\r\n   * O(n) Space — Recursion depth\r\n   * Example: Generate all permutations\r\n   */\r\n  factorialPermutations(arr: number[]): number[][] {\r\n    if (arr.length === 0) return [[]];\r\n\r\n    const result: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      const current = arr[i];\r\n      const remaining = arr.filter((_, idx) => idx !== i);\r\n      const perms = this.factorialPermutations(remaining);\r\n\r\n      for (const perm of perms) {\r\n        result.push([current, ...perm]);\r\n      }\r\n    }\r\n\r\n    return result;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n) Space — Linear\r\n   * Creates a new array of size n\r\n   */\r\n  linearSpace(n: number): number[] {\r\n    return new Array(n).fill(0);\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n²) Space — Quadratic\r\n   * Creates a 2D grid\r\n   */\r\n  quadraticSpace(n: number): number[][] {\r\n    const grid: number[][] = [];\r\n    for (let i = 0; i < n; i++) {\r\n      const row = new Array(n).fill(0);\r\n      grid.push(row);\r\n    }\r\n    return grid;\r\n  }\r\n\r\n\r\n\r\n}",
+    "timeComplexity": {
+      "notation": "O(n log n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n²)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 5,
+    "spaceScore": 7,
+    "totalScore": 6,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "arrows_0:56",
+    "kind": "arrows",
+    "name": "arrows_0",
+    "startLine": 56,
+    "endLine": 56,
+    "text": "(a, b) => a - b",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "arrows_1:117",
+    "kind": "arrows",
+    "name": "arrows_1",
+    "startLine": 117,
+    "endLine": 117,
+    "text": "(_, idx) => idx !== i",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_0:8",
+    "kind": "methods",
+    "name": "methods_0",
+    "startLine": 8,
+    "endLine": 10,
+    "text": "constantOperation(): number {\r\n    return 1 + 1;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_1:18",
+    "kind": "methods",
+    "name": "methods_1",
+    "startLine": 18,
+    "endLine": 29,
+    "text": "logarithmicSearch(arr: number[], target: number): number {\r\n    let left = 0, right = arr.length - 1;\r\n\r\n    while (left <= right) {\r\n      let mid = Math.floor((left + right) / 2);\r\n      if (arr[mid] === target) return mid;\r\n      if (arr[mid] < target) left = mid + 1;\r\n      else right = mid - 1;\r\n    }\r\n\r\n    return -1;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(log n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 2,
+    "spaceScore": 1,
+    "totalScore": 2,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_2:36",
+    "kind": "methods",
+    "name": "methods_2",
+    "startLine": 36,
+    "endLine": 41,
+    "text": "linearSearch(arr: number[], target: number): number {\r\n    for (let i = 0; i < arr.length; i++) {\r\n      if (arr[i] === target) return i;\r\n    }\r\n    return -1;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(log n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 2,
+    "spaceScore": 1,
+    "totalScore": 2,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_3:49",
+    "kind": "methods",
+    "name": "methods_3",
+    "startLine": 49,
+    "endLine": 57,
+    "text": "nLogNExample(arr: number[]): number[] {\r\n    if (arr.length <= 1) return arr;\r\n\r\n    const mid = Math.floor(arr.length / 2);\r\n    const left = this.nLogNExample(arr.slice(0, mid));\r\n    const right = this.nLogNExample(arr.slice(mid));\r\n\r\n    return [...left, ...right].sort((a, b) => a - b);\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 2,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_4:64",
+    "kind": "methods",
+    "name": "methods_4",
+    "startLine": 64,
+    "endLine": 74,
+    "text": "quadraticPairs(arr: number[]): number[][] {\r\n    const pairs: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      for (let j = 0; j < arr.length; j++) {\r\n        pairs.push([arr[i], arr[j]]);\r\n      }\r\n    }\r\n\r\n    return pairs;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n²)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 7,
+    "spaceScore": 4,
+    "totalScore": 6,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_5:81",
+    "kind": "methods",
+    "name": "methods_5",
+    "startLine": 81,
+    "endLine": 91,
+    "text": "cubicLoop(n: number): number {\r\n    let count = 0;\r\n    for (let i = 0; i < n; i++) {\r\n      for (let j = 0; j < n; j++) {\r\n        for (let k = 0; k < n; k++) {\r\n          count++;\r\n        }\r\n      }\r\n    }\r\n    return count;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n³)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 8,
+    "spaceScore": 1,
+    "totalScore": 6,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_6:99",
+    "kind": "methods",
+    "name": "methods_6",
+    "startLine": 99,
+    "endLine": 102,
+    "text": "exponentialFibonacci(n: number): number {\r\n    if (n <= 1) return n;\r\n    return this.exponentialFibonacci(n - 1) + this.exponentialFibonacci(n - 2);\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_7:110",
+    "kind": "methods",
+    "name": "methods_7",
+    "startLine": 110,
+    "endLine": 126,
+    "text": "factorialPermutations(arr: number[]): number[][] {\r\n    if (arr.length === 0) return [[]];\r\n\r\n    const result: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      const current = arr[i];\r\n      const remaining = arr.filter((_, idx) => idx !== i);\r\n      const perms = this.factorialPermutations(remaining);\r\n\r\n      for (const perm of perms) {\r\n        result.push([current, ...perm]);\r\n      }\r\n    }\r\n\r\n    return result;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n³)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n²)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 8,
+    "spaceScore": 7,
+    "totalScore": 8,
+    "riskLevel": "HIGH",
+    "confidence": 70,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_8:133",
+    "kind": "methods",
+    "name": "methods_8",
+    "startLine": 133,
+    "endLine": 135,
+    "text": "linearSpace(n: number): number[] {\r\n    return new Array(n).fill(0);\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 2,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_9:142",
+    "kind": "methods",
+    "name": "methods_9",
+    "startLine": 142,
+    "endLine": 149,
+    "text": "quadraticSpace(n: number): number[][] {\r\n    const grid: number[][] = [];\r\n    for (let i = 0; i < n; i++) {\r\n      const row = new Array(n).fill(0);\r\n      grid.push(row);\r\n    }\r\n    return grid;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 4,
+    "spaceScore": 4,
+    "totalScore": 4,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "topLevelStatements_0:2",
+    "kind": "topLevelStatements",
+    "name": "topLevelStatements_0",
+    "startLine": 2,
+    "endLine": 153,
+    "text": "export class ComplexityShowcase {\r\n\r\n  /**\r\n   * O(1) Time — Constant\r\n   * O(1) Space — Constant\r\n   */\r\n  constantOperation(): number {\r\n    return 1 + 1;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(log n) Time — Logarithmic\r\n   * O(1) Space — Constant\r\n   * Example: Binary Search\r\n   */\r\n  logarithmicSearch(arr: number[], target: number): number {\r\n    let left = 0, right = arr.length - 1;\r\n\r\n    while (left <= right) {\r\n      let mid = Math.floor((left + right) / 2);\r\n      if (arr[mid] === target) return mid;\r\n      if (arr[mid] < target) left = mid + 1;\r\n      else right = mid - 1;\r\n    }\r\n\r\n    return -1;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n) Time — Linear\r\n   * O(1) Space — Constant\r\n   */\r\n  linearSearch(arr: number[], target: number): number {\r\n    for (let i = 0; i < arr.length; i++) {\r\n      if (arr[i] === target) return i;\r\n    }\r\n    return -1;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n log n) Time — Linearithmic\r\n   * O(log n) Space — Recursion stack\r\n   * Example: Merge Sort (showing structure only)\r\n   */\r\n  nLogNExample(arr: number[]): number[] {\r\n    if (arr.length <= 1) return arr;\r\n\r\n    const mid = Math.floor(arr.length / 2);\r\n    const left = this.nLogNExample(arr.slice(0, mid));\r\n    const right = this.nLogNExample(arr.slice(mid));\r\n\r\n    return [...left, ...right].sort((a, b) => a - b);\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n²) Time — Quadratic\r\n   * O(1) Space — Constant\r\n   */\r\n  quadraticPairs(arr: number[]): number[][] {\r\n    const pairs: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      for (let j = 0; j < arr.length; j++) {\r\n        pairs.push([arr[i], arr[j]]);\r\n      }\r\n    }\r\n\r\n    return pairs;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n³) Time — Cubic\r\n   * O(1) Space — Constant\r\n   */\r\n  cubicLoop(n: number): number {\r\n    let count = 0;\r\n    for (let i = 0; i < n; i++) {\r\n      for (let j = 0; j < n; j++) {\r\n        for (let k = 0; k < n; k++) {\r\n          count++;\r\n        }\r\n      }\r\n    }\r\n    return count;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(2ⁿ) Time — Exponential\r\n   * O(n) Space — Call stack grows with depth\r\n   * Example: Fibonacci (naive recursion)\r\n   */\r\n  exponentialFibonacci(n: number): number {\r\n    if (n <= 1) return n;\r\n    return this.exponentialFibonacci(n - 1) + this.exponentialFibonacci(n - 2);\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n!) Time — Factorial\r\n   * O(n) Space — Recursion depth\r\n   * Example: Generate all permutations\r\n   */\r\n  factorialPermutations(arr: number[]): number[][] {\r\n    if (arr.length === 0) return [[]];\r\n\r\n    const result: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      const current = arr[i];\r\n      const remaining = arr.filter((_, idx) => idx !== i);\r\n      const perms = this.factorialPermutations(remaining);\r\n\r\n      for (const perm of perms) {\r\n        result.push([current, ...perm]);\r\n      }\r\n    }\r\n\r\n    return result;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n) Space — Linear\r\n   * Creates a new array of size n\r\n   */\r\n  linearSpace(n: number): number[] {\r\n    return new Array(n).fill(0);\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n²) Space — Quadratic\r\n   * Creates a 2D grid\r\n   */\r\n  quadraticSpace(n: number): number[][] {\r\n    const grid: number[][] = [];\r\n    for (let i = 0; i < n; i++) {\r\n      const row = new Array(n).fill(0);\r\n      grid.push(row);\r\n    }\r\n    return grid;\r\n  }\r\n\r\n\r\n\r\n}",
+    "timeComplexity": {
+      "notation": "O(n log n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n²)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 5,
+    "spaceScore": 7,
+    "totalScore": 6,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "arrows_0:56",
+    "kind": "arrows",
+    "name": "arrows_0",
+    "startLine": 56,
+    "endLine": 56,
+    "text": "(a, b) => a - b",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "arrows_1:117",
+    "kind": "arrows",
+    "name": "arrows_1",
+    "startLine": 117,
+    "endLine": 117,
+    "text": "(_, idx) => idx !== i",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_0:8",
+    "kind": "methods",
+    "name": "methods_0",
+    "startLine": 8,
+    "endLine": 10,
+    "text": "constantOperation(): number {\r\n    return 1 + 1;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_1:18",
+    "kind": "methods",
+    "name": "methods_1",
+    "startLine": 18,
+    "endLine": 29,
+    "text": "logarithmicSearch(arr: number[], target: number): number {\r\n    let left = 0, right = arr.length - 1;\r\n\r\n    while (left <= right) {\r\n      let mid = Math.floor((left + right) / 2);\r\n      if (arr[mid] === target) return mid;\r\n      if (arr[mid] < target) left = mid + 1;\r\n      else right = mid - 1;\r\n    }\r\n\r\n    return -1;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(log n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 2,
+    "spaceScore": 1,
+    "totalScore": 2,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_2:36",
+    "kind": "methods",
+    "name": "methods_2",
+    "startLine": 36,
+    "endLine": 41,
+    "text": "linearSearch(arr: number[], target: number): number {\r\n    for (let i = 0; i < arr.length; i++) {\r\n      if (arr[i] === target) return i;\r\n    }\r\n    return -1;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(log n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 2,
+    "spaceScore": 1,
+    "totalScore": 2,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_3:49",
+    "kind": "methods",
+    "name": "methods_3",
+    "startLine": 49,
+    "endLine": 57,
+    "text": "nLogNExample(arr: number[]): number[] {\r\n    if (arr.length <= 1) return arr;\r\n\r\n    const mid = Math.floor(arr.length / 2);\r\n    const left = this.nLogNExample(arr.slice(0, mid));\r\n    const right = this.nLogNExample(arr.slice(mid));\r\n\r\n    return [...left, ...right].sort((a, b) => a - b);\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 2,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_4:64",
+    "kind": "methods",
+    "name": "methods_4",
+    "startLine": 64,
+    "endLine": 74,
+    "text": "quadraticPairs(arr: number[]): number[][] {\r\n    const pairs: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      for (let j = 0; j < arr.length; j++) {\r\n        pairs.push([arr[i], arr[j]]);\r\n      }\r\n    }\r\n\r\n    return pairs;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n²)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 7,
+    "spaceScore": 4,
+    "totalScore": 6,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_5:81",
+    "kind": "methods",
+    "name": "methods_5",
+    "startLine": 81,
+    "endLine": 91,
+    "text": "cubicLoop(n: number): number {\r\n    let count = 0;\r\n    for (let i = 0; i < n; i++) {\r\n      for (let j = 0; j < n; j++) {\r\n        for (let k = 0; k < n; k++) {\r\n          count++;\r\n        }\r\n      }\r\n    }\r\n    return count;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n³)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 8,
+    "spaceScore": 1,
+    "totalScore": 6,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_6:99",
+    "kind": "methods",
+    "name": "methods_6",
+    "startLine": 99,
+    "endLine": 102,
+    "text": "exponentialFibonacci(n: number): number {\r\n    if (n <= 1) return n;\r\n    return this.exponentialFibonacci(n - 1) + this.exponentialFibonacci(n - 2);\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 1,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_7:110",
+    "kind": "methods",
+    "name": "methods_7",
+    "startLine": 110,
+    "endLine": 126,
+    "text": "factorialPermutations(arr: number[]): number[][] {\r\n    if (arr.length === 0) return [[]];\r\n\r\n    const result: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      const current = arr[i];\r\n      const remaining = arr.filter((_, idx) => idx !== i);\r\n      const perms = this.factorialPermutations(remaining);\r\n\r\n      for (const perm of perms) {\r\n        result.push([current, ...perm]);\r\n      }\r\n    }\r\n\r\n    return result;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n³)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n²)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 8,
+    "spaceScore": 7,
+    "totalScore": 8,
+    "riskLevel": "HIGH",
+    "confidence": 70,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_8:133",
+    "kind": "methods",
+    "name": "methods_8",
+    "startLine": 133,
+    "endLine": 135,
+    "text": "linearSpace(n: number): number[] {\r\n    return new Array(n).fill(0);\r\n  }",
+    "timeComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(1)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 1,
+    "spaceScore": 2,
+    "totalScore": 1,
+    "riskLevel": "LOW",
+    "confidence": 90,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "methods_9:142",
+    "kind": "methods",
+    "name": "methods_9",
+    "startLine": 142,
+    "endLine": 149,
+    "text": "quadraticSpace(n: number): number[][] {\r\n    const grid: number[][] = [];\r\n    for (let i = 0; i < n; i++) {\r\n      const row = new Array(n).fill(0);\r\n      grid.push(row);\r\n    }\r\n    return grid;\r\n  }",
+    "timeComplexity": {
+      "notation": "O(n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 4,
+    "spaceScore": 4,
+    "totalScore": 4,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  },
+  {
+    "id": "topLevelStatements_0:2",
+    "kind": "topLevelStatements",
+    "name": "topLevelStatements_0",
+    "startLine": 2,
+    "endLine": 153,
+    "text": "export class ComplexityShowcase {\r\n\r\n  /**\r\n   * O(1) Time — Constant\r\n   * O(1) Space — Constant\r\n   */\r\n  constantOperation(): number {\r\n    return 1 + 1;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(log n) Time — Logarithmic\r\n   * O(1) Space — Constant\r\n   * Example: Binary Search\r\n   */\r\n  logarithmicSearch(arr: number[], target: number): number {\r\n    let left = 0, right = arr.length - 1;\r\n\r\n    while (left <= right) {\r\n      let mid = Math.floor((left + right) / 2);\r\n      if (arr[mid] === target) return mid;\r\n      if (arr[mid] < target) left = mid + 1;\r\n      else right = mid - 1;\r\n    }\r\n\r\n    return -1;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n) Time — Linear\r\n   * O(1) Space — Constant\r\n   */\r\n  linearSearch(arr: number[], target: number): number {\r\n    for (let i = 0; i < arr.length; i++) {\r\n      if (arr[i] === target) return i;\r\n    }\r\n    return -1;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n log n) Time — Linearithmic\r\n   * O(log n) Space — Recursion stack\r\n   * Example: Merge Sort (showing structure only)\r\n   */\r\n  nLogNExample(arr: number[]): number[] {\r\n    if (arr.length <= 1) return arr;\r\n\r\n    const mid = Math.floor(arr.length / 2);\r\n    const left = this.nLogNExample(arr.slice(0, mid));\r\n    const right = this.nLogNExample(arr.slice(mid));\r\n\r\n    return [...left, ...right].sort((a, b) => a - b);\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n²) Time — Quadratic\r\n   * O(1) Space — Constant\r\n   */\r\n  quadraticPairs(arr: number[]): number[][] {\r\n    const pairs: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      for (let j = 0; j < arr.length; j++) {\r\n        pairs.push([arr[i], arr[j]]);\r\n      }\r\n    }\r\n\r\n    return pairs;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n³) Time — Cubic\r\n   * O(1) Space — Constant\r\n   */\r\n  cubicLoop(n: number): number {\r\n    let count = 0;\r\n    for (let i = 0; i < n; i++) {\r\n      for (let j = 0; j < n; j++) {\r\n        for (let k = 0; k < n; k++) {\r\n          count++;\r\n        }\r\n      }\r\n    }\r\n    return count;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(2ⁿ) Time — Exponential\r\n   * O(n) Space — Call stack grows with depth\r\n   * Example: Fibonacci (naive recursion)\r\n   */\r\n  exponentialFibonacci(n: number): number {\r\n    if (n <= 1) return n;\r\n    return this.exponentialFibonacci(n - 1) + this.exponentialFibonacci(n - 2);\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n!) Time — Factorial\r\n   * O(n) Space — Recursion depth\r\n   * Example: Generate all permutations\r\n   */\r\n  factorialPermutations(arr: number[]): number[][] {\r\n    if (arr.length === 0) return [[]];\r\n\r\n    const result: number[][] = [];\r\n\r\n    for (let i = 0; i < arr.length; i++) {\r\n      const current = arr[i];\r\n      const remaining = arr.filter((_, idx) => idx !== i);\r\n      const perms = this.factorialPermutations(remaining);\r\n\r\n      for (const perm of perms) {\r\n        result.push([current, ...perm]);\r\n      }\r\n    }\r\n\r\n    return result;\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n) Space — Linear\r\n   * Creates a new array of size n\r\n   */\r\n  linearSpace(n: number): number[] {\r\n    return new Array(n).fill(0);\r\n  }\r\n\r\n\r\n  /**\r\n   * O(n²) Space — Quadratic\r\n   * Creates a 2D grid\r\n   */\r\n  quadraticSpace(n: number): number[][] {\r\n    const grid: number[][] = [];\r\n    for (let i = 0; i < n; i++) {\r\n      const row = new Array(n).fill(0);\r\n      grid.push(row);\r\n    }\r\n    return grid;\r\n  }\r\n\r\n\r\n\r\n}",
+    "timeComplexity": {
+      "notation": "O(n log n)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "spaceComplexity": {
+      "notation": "O(n²)",
+      "confidence": 0,
+      "flags": [
+        "not implemented"
+      ]
+    },
+    "timeScore": 5,
+    "spaceScore": 7,
+    "totalScore": 6,
+    "riskLevel": "MEDIUM",
+    "confidence": 80,
+    "reasons": [],
+    "matchedKeywords": [
+      "No key word added for now"
+    ],
+    "tierUsed": "paid"
+  }
+]

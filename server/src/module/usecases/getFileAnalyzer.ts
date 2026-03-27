@@ -141,11 +141,11 @@ export class GetFileAnalyzer {
       return { success: false, data: null, message: "File sanitization failed." };
     }
 
-    const compilerAnalysis = await this.compiler.execute(serializedData);
+    const complexityAnalysis = await this.compiler.execute(serializedData);
 
     return {
       success: true,
-      data: { compilerAnalysis }
+      data: { complexityAnalysis }
     };
   }
 }

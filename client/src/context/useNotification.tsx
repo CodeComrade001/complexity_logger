@@ -1,36 +1,53 @@
-import React, { createContext, useContext, useCallback } from "react";
+import React, { createContext, useContext, useCallback, useRef } from "react";
 import { toast } from "sonner";
 
-// 1. Define the types for our context
 type NotificationType = 'success' | 'error' | 'warning' | 'info';
 
 interface NotificationContextType {
   notify: (message: string, type?: NotificationType) => void;
 }
 
-// 2. Create the Context
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
-// 3. Create the Provider Component
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const activeToast = useRef<string | number | null>(null);
 
   const notify = useCallback((message: string, type: NotificationType = 'info') => {
+    // prevent stacking → dismiss previous
+    if (activeToast.current) {
+      toast.dismiss(activeToast.current);
+    }
+
+    const baseConfig = {
+      duration: 5000, // 5 seconds
+      action: {
+        label: "Cancel",
+        onClick: () => {
+          if (activeToast.current) toast.dismiss(activeToast.current);
+        }
+      }
+    };
+
+    let id;
+
     switch (type) {
       case 'success':
-        toast.success(message);
+        id = toast.success(message, baseConfig);
         break;
       case 'error':
-        toast.error(message);
+        id = toast.error(message, baseConfig);
         break;
       case 'warning':
-        toast.warning(message);
+        id = toast.warning(message, baseConfig);
         break;
       case 'info':
-        toast.info(message);
+        id = toast.info(message, baseConfig);
         break;
       default:
-        toast(message);
+        id = toast(message, baseConfig);
     }
+
+    activeToast.current = id;
   }, []);
 
   return (
@@ -40,11 +57,10 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   );
 };
 
-// 4. Create the Hook to use the context
 export const useNotification = () => {
   const context = useContext(NotificationContext);
 
-  if (context === undefined) {
+  if (!context) {
     throw new Error("useNotification must be used within a NotificationProvider");
   }
 

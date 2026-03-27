@@ -12,10 +12,10 @@ export default function Landing() {
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden flex-1 flex flex-col justify-center">
         {/* Background Effects */}
-        {/* <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 z-0">
           <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[120px] mix-blend-screen opacity-50 dark:opacity-30 translate-x-1/2 -translate-y-1/4" />
           <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-secondary/20 rounded-full blur-[120px] mix-blend-screen opacity-50 dark:opacity-30 -translate-x-1/2 translate-y-1/4" />
-        </div> */}
+        </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -48,7 +48,7 @@ export default function Landing() {
                     Start Free Trial <ArrowRight className="ml-2 w-4 h-4" />
                   </Button>
                 </Link>
-                <Link href="/login">
+                <Link href="/dashboard">
                   <Button size="lg" variant="outline" className="w-full sm:w-auto h-12 px-8 text-base bg-background/50 backdrop-blur-sm border-border hover:bg-muted">
                     View Interactive Demo
                   </Button>

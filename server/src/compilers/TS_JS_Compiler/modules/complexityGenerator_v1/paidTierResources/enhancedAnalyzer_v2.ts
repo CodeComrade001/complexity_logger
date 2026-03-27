@@ -42,12 +42,16 @@ export class EnhancedAnalyzer_v2 {
   // ───────────────────────────────────────────────────────────────────────────
   // STEP 1 — SIGNAL EXTRACTION
   // Single depth-first traversal.  All counters updated in one pass.
+  // ENHANCED: Now includes regex fallbacks for patterns AST might miss
   // ───────────────────────────────────────────────────────────────────────────
 
   private extractSignals(
     node: Node,
     functionName: string | null
   ): SignalProfile {
+
+    // Get the full text for regex analysis
+    const fullText = node.getText();
 
     // ── Mutable counters ────────────────────────────────────────────────────
     let loops = 0;
@@ -57,7 +61,7 @@ export class EnhancedAnalyzer_v2 {
     let recursionCallCount = 0;    // total recursive call-sites found
     let recursionDoubled = false;
     let hasBreakOrContinue = false;
-    let hasEarlyReturn = false;    // NEW: detects return statements in loops
+    let hasEarlyReturn = false;
     let conditionDoubled = false;
     let allocations = 0;
     let variables = 0;
@@ -65,9 +69,16 @@ export class EnhancedAnalyzer_v2 {
     let usesNestedDataStructures = false;
     let loopWithAllocation = false;
     let recursionWithAllocation = false;
-    let hasLoopInRecursion = false; // NEW: loop inside recursive function
-    let hasFilterOrSlice = false;   // NEW: detects filtering/slicing patterns
-    let recursionDepth = 0;         // NEW: track how deep recursion goes
+    let hasLoopInRecursion = false;
+    let hasFilterOrSlice = false;
+
+    // NEW: Additional signals from regex analysis
+    let hasLinearSearchInLoop = false;
+    let hasNestedArrayMethods = false;
+    let hasSorting = false;
+    let hasJSONOperations = false;
+    let hasSpreadOperator = false;
+    let functionalLoopCount = 0;
 
     // ── Stack to track current loop-nesting depth ───────────────────────────
     let currentLoopDepth = 0;
@@ -182,7 +193,6 @@ export class EnhancedAnalyzer_v2 {
         if (isSelfCall(callNode)) {
           recursion = true;
           recursionCallCount++;
-          recursionDepth = Math.max(recursionDepth, 1);
           insideRecursion = true;
         }
       }
@@ -212,15 +222,76 @@ export class EnhancedAnalyzer_v2 {
 
     traverse(node, false, false);
 
+    // ═══════════════════════════════════════════════════════════════════════
+    // REGEX FALLBACK ANALYSIS
+    // Use when AST analysis might miss patterns or needs supplementation
+    // ═══════════════════════════════════════════════════════════════════════
+
+    // ── FUNCTIONAL LOOP DETECTION (forEach, map, filter, reduce) ──────────
+    const functionalLoopMatches = fullText.match(/\.(forEach|map|filter|reduce)\s*\(/g);
+    if (functionalLoopMatches) {
+      functionalLoopCount = functionalLoopMatches.length;
+      // Add to loop count if AST missed them
+      const totalDetectedLoops = loops + functionalLoopCount;
+      if (totalDetectedLoops > loops) {
+        loops = totalDetectedLoops;
+      }
+    }
+
+    // ── NESTED ARRAY METHODS (map inside map, filter with includes, etc) ──
+    const nestedArrayPattern = /\.(map|filter|forEach|reduce)\s*\([^)]*\.(map|filter|includes|indexOf|find|findIndex)/;
+    hasNestedArrayMethods = nestedArrayPattern.test(fullText);
+
+    // If we found nested array methods, update nesting depth
+    if (hasNestedArrayMethods && maxLoopDepth < 2) {
+      maxLoopDepth = Math.max(maxLoopDepth, 2);
+    }
+
+    // ── LINEAR SEARCH IN LOOPS (.includes, .indexOf inside loops) ─────────
+    // This is a critical O(n²) pattern that's easy to miss
+    const hasLinearSearchMethods = /\.(includes|indexOf|find|findIndex)\s*\(/.test(fullText);
+    if ((loops > 0 || functionalLoopCount > 0) && hasLinearSearchMethods) {
+      hasLinearSearchInLoop = true;
+    }
+
+    // ── BINARY RECURSION FALLBACK ─────────────────────────────────────────
+    // If AST missed it, use regex to detect multiple recursive calls
+    if (functionName && !recursionDoubled && recursion) {
+      const recursiveCallPattern = new RegExp(`\\b${functionName}\\s*\\(`, 'g');
+      const callsInBinaryExpr = fullText.match(/return[^;]*\+[^;]*|return[^;]*\*[^;]*/g);
+
+      if (callsInBinaryExpr) {
+        for (const expr of callsInBinaryExpr) {
+          const callsInExpr = (expr.match(recursiveCallPattern) || []).length;
+          if (callsInExpr >= 2) {
+            recursionDoubled = true;
+            break;
+          }
+        }
+      }
+    }
+
+    // ── SORTING DETECTION ──────────────────────────────────────────────────
+    hasSorting = /\.sort\s*\(/.test(fullText);
+
+    // ── JSON OPERATIONS (expensive builtins) ───────────────────────────────
+    hasJSONOperations = /JSON\.(parse|stringify)/.test(fullText);
+
+    // ── SPREAD OPERATOR (creates copies) ───────────────────────────────────
+    hasSpreadOperator = /\.\.\.|\bspread\b/.test(fullText);
+
+    // ── ENHANCED NESTING DEPTH (regex fallback) ────────────────────────────
+    // Use regex-based nesting calculation if it's higher than AST found
+    const regexNestingDepth = this.estimateLoopNestingDepth(fullText);
+    maxLoopDepth = Math.max(maxLoopDepth, regexNestingDepth);
+
     // ── Post-traversal derived booleans ────────────────────────────────────
     const isConstantBody = loops === 0 && !recursion;
     const isConstantWithReturn =
       isConstantBody && conditionals === 0 && allocations === 0;
 
     // ── Dataset size hint ──────────────────────────────────────────────────
-    // Heuristic: infer from parameter names / variable names whether the
-    // function appears to work on large data.
-    const allText = node.getText().toLowerCase();
+    const allText = fullText.toLowerCase();
     let dataSizeHint: "SMALL" | "MEDIUM" | "LARGE" = "MEDIUM";
     if (/\b(n|size|length|count|items|dataset|records|rows|elements)\b/.test(allText)) {
       dataSizeHint = "LARGE";
@@ -250,12 +321,67 @@ export class EnhancedAnalyzer_v2 {
       hasLoopInRecursion,
       hasFilterOrSlice,
       dataSizeHint,
+      // NEW SIGNALS FROM REGEX ANALYSIS
+      hasLinearSearchInLoop,
+      hasNestedArrayMethods,
+      hasSorting,
+      hasJSONOperations,
+      hasSpreadOperator,
+      functionalLoopCount,
     };
   }
 
   // ───────────────────────────────────────────────────────────────────────────
+  // REGEX HELPER: Better loop nesting detection
+  // Used as fallback when AST analysis might undercount nesting
+  // ───────────────────────────────────────────────────────────────────────────
+  private estimateLoopNestingDepth(text: string): number {
+    let maxDepth = 0;
+    let currentDepth = 0;
+    const blockStack: boolean[] = [];
+
+    const lines = text.split('\n');
+
+    for (let line of lines) {
+      // Remove strings and comments (basic heuristic)
+      line = line.replace(/\/\/.*$/g, ''); // remove single-line comments
+      line = line.replace(/\/\*.*\*\//g, ''); // remove block comments
+      line = line.replace(/(["'`]).*?\1/g, ''); // remove string literals
+
+      // Count all loop keywords in the line
+      const loopKeywords = line.match(/\b(for|while|do|forEach|map|filter|reduce)\b/g) || [];
+      const openBraces = (line.match(/\{/g) || []).length;
+      const closeBraces = (line.match(/\}/g) || []).length;
+
+      // Handle loop keywords
+      for (let i = 0; i < loopKeywords.length; i++) {
+        blockStack.push(true);
+        currentDepth++;
+        maxDepth = Math.max(maxDepth, currentDepth);
+      }
+
+      // Track non-loop blocks for extra braces
+      const nonLoopBlocks = Math.max(0, openBraces - loopKeywords.length);
+      for (let i = 0; i < nonLoopBlocks; i++) {
+        blockStack.push(false);
+      }
+
+      // Close blocks
+      for (let i = 0; i < closeBraces; i++) {
+        const isLoopBlock = blockStack.pop();
+        if (isLoopBlock) {
+          currentDepth = Math.max(0, currentDepth - 1);
+        }
+      }
+    }
+
+    return maxDepth;
+  }
+
+  // ───────────────────────────────────────────────────────────────────────────
   // STEP 2 — BUILD COMPLEXITY PROFILE
-  // Maps SignalProfile signals → Big-O strings + numeric severity scores.
+  // Maps SignalProfile signals → Big-O strings + numeric scores.
+  // ENHANCED: Now uses regex signals for better detection
   //
   // TIME scoring ladder  (1 = best → 10 = worst):
   //   O(1)         → 1
@@ -301,6 +427,12 @@ export class EnhancedAnalyzer_v2 {
       timeNotation = "O(n!)";
       timeScore = 10;
 
+    } else if (signals.hasLinearSearchInLoop || signals.hasNestedArrayMethods) {
+      // CRITICAL: Linear search inside loops or nested array methods
+      // This is a hidden O(n²) pattern that's very common
+      timeNotation = "O(n²)";
+      timeScore = 7;
+
     } else if (signals.recursion && signals.nestedLoops >= 2) {
       // Recursive + deeply nested loops → very expensive, treat as O(n³)
       timeNotation = "O(n³)";
@@ -314,7 +446,6 @@ export class EnhancedAnalyzer_v2 {
     } else if (signals.recursion && signals.allocations > 0) {
       // Recursion with allocations (like merge sort with slice)
       // If it's dividing the problem, it's likely O(n log n)
-      // We infer this from the presence of slice/split operations
 
       if (signals.hasFilterOrSlice) {
         timeNotation = "O(n log n)";
@@ -323,6 +454,11 @@ export class EnhancedAnalyzer_v2 {
         timeNotation = "O(n²)";
         timeScore = 7;
       }
+
+    } else if (signals.hasSorting) {
+      // Sorting is O(n log n) - common pattern
+      timeNotation = "O(n log n)";
+      timeScore = 5;
 
     } else if (signals.recursion) {
       // Pure recursion (single branch) → O(n) on the call stack
@@ -367,6 +503,11 @@ export class EnhancedAnalyzer_v2 {
       spaceNotation = "O(n²)";
       spaceScore = 7;
 
+    } else if (signals.hasSpreadOperator && signals.loops > 0) {
+      // Spread operator in loops creates multiple copies → O(n) or O(n²)
+      spaceNotation = signals.nestedLoops >= 2 ? "O(n²)" : "O(n)";
+      spaceScore = signals.nestedLoops >= 2 ? 7 : 4;
+
     } else if (signals.recursionWithAllocation || signals.loopWithAllocation) {
       // Allocating inside a loop or recursion → grows with input → O(n)
       spaceNotation = "O(n)";
@@ -377,7 +518,12 @@ export class EnhancedAnalyzer_v2 {
       spaceNotation = "O(n)";
       spaceScore = 4;
 
-    } else if (signals.allocations > 0 || signals.usesDataStructures) {
+    } else if (signals.hasJSONOperations) {
+      // JSON operations create full copies of data → O(n) space
+      spaceNotation = "O(n)";
+      spaceScore = 4;
+
+    } else if (signals.allocations > 0 || signals.usesDataStructures || signals.hasSpreadOperator) {
       // Fixed allocations outside loops → O(1) auxiliary, but flag it
       spaceNotation = "O(1)";
       spaceScore = 2;

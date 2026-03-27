@@ -1,8 +1,8 @@
 import { useCallback, useState } from "react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { Badge } from "@/components/ui/badge";
-import { Code2, GitMerge, AlertTriangle, ShieldCheck, FolderGit2, Plus, Play, Zap, FileCode, Folder } from "lucide-react";
-import { LineChart, Line, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
+import { Code2, GitMerge, AlertTriangle, ShieldCheck, Plus, Play, Zap, FileCode, Folder, DeleteIcon } from "lucide-react";
+import { ResponsiveContainer } from "recharts";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +12,9 @@ import { uploadAndAnalyzeFiles } from "@/utils/axios";
 import type { SingleFile } from "@/types/fileUploadInterface";
 import { CodeEditor } from "@/components/dashboard/CodeEditor";
 import TrendCardPreview from "@/components/dashboard/trendCardPreview";
+import { useNotification } from "@/context/useNotification";
+import { FileComplexityData } from "@/types/apiDataInterface";
+import { MetricsGrid } from "@/components/dashboard/MetricCard";
 
 // Temporary types for metrics/dist/trends
 interface Metrics {
@@ -39,19 +42,15 @@ const TEMP_DIST: DistItem[] = [
   { label: "Medium", value: 30, color: "bg-yellow-500" },
   { label: "High", value: 20, color: "bg-red-500" },
 ];
-const TEMP_TRENDS: TrendItem[] = [
-  { complexity: 40, date: "2026-03-20" },
-  { complexity: 55, date: "2026-03-21" },
-  { complexity: 60, date: "2026-03-22" },
-];
 
 export default function DashboardOverview() {
   const [files, setFiles] = useState<any[]>([]);
   const [selectedFile, setSelectedFile] = useState<string>("");
   const [selectedFileText, setSelectedFileText] = useState<string>("");
-
+  const [analyzedApiResult, setAnalyzedApiResult] = useState<FileComplexityData | null>(null)
   const [uploadFilesForComplexity, setUploadFilesForComplexity] = useState<SingleFile[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const { notify } = useNotification()
 
   const importUserFileFolder = async () => {
     const input = document.createElement("input");
@@ -61,18 +60,35 @@ export default function DashboardOverview() {
       const target = e.target as HTMLInputElement;
       if (!target?.files) return;
       const fileArray: any[] = Array.from(target.files).map((file) => ({ id: crypto.randomUUID(), name: file.name, type: "file", file }));
+      setUploadFilesForComplexity(fileArray)
       setFiles(fileArray);
     };
     input.click();
   };
 
+
   const submitForAnalysis = async () => {
-    if (uploadFilesForComplexity.length === 0) return;
+    if (uploadFilesForComplexity.length === 0) {
+      console.log("no files for upload pleae load files")
+      return notify("Please Select a File For Upload", "error")
+
+    }
     try {
       setIsAnalyzing(true);
+      notify("FIles Submitted for analyzing", "info")
       const formData = new FormData();
       uploadFilesForComplexity.forEach((item) => formData.append("files", item.file));
-      await uploadAndAnalyzeFiles(formData);
+      console.log("formData")
+      const response = await uploadAndAnalyzeFiles(formData);
+      console.log("Turbo Log  ~ submitForAnalysis ~ response:", response);
+      const { success, data } = response.data;
+      setAnalyzedApiResult(data)
+      if (success) {
+        notify("Files Complexity Generated Successfully", "success")
+      }
+    } catch (err) {
+      notify("Internal Server Error", "error")
+      console.log("Error uploading files", err)
     } finally {
       setIsAnalyzing(false);
     }
@@ -85,9 +101,12 @@ export default function DashboardOverview() {
         <aside className="w-72 flex flex-col border border-border/50 max-h-[95%] bg-card/50 backdrop-blur-sm rounded-xl overflow-hidden">
           <div className="p-4 border-b border-border/50 flex items-center justify-between bg-muted/30">
             <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Explorer</span>
-            <Button onClick={importUserFileFolder} variant="ghost" size="icon" className="h-8 w-8">
+            <Button onClick={importUserFileFolder} size="icon" className="h-8 shadow-primary/20 w-8">
               <Plus className="h-4 w-4" />
             </Button>
+            {/* <Button onClick={DeleteFiles} variant="ghost" size="icon" className="h-8 w-8">
+              <DeleteIcon className="h-4 w-4" />
+            </Button> */}
           </div>
           <ScrollArea className="flex-1 p-2">
             <div className="space-y-1">
@@ -112,33 +131,17 @@ export default function DashboardOverview() {
         <div className="flex-1 flex flex-col gap-6  pr-2">
           <header className="flex items-center justify-between">
             <h1 className="text-3xl font-bold tracking-tight">Code Analysis</h1>
-            <Button onClick={submitForAnalysis} disabled={isAnalyzing} className="gap-2 shadow-lg shadow-primary/20">
+            <Button onClick={submitForAnalysis} disabled={isAnalyzing} className="gap-2 mt-5 shadow-lg shadow-primary/20">
               {isAnalyzing ? <Zap className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
               {isAnalyzing ? "Analyzing..." : "Generate Complexity"}
             </Button>
           </header>
 
           {/* Metrics */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
-              { title: "Total Score", val: TEMP_METRICS.totalScore, icon: ShieldCheck, color: "text-emerald-500", bg: "bg-emerald-500/10" },
-              { title: "Functions", val: TEMP_METRICS.functionsAnalyzed, icon: Code2, color: "text-blue-500", bg: "bg-blue-500/10" },
-              { title: "Issues", val: TEMP_METRICS.issuesFound, icon: AlertTriangle, color: "text-amber-500", bg: "bg-amber-500/10" },
-              { title: "Status", val: TEMP_METRICS.ciCdStatus, icon: GitMerge, color: "text-purple-500", bg: "bg-purple-500/10" }
-            ].map((m, i: number) => (
-              <Card key={i} className="border-border/50 bg-card/50">
-                <CardContent className="p-4 flex items-center justify-between">
-                  <div>
-                    <p className="text-[10px] font-bold uppercase text-muted-foreground">{m.title}</p>
-                    <h3 className="text-xl font-bold font-mono">{m.val}</h3>
-                  </div>
-                  <div className={`w-10 h-10 rounded-lg ${m.bg} flex items-center justify-center`}>
-                    <m.icon className={`w-5 h-5 ${m.color}`} />
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          {/* {(analyzedApiResult !== null) && (
+            <MetricsGrid metricValues={analyzedApiResult.data.summary} />
+          )} */}
+          <MetricsGrid metricValues={analyzedApiResult?.data?.summary ?? null} />
 
           {/* Complexity & Trends */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -172,11 +175,11 @@ export default function DashboardOverview() {
 
               <Card className="border-border/50 bg-card/50">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm">30-Day Trend</CardTitle>
+                  <CardTitle className="text-sm">Complexity Result</CardTitle>
                 </CardHeader>
                 <CardContent className="h-auto">
                   <ResponsiveContainer width="100%" height="100%">
-                    <TrendCardPreview />
+                    <TrendCardPreview apiComplexitydetails={analyzedApiResult?.data.details || null} />
                   </ResponsiveContainer>
                 </CardContent>
               </Card>

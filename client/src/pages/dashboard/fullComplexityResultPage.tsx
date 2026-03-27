@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { RefreshCcw, List, LayoutGrid, Info, Search, Filter, AlertCircle, CheckCircle2, AlertTriangle, XCircle, Table as TableIcon } from "lucide-react";
-import type { ComplexityReason, ComplexityUnit, FileComplexityReceivedPayload, RiskLevel, ViewMode } from "@/types/apiDataInterface";
+import type { ComplexityUnit, FileComplexityReceivedPayload, RiskLevel, ViewMode } from "@/types/apiDataInterface";
 import { useNotification } from "@/context/useNotification";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 
@@ -21,8 +21,8 @@ export default function ComplexityResultPage() {
   const cn = (...classes: (string | boolean | undefined)[]) => classes.filter(Boolean).join(' ');
 
   const allFunctions: UIFunction[] = fileComplexityResult.flatMap(payload => {
-    if (!payload.data?.freeComplexityReport) return [];
-    const report = payload.data.freeComplexityReport;
+    if (!payload.complexityAnalysis.data.details) return [];
+    const report = payload.complexityAnalysis.data;
     const fileName = report.nameOfFile;
     const allUnits: ComplexityUnit[] = [
       ...report.details.functions, ...report.details.arrows, ...report.details.methods,

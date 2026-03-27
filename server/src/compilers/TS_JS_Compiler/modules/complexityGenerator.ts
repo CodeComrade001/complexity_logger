@@ -32,7 +32,7 @@ export class GetComplexityGenerator {
         success: true,
         message: "Complexity analysis complete",
         data: {
-          freeComplexityReport: reportGenerated
+          complexityAnalysis: reportGenerated
           // paidComplexityReport: paidReport,
         },
       };

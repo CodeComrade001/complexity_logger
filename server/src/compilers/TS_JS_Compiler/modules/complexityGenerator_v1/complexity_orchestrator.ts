@@ -9,7 +9,6 @@ import {
   TierLevel
 } from "../../interfaces/complexityGeneratorInterface.js";
 import { FastAnalyzer } from "./freeTierResources/fast_analyzer.js";
-import { EnhancedAnalyzer } from "./paidTierResources/enhanced_analyzer.js";
 import { normalizedPayloadData } from "../complexityOrchestratorHelpers/complexityOrchestratorInterface.js";
 import { fetchUnitPartOfCodeArrayTargets } from "../../interfaces/fetchUnitPartOfCodeProps.js";
 import { AIComplexityExplainer } from "./paidTierResources/aI_ReasonGenerator.js";
@@ -128,26 +127,6 @@ export class ComplexityOrchestrator_v1 {
 
     const reasons: PaidComplexityReason[] = [];
 
-
-    /*//////////////////////////////////////////////////////////////
-      THESE IS AND OUTDATED VERSION THAT WILL BE DELETED LATER JUST LEAVE IT TO PREVENT CODE ERROES 
-    //////////////////////////////////////////////////////////////*/
-
-    // const asyncWeight = await EnhancedAnalyzer.detectAsyncPattern(node, startLine, reasons);
-    // const signals = await EnhancedAnalyzer.collectASTSignals(node, name, this.keywordSet);
-
-    // // Phase 2: Calculate scores from signals
-    // const scores = await EnhancedAnalyzer.calculateScores(signals, asyncWeight, startLine);
-
-    // // Phase 3: Classify complexity
-    // const classification = await EnhancedAnalyzer.classifyComplexity(signals, scores);
-
-    // const uniqueKeywords = await Array.from(new Set(signals.matchedKeywords)) as string[];
-
-    // const aiReason = await this.generateAIReason(classification, signals);
-    // console.log("Turbo Log  ~ ComplexityOrchestrator_v1 ~ analyzeDeepNode ~ aiReason:", aiReason);
-
-    // reasons.push(aiReason);
 
 
     /*//////////////////////////////////////////////////////////////
