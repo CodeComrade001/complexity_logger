@@ -13,9 +13,7 @@ export class AIComplexityExplainer {
 
   private async init() {
     const __filename = fileURLToPath(import.meta.url);
-    console.log("Turbo Log  ~ AIComplexityExplainer ~ init ~ __filename:", __filename);
     const __dirname = path.dirname(__filename);
-    console.log("Turbo Log  ~ AIComplexityExplainer ~ init ~ __dirname:", __dirname);
 
     const llama = await getLlama();
 

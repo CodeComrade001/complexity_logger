@@ -6,7 +6,6 @@ import { IFileRepository } from "../ports/IFileRepository.js";
 import { streamToString } from "../utils/parserFileData.js";
 import fs from 'fs';
 import { Readable } from "stream";
-import { DemoFileLoader } from "../download/demofileLoader.js";
 
 const IGNORED_FILES = [
   ".DS_Store",
@@ -45,10 +44,9 @@ export class GetFileAnalyzer {
   }
 
   private async dataSecurityAndSanitization(
-    filesUnknown: FileUploadModel[]
+    files: FileUploadModel[]
   ): Promise<{ success: boolean; data: FileUploadModel[] }> {
 
-    const files = [this.testDemoFile()]
 
     if (!Array.isArray(files) || files.length === 0) {
       return { success: false, data: [] };
@@ -127,9 +125,6 @@ export class GetFileAnalyzer {
     return { success: true, data: sanitized };
   }
 
-  private testDemoFile(): FileUploadModel {
-    return DemoFileLoader.load();
-  }
 
   public async execute(
     filesToAnalyze: FileUploadModel[]

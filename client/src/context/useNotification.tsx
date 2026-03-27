@@ -20,6 +20,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     const baseConfig = {
       duration: 5000, // 5 seconds
+      className: "bg-card text-card-foreground border border-card-border",
       action: {
         label: "Cancel",
         onClick: () => {

@@ -48,6 +48,7 @@ export default function DashboardOverview() {
   const [selectedFile, setSelectedFile] = useState<string>("");
   const [selectedFileText, setSelectedFileText] = useState<string>("");
   const [analyzedApiResult, setAnalyzedApiResult] = useState<FileComplexityData | null>(null)
+  console.log("Turbo Log  ~ DashboardOverview ~ analyzedApiResult:", analyzedApiResult);
   const [uploadFilesForComplexity, setUploadFilesForComplexity] = useState<SingleFile[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const { notify } = useNotification()
@@ -68,27 +69,43 @@ export default function DashboardOverview() {
 
 
   const submitForAnalysis = async () => {
-    if (uploadFilesForComplexity.length === 0) {
-      console.log("no files for upload pleae load files")
-      return notify("Please Select a File For Upload", "error")
-
+    // 1. Guard clause
+    if (!uploadFilesForComplexity.length) {
+      notify("Please select files before uploading", "error");
+      return;
     }
+
+    setIsAnalyzing(true);
+    notify("Files submitted for analysis", "info");
+
     try {
-      setIsAnalyzing(true);
-      notify("FIles Submitted for analyzing", "info")
+      // 2. Build FormData
       const formData = new FormData();
-      uploadFilesForComplexity.forEach((item) => formData.append("files", item.file));
-      console.log("formData")
+
+      uploadFilesForComplexity.forEach(({ file }) => {
+        if (file) {
+          formData.append("files", file);
+        }
+      });
+
+
+      // 4. API call
       const response = await uploadAndAnalyzeFiles(formData);
       console.log("Turbo Log  ~ submitForAnalysis ~ response:", response);
+
       const { success, data } = response.data;
-      setAnalyzedApiResult(data)
-      if (success) {
-        notify("Files Complexity Generated Successfully", "success")
+
+      if (!success) {
+        throw new Error("Analysis failed");
       }
-    } catch (err) {
-      notify("Internal Server Error", "error")
-      console.log("Error uploading files", err)
+
+      // 5. State update
+      setAnalyzedApiResult(data.complexityAnalysis);
+
+      notify("Files analyzed successfully", "success");
+    } catch (error) {
+      console.error("Upload error:", error);
+      notify("Internal Server Error", "error");
     } finally {
       setIsAnalyzing(false);
     }

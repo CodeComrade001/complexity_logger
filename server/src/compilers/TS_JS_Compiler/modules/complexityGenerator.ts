@@ -26,7 +26,6 @@ export class GetComplexityGenerator {
 
       // const reportGenerated = await this.tierRunner.runFree(normalized);
       const reportGenerated = await this.tierRunner.runPaid(normalized);
-      console.log("Turbo Log  ~ GetComplexityGenerator ~ execute ~ reportGenerated:", reportGenerated);
 
       return {
         success: true,

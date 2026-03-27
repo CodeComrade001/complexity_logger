@@ -135,7 +135,6 @@ export class ComplexityOrchestrator_v1 {
 
 
     const { success, result: newComplexityEnhancer } = this.enhancedAnalyzer.run(node, name, this.keywordSet)
-    console.log("Turbo Log  ~ ComplexityOrchestrator_v1 ~ analyzeDeepNode ~ newComplexityEnhancer:", newComplexityEnhancer);
     if (!success || newComplexityEnhancer == undefined) {
       throw new Error("Paid complexity failed to run")
     }

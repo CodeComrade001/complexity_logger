@@ -199,4 +199,46 @@
   .active-elevate-2 {
     @apply transition-transform duration-200 active:translate-y-0;
   }
+
+  /* Sonner override */
+  [data-sonner-toast] {
+    background: hsl(var(--card)) !important;
+    color: hsl(var(--card-foreground)) !important;
+    border: 1px solid hsl(var(--card-border)) !important;
+    border-radius: var(--radius-lg) !important;
+
+    /* Proper elevation */
+    box-shadow:
+      0 4px 12px rgba(0, 0, 0, 0.08),
+      0 2px 4px rgba(0, 0, 0, 0.04);
+  }
+
+  /* Dark mode shadow fix */
+  .dark [data-sonner-toast] {
+    box-shadow:
+      0 4px 12px rgba(0, 0, 0, 0.5),
+      0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Action button */
+  [data-sonner-toast] button {
+    color: hsl(var(--primary));
+  }
+
+  /* Success / Error / Warning accents (not full background) */
+  [data-sonner-toast][data-type="success"] {
+    border-left: 4px solid hsl(var(--success));
+  }
+
+  [data-sonner-toast][data-type="error"] {
+    border-left: 4px solid hsl(var(--destructive));
+  }
+
+  [data-sonner-toast][data-type="warning"] {
+    border-left: 4px solid hsl(var(--warning));
+  }
+
+  [data-sonner-toast][data-type="info"] {
+    border-left: 4px solid hsl(var(--primary));
+  }
 }

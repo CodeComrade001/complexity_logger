@@ -14,7 +14,6 @@ export class DemoFileLoader {
       __dirname,
       "./demo.ts"
     );
-    console.log("Turbo Log  ~ DemoFileLoader ~ load ~ filePath:", filePath);
 
     const fileContent = fs.readFileSync(filePath, "utf-8");
 
