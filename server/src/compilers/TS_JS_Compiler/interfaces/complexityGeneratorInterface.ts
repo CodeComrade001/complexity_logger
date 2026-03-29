@@ -229,8 +229,15 @@ export interface AnalysisSummary {
   };
   details: {
     methods: ComplexityResult[];
-    arrows: ComplexityResult[];
     functions: ComplexityResult[];
+    arrows: ComplexityResult[];
+    constructors: ComplexityResult[];
+    getters: ComplexityResult[];
+    setters: ComplexityResult[];
+    callbacks: ComplexityResult[];
+    handlers: ComplexityResult[];
+    staticBlocks: ComplexityResult[];
+    topLevelStatements: ComplexityResult[];
   };
 }
 

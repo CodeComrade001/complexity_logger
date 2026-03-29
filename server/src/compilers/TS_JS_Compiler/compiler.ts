@@ -1,4 +1,5 @@
 import { FileUploadModel } from "../../module/file_Interface/fileInterface.js";
+import { AnalysisSummary } from "./interfaces/complexityGeneratorInterface.js";
 import { COMPLEXITYGENERATORMAXFILES } from "./interfaces/fetchUnitPartOfCodeProps.js";
 import { CancelRunningTask } from "./modules/cancelTask.js";
 import { GetCodeChanges } from "./modules/codeChange.js";
@@ -50,7 +51,7 @@ export default class Compiler {
   private async complexityGenerator(
     payload: ComplexityGeneratorPayload,
     concurrency = COMPLEXITYGENERATORMAXFILES
-  ) {
+  ): Promise<AnalysisSummary[]> {
     const entries = Object.entries(payload);
 
     const results: any[] = [];
@@ -64,8 +65,16 @@ export default class Compiler {
         });
       });
 
+      // execute result in batch
       const batchResults = await Promise.all(promises);
-      results.push(...batchResults);
+
+      //store only successful result
+      batchResults.map((item) => {
+        const { success, data } = item
+        if (success && data) {
+          results.push(data);
+        }
+      })
     }
 
     return results;
@@ -84,10 +93,10 @@ export default class Compiler {
 
 
 
-  public async execute(allFilesToAnalyze: FileUploadModel[]) {
+  public async execute(allFilesToAnalyze: FileUploadModel[]): Promise<{ data: AnalysisSummary[] | null, success: boolean, message?: string }> {
     const { success, data } = await this.fetchPartOfCode(allFilesToAnalyze);
     if (!success)
-      return { success: false, message: "parse tree generator failed" };
+      return { success: false, message: "parse tree generator failed", data: null };
 
     const complexityReport = await this.complexityGenerator(data);
 

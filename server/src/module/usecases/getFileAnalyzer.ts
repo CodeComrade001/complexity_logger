@@ -137,10 +137,15 @@ export class GetFileAnalyzer {
     }
 
     const complexityAnalysis = await this.compiler.execute(serializedData);
+    console.log("Turbo Log  ~ GetFileAnalyzer ~ execute ~ complexityAnalysis:", complexityAnalysis);
+
+    if (!complexityAnalysis.success) {
+      return { success: false, data: null, message: "Compiler Generator Module Failed" }
+    }
 
     return {
       success: true,
-      data: { complexityAnalysis }
+      data: complexityAnalysis
     };
   }
 }

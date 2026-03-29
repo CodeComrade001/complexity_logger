@@ -1,3 +1,4 @@
+import { AnalysisSummary } from "../../interfaces/complexityGeneratorInterface.js";
 import { ComplexityOrchestrator_v1 } from "../complexityGenerator_v1/complexity_orchestrator.js";
 import { normalizedPayloadData } from "./complexityOrchestratorInterface.js";
 
@@ -10,11 +11,11 @@ export class TierRunner {
     this.engine = engine
   }
 
-  async runFree(data: normalizedPayloadData) {
+  async runFree(data: normalizedPayloadData): Promise<AnalysisSummary> {
     return this.engine.executeFreeTier(data);
   }
 
-  async runPaid(data: normalizedPayloadData) {
+  async runPaid(data: normalizedPayloadData): Promise<AnalysisSummary> {
     return this.engine.executePaidTier(data);
   }
 }

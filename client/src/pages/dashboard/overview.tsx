@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { Badge } from "@/components/ui/badge";
 import { Code2, GitMerge, AlertTriangle, ShieldCheck, Plus, Play, Zap, FileCode, Folder, DeleteIcon } from "lucide-react";
@@ -13,8 +13,9 @@ import type { SingleFile } from "@/types/fileUploadInterface";
 import { CodeEditor } from "@/components/dashboard/CodeEditor";
 import TrendCardPreview from "@/components/dashboard/trendCardPreview";
 import { useNotification } from "@/context/useNotification";
-import { FileComplexityData } from "@/types/apiDataInterface";
+import { FileComplexityData, FileComplexityReceivedPayload } from "@/types/apiDataInterface";
 import { MetricsGrid } from "@/components/dashboard/MetricCard";
+import { fetchSession, storeSession } from "@/utils/sessionStorage";
 
 // Temporary types for metrics/dist/trends
 interface Metrics {
@@ -95,14 +96,13 @@ export default function DashboardOverview() {
 
       const { success, data } = response.data;
 
+      storeSession<FileComplexityData>("code-analysis", response.data)
+
       if (!success) {
-        throw new Error("Analysis failed");
+        notify("Files analysis error", "error");
       }
-
-      // 5. State update
-      setAnalyzedApiResult(data.complexityAnalysis);
-
       notify("Files analyzed successfully", "success");
+      setAnalyzedApiResult(data);
     } catch (error) {
       console.error("Upload error:", error);
       notify("Internal Server Error", "error");
@@ -110,6 +110,15 @@ export default function DashboardOverview() {
       setIsAnalyzing(false);
     }
   };
+
+  useEffect(() => {
+    const storedCodeAnalysis = fetchSession<FileComplexityData>("code-analysis")
+    console.log("Turbo Log  ~ DashboardOverview ~ storedCodeAnalysis:", storedCodeAnalysis);
+    if (storedCodeAnalysis == null) {
+      setAnalyzedApiResult(null)
+    }
+    setAnalyzedApiResult(storedCodeAnalysis)
+  }, [])
 
   return (
     <DashboardLayout>
@@ -158,7 +167,7 @@ export default function DashboardOverview() {
           {/* {(analyzedApiResult !== null) && (
             <MetricsGrid metricValues={analyzedApiResult.data.summary} />
           )} */}
-          <MetricsGrid metricValues={analyzedApiResult?.data?.summary ?? null} />
+          {/* <MetricsGrid metricValues={analyzedApiResult?.complexityAnalysis.data?.summary ?? null} /> */}
 
           {/* Complexity & Trends */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -196,7 +205,11 @@ export default function DashboardOverview() {
                 </CardHeader>
                 <CardContent className="h-auto">
                   <ResponsiveContainer width="100%" height="100%">
-                    <TrendCardPreview apiComplexitydetails={analyzedApiResult?.data.details || null} />
+                    {(analyzedApiResult !== null && !analyzedApiResult.success) ?
+                      <TrendCardPreview apiComplexitydetails={null} />
+                      :
+                      <TrendCardPreview apiComplexitydetails={analyzedApiResult} />
+                    }
                   </ResponsiveContainer>
                 </CardContent>
               </Card>

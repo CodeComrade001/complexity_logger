@@ -1,6 +1,6 @@
+import { AnalysisSummary } from "../interfaces/complexityGeneratorInterface.js";
 import { ComplexityOrchestrator_v1 } from "./complexityGenerator_v1/complexity_orchestrator.js";
 import { FilePayload } from "./complexityOrchestratorHelpers/complexityOrchestratorInterface.js";
-import { ErrorBoundary } from "./complexityOrchestratorHelpers/ErrorBoundary.js";
 import { PayloadNormalizer } from "./complexityOrchestratorHelpers/payloadNormalizer.js";
 import { TierRunner } from "./complexityOrchestratorHelpers/tierRunner.js";
 
@@ -12,16 +12,16 @@ export class GetComplexityGenerator {
     this.tierRunner = new TierRunner(engine);
   }
 
-  public async execute(payload: FilePayload) {
+  public async execute(payload: FilePayload): Promise<{ success: boolean, message: string, data: AnalysisSummary | null }> {
     try {
       const normalized = this.normalizer.normalize(payload);
 
       if (!normalized) {
-        return { success: false, message: "No analyzable code found" };
+        return { success: false, message: "No analyzable code found", data: null };
       }
 
       if (!Object.keys(normalized).length) {
-        return { success: false, message: "No analyzable code found" };
+        return { success: false, message: "No analyzable code found", data: null };
       }
 
       // const reportGenerated = await this.tierRunner.runFree(normalized);
@@ -30,14 +30,11 @@ export class GetComplexityGenerator {
       return {
         success: true,
         message: "Complexity analysis complete",
-        data: {
-          complexityAnalysis: reportGenerated
-          // paidComplexityReport: paidReport,
-        },
+        data: reportGenerated
       };
     } catch (error) {
       console.log("Turbo Log  ~ GetComplexityGenerator ~ execute ~ error:", error);
-      return ErrorBoundary.handle("GetComplexityGenerator.execute", error);
+      return { success: false, message: "Compiler Execute error", data: null };
     }
   }
 }
