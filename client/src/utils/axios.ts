@@ -10,6 +10,22 @@ const api = axios.create({
   // timeout: 5000, // optional
 });
 
+api.interceptors.response.use(
+  (res) => res,
+  (err) => {
+    if (err.response?.status === 401) {
+      // session expired or invalid
+      window.location.href = "/login";
+    }
+
+    if (err.response?.status === 403) {
+      console.warn("Forbidden action");
+    }
+
+    return Promise.reject(err);
+  }
+);
+
 // --------------------
 // AUTH / SIGNUP
 // --------------------
@@ -18,7 +34,7 @@ export const CreateNewAccount = (data: { phone: string; name?: string }, config?
 };
 
 export const LOgInExistingAccount = (data: { phone: string; name?: string }, config?: AxiosRequestConfig) => {
-  return api.post("user/sugnup", data, config);
+  return api.post("user/signup", data, config);
 };
 
 // --------------------

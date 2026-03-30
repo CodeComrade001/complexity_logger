@@ -20,7 +20,7 @@ export default function Settings() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-8 max-w-4xl">
+      <div className="space-y-8 max-w-full">
         <div>
           <h1 className="text-3xl font-bold tracking-tight mb-1">Settings</h1>
           <p className="text-muted-foreground">

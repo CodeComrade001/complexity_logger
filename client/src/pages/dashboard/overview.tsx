@@ -124,7 +124,7 @@ export default function DashboardOverview() {
     <DashboardLayout>
       <div className="flex h-[calc(100vh-theme(spacing.16))] overflow-hidden gap-6">
         {/* LEFT SIDEBAR */}
-        <aside className="w-72 flex flex-col border border-border/50 max-h-[95%] bg-card/50 backdrop-blur-sm rounded-xl overflow-hidden">
+        <aside className="w-72 flex flex-col border  max-h-[95%] bg-card/50 backdrop-blur-sm glass-panel rounded-xl shadow-sm border-card-border overflow-hidden">
           <div className="p-4 border-b border-border/50 flex items-center justify-between bg-muted/30">
             <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Explorer</span>
             <Button onClick={importUserFileFolder} size="icon" className="h-8 shadow-primary/20 w-8">
@@ -171,7 +171,7 @@ export default function DashboardOverview() {
 
           {/* Complexity & Trends */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Card className="lg:col-span-2 border-border/50 bg-card/50 overflow-hidden flex flex-col">
+            <Card className="lg:col-span-2 glass-panel p-4 rounded-xl shadow-sm border-card-border bg-card/50 overflow-hidden flex flex-col">
               <CardHeader className="py-3 px-4 border-b border-border/50 bg-muted/10 flex flex-row items-center justify-between">
                 <CardTitle className="text-sm font-medium">Source Viewer</CardTitle>
                 <Badge variant="outline" className="text-[10px]">typescript</Badge>
@@ -180,7 +180,7 @@ export default function DashboardOverview() {
             </Card>
 
             <div className="space-y-6">
-              <Card className="border-border/50 bg-card/50">
+              <Card className="glass-panel p-4 rounded-xl shadow-sm border-card-border bg-card/50">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm">Complexity Distribution</CardTitle>
                 </CardHeader>

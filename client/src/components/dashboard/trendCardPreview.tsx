@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import TrendCardFullOverlay from "./trendCardFullOverlay";
 import { FileComplexityData } from "@/types/apiDataInterface";
+import { Link } from "wouter";
 
 interface TrendCardPreviewProps {
   apiComplexitydetails: FileComplexityData | null; // ✅ FIXED
@@ -20,21 +21,20 @@ export default function TrendCardPreview({ apiComplexitydetails }: TrendCardPrev
 
   return (
     <>
-      <div className="border-border/50 bg-card/50 rounded-xl shadow-sm p-4">
+      <div className="relative border-border/50 bg-card/50 rounded-xl shadow-sm p-4">
         <h3 className="text-sm font-semibold mb-3">Analyzed Files</h3>
 
         {files === null ? (
           <p className="text-xs text-muted-foreground italic">No results yet</p>
         ) : (
-          <ul className="divide-y divide-border/20 max-h-60 overflow-y-auto">
+          <ul className="divide-y divide-border/20 gap-3 p-y-3 max-h-60 overflow-y-scroll">
             {files.map((file, idx) => {
               const report = file; // ✅ TYPE ASSERTION
-              // console.log("Turbo Log  ~ TrendCardPreview ~ report:", report.data);
 
               return (
                 <li
                   key={idx}
-                  className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-3 gap-2"
+                  className="flex flex-col sm:flex-row sm:justify-between glass-panel m-2 px-2 rounded-xl shadow-sm border-card-border sm:items-center gap-4 overflow-x-hidden overflow-y-hidden"
                 >
                   {/* LEFT */}
                   <div className="flex-1">
@@ -87,13 +87,12 @@ export default function TrendCardPreview({ apiComplexitydetails }: TrendCardPrev
             View Details
           </Button>
 
-          <Button
-            onClick={() => (window.location.href = "/dashboard/complexity-full-result")}
-            variant="outline"
+          <Link
             className="flex-1 shadow-primary/20"
+            href="/dashboard/complexity-full-result"
           >
             Full Code View
-          </Button>
+          </Link>
         </div>
       </div>
 

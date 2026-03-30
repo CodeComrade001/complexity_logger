@@ -51,21 +51,9 @@ export default function ComplexityResultPage() {
     });
   }, [fileComplexityResult]);
 
-  // const allFunctions: UIFunction[] = fileComplexityResult.flatMap(payload => {
-  //   if (!payload.complexityAnalysis.data.details) return [];
-  //   const report = payload.complexityAnalysis.data;
-  //   const fileName = report.nameOfFile;
-  //   const allUnits: ComplexityUnit[] = [
-  //     ...report.details.functions, ...report.details.arrows, ...report.details.methods,
-  //     ...report.details.constructors, ...report.details.getters, ...report.details.setters,
-  //     ...report.details.callbacks, ...report.details.handlers, ...report.details.staticBlocks,
-  //     ...report.details.topLevelStatements
-  //   ];
-  //   return allUnits.map(unit => ({ ...unit, fileName }));
-  // });
-
   const fileNames: string[] = ["all", ...new Set(allFunctions.map(fn => fn.fileName))];
 
+  //TODO: include pagination here 
   const filteredFunctions = allFunctions.filter(fn => {
     const matchesSearch = fn.name.toLowerCase().includes(searchQuery.toLowerCase()) || fn.fileName.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesRisk = filterRisk === "ALL" || fn.riskLevel === filterRisk;
@@ -119,13 +107,15 @@ export default function ComplexityResultPage() {
   };
 
   useEffect(() => {
+    if (fileComplexityResult) { }
     const storedCodeAnalysis = fetchSession<FileComplexityData>("code-analysis")
     console.log("Turbo Log  ~ DashboardOverview ~ storedCodeAnalysis:", storedCodeAnalysis);
     if (storedCodeAnalysis == null) {
       setFileComplexityResult(null)
     }
+    notify("Project Analysis fetch Successful", "success")
     setFileComplexityResult(storedCodeAnalysis)
-  }, [])
+  }, [fileComplexityResult])
 
   return (
     <DashboardLayout>
@@ -225,10 +215,10 @@ export default function ComplexityResultPage() {
           {/* Main Content Area */}
           {viewMode === "card" && (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 overflow-auto max-h-[500px] p-4 border">
-              {filteredFunctions.map((fn) => {
+              {filteredFunctions.map((fn, index) => {
                 const styles = getRiskStyles(fn.riskLevel);
                 return (
-                  <div key={fn.id} className={cn("glass-panel flex flex-col rounded-xl overflow-hidden border-t-4 transition-all hover-elevate", styles.border)}>
+                  <div key={`${fn.id}_${index}`} className={cn("glass-panel flex flex-col rounded-xl overflow-hidden border-t-4 transition-all hover-elevate", styles.border)}>
                     <div className="p-5 space-y-4">
                       <div className="flex justify-between items-start">
                         <div className="min-w-0">
@@ -255,9 +245,10 @@ export default function ComplexityResultPage() {
                         </div>
                       </div>
 
-                      <div className="bg-zinc-950 rounded-lg p-3 border border-white/5 relative">
-                        <pre className="text-[10px] font-mono text-zinc-400 overflow-x-auto max-h-[300px] leading-relaxed">
-                          {fn.text.slice(0, 150)}...
+                      <div className="bg-zinc-950 rounded-lg p-3 border overflow-y-hidden overflow-x-auto border-white/5 relative">
+                        <pre className="text-[10px] font-mono text-zinc-400 overflow-x-hidden max-h-[300px] leading-relaxed">
+                          {/* {fn.text.slice(0, 150)}... */}
+                          {fn.text}
                         </pre>
                       </div>
 
@@ -292,10 +283,10 @@ export default function ComplexityResultPage() {
           {/* LIST VIEW */}
           {viewMode === "list" && (
             <div className="space-y-3">
-              {filteredFunctions.map((fn) => {
+              {filteredFunctions.map((fn, index) => {
                 const styles = getRiskStyles(fn.riskLevel);
                 return (
-                  <div key={fn.id} className={cn("panel border-l-4 ", styles.bg, styles.color)}>
+                  <div key={`${fn.id}_${index}`} className={cn("panel border-l-4 ", styles.bg, styles.color)}>
                     <div className="p-4">
                       <div className="flex flex-col md:flex-row md:items-start gap-4">
                         <div className="flex-1 min-w-0 space-y-2">
@@ -373,14 +364,14 @@ export default function ComplexityResultPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredFunctions.map((fn) => (
+                  {filteredFunctions.map((fn, index) => (
                     <>
                       <tr
-                        key={fn.id}
+                        key={`${fn.id}_${index}`}
                         className={cn("border-t border-l-4 hover:bg-muted", getRiskClass(fn.riskLevel))}
                       >
                         <td className="p-3 font-mono text-xs">{fn.name}()</td>
-                        <td className="p-3 text-xs text-muted">{fn.fileName}</td>
+                        <td className="p-3 text-xs text-xs">{fn.fileName}</td>
                         <td className="p-3 text-xs">{fn.startLine}–{fn.endLine}</td>
                         <td className="p-3 font-mono text-xs">{fn.timeComplexity.notation || "Null"}</td>
                         <td className="p-3 font-mono text-xs">{fn.spaceComplexity.notation || "Null"}</td>
