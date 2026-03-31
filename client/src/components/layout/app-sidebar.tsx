@@ -15,7 +15,7 @@ import { useAuth } from "@/hooks/use-auth";
 
 const items = [
   { title: "Overview", url: "/dashboard", icon: BarChart3 },
-  { title: "Analysis", url: "//dashboard/complexity-full-result", icon: ActivityIcon },
+  { title: "Analysis", url: "/dashboard/complexity-full-result", icon: ActivityIcon },
   { title: "Projects", url: "/dashboard/projects", icon: FolderGit2 },
   { title: "Reports", url: "/dashboard/reports", icon: FileText },
   { title: "Settings", url: "/dashboard/settings", icon: Settings },

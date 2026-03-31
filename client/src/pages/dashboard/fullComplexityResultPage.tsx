@@ -4,6 +4,7 @@ import type { ComplexityReason, ComplexityUnit, FileComplexityData, FileComplexi
 import { useNotification } from "@/context/useNotification";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { fetchSession } from "@/utils/sessionStorage";
+import { Button } from "@/components/ui/button";
 
 type UIFunction = ComplexityUnit & {
   fileName: string;
@@ -16,6 +17,8 @@ export default function ComplexityResultPage() {
   const [activeReasonId, setActiveReasonId] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<string>("all");
   const [fileComplexityResult, setFileComplexityResult] = useState<FileComplexityData | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   const { notify } = useNotification();
 
   // Helper for cleaner class merging
@@ -53,7 +56,6 @@ export default function ComplexityResultPage() {
 
   const fileNames: string[] = ["all", ...new Set(allFunctions.map(fn => fn.fileName))];
 
-  //TODO: include pagination here 
   const filteredFunctions = allFunctions.filter(fn => {
     const matchesSearch = fn.name.toLowerCase().includes(searchQuery.toLowerCase()) || fn.fileName.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesRisk = filterRisk === "ALL" || fn.riskLevel === filterRisk;
@@ -61,14 +63,28 @@ export default function ComplexityResultPage() {
     return matchesSearch && matchesRisk && matchesFile;
   });
 
-  const summary = {
-    total: allFunctions.length,
-    critical: allFunctions.filter(fn => fn.riskLevel === "CRITICAL").length,
-    high: allFunctions.filter(fn => fn.riskLevel === "HIGH").length,
-    medium: allFunctions.filter(fn => fn.riskLevel === "MEDIUM").length,
-    low: allFunctions.filter(fn => fn.riskLevel === "LOW").length,
-    avgScore: allFunctions.length ? Math.round(allFunctions.reduce((sum, fn) => sum + fn.totalScore, 0) / allFunctions.length) : 0
-  };
+  const totalPages = Math.ceil(filteredFunctions.length / itemsPerPage);
+
+  const paginatedFunctions = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return filteredFunctions.slice(start, start + itemsPerPage);
+  }, [filteredFunctions, currentPage]);
+
+  const summary = useMemo(() => {
+    return {
+      total: filteredFunctions.length,
+      critical: filteredFunctions.filter(fn => fn.riskLevel === "CRITICAL").length,
+      high: filteredFunctions.filter(fn => fn.riskLevel === "HIGH").length,
+      medium: filteredFunctions.filter(fn => fn.riskLevel === "MEDIUM").length,
+      low: filteredFunctions.filter(fn => fn.riskLevel === "LOW").length,
+      avgScore: filteredFunctions.length
+        ? Math.round(
+          filteredFunctions.reduce((sum, fn) => sum + fn.totalScore, 0) /
+          filteredFunctions.length
+        )
+        : 0
+    };
+  }, [filteredFunctions]);
 
   const getRiskStyles = (risk: RiskLevel) => {
     switch (risk) {
@@ -106,16 +122,19 @@ export default function ComplexityResultPage() {
     }
   };
 
+
   useEffect(() => {
-    if (fileComplexityResult) { }
     const storedCodeAnalysis = fetchSession<FileComplexityData>("code-analysis")
     console.log("Turbo Log  ~ DashboardOverview ~ storedCodeAnalysis:", storedCodeAnalysis);
     if (storedCodeAnalysis == null) {
       setFileComplexityResult(null)
     }
-    notify("Project Analysis fetch Successful", "success")
     setFileComplexityResult(storedCodeAnalysis)
-  }, [fileComplexityResult])
+  }, [])
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, filterRisk, selectedFile]);
 
   return (
     <DashboardLayout>
@@ -126,12 +145,12 @@ export default function ComplexityResultPage() {
             <h1 className="text-2xl font-bold tracking-tight text-gradient">Complexity Analysis</h1>
             <p className="text-sm text-muted-foreground">Deep dive into your codebase performance metrics.</p>
           </div>
-          <button
+          <Button
             onClick={() => { setSearchQuery(""); setFilterRisk("ALL"); setSelectedFile("all"); }}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary text-secondary-foreground hover-elevate active-elevate-2 text-sm font-medium transition-all"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg shadow-primary/20 font-medium transition-all"
           >
             <RefreshCcw className="h-4 w-4" /> Reset Filters
-          </button>
+          </Button>
         </div>
 
         {/* Summary Grid - Using your 'glass-panel' and 'elevate' logic */}
@@ -214,8 +233,8 @@ export default function ComplexityResultPage() {
 
           {/* Main Content Area */}
           {viewMode === "card" && (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 overflow-auto max-h-[500px] p-4 border">
-              {filteredFunctions.map((fn, index) => {
+            <div className="grid flex-1 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 overflow-auto max-h-[500px] p-4 border">
+              {paginatedFunctions.map((fn, index) => {
                 const styles = getRiskStyles(fn.riskLevel);
                 return (
                   <div key={`${fn.id}_${index}`} className={cn("glass-panel flex flex-col rounded-xl overflow-hidden border-t-4 transition-all hover-elevate", styles.border)}>
@@ -283,7 +302,7 @@ export default function ComplexityResultPage() {
           {/* LIST VIEW */}
           {viewMode === "list" && (
             <div className="space-y-3">
-              {filteredFunctions.map((fn, index) => {
+              {paginatedFunctions.map((fn, index) => {
                 const styles = getRiskStyles(fn.riskLevel);
                 return (
                   <div key={`${fn.id}_${index}`} className={cn("panel border-l-4 ", styles.bg, styles.color)}>
@@ -325,7 +344,7 @@ export default function ComplexityResultPage() {
                                   <div className="font-semibold capitalize mb-1">
                                     {reason.pattern.replace(/-/g, " ")} (Line {reason.lineNumber})
                                   </div>
-                                  <div className="text-muted">{reason.detail}</div>
+                                  <div className="">{reason.detail}</div>
                                 </div>
                               ))}
                             </div>
@@ -349,7 +368,7 @@ export default function ComplexityResultPage() {
 
           {/* TABLE VIEW */}
           {viewMode === "table" && (
-            <div className="overflow-auto border rounded-md">
+            <div className=" border rounded-md">
               <table className="w-full text-sm">
                 <thead className="panel-muted">
                   <tr className="text-left">
@@ -363,8 +382,8 @@ export default function ComplexityResultPage() {
                     <th className="p-3 font-semibold min-w-20 text-center">Info</th>
                   </tr>
                 </thead>
-                <tbody>
-                  {filteredFunctions.map((fn, index) => (
+                <tbody className="overflow-auto">
+                  {paginatedFunctions.map((fn, index) => (
                     <>
                       <tr
                         key={`${fn.id}_${index}`}
@@ -395,17 +414,47 @@ export default function ComplexityResultPage() {
                       {activeReasonId === fn.id && (
                         <tr className="border-t panel-muted">
                           <td colSpan={8} className="p-4">
-                            <div className="space-y-2">
-                              <div className="font-semibold text-sm">Analysis Details:</div>
+                            <div className="space-y-3">
+                              <div className="font-semibold text-sm">Analysis Details</div>
+
                               {fn.reasons.map((reason: ComplexityReason, i: number) => (
-                                <div key={i} className="p-3 panel rounded text-xs space-y-1">
-                                  <div className="font-semibold capitalize">
-                                    {reason.pattern.replace(/-/g, " ")} · Line {reason.lineNumber}
+                                <div
+                                  key={i}
+                                  className="p-3 rounded-lg border bg-background space-y-2 hover:shadow-sm transition"
+                                >
+                                  {/* TOP ROW → WHAT + WHERE */}
+                                  <div className="flex items-center justify-between gap-2">
+                                    <div className="font-semibold text-sm capitalize">
+                                      {reason.pattern.replace(/-/g, " ")}
+                                    </div>
+
+                                    <div className="text-[10px] text-muted-foreground">
+                                      Line {reason.lineNumber}
+                                    </div>
                                   </div>
-                                  <div className="text-muted leading-relaxed">{reason.detail}</div>
-                                  <div className="flex items-center gap-3 text-[10px] text-muted">
-                                    <span>Impact: <span className="capitalize font-semibold">{reason.impact}</span></span>
-                                    <span>Confidence: <span className="font-semibold">{reason.confidence}%</span></span>
+
+                                  {/* IMPACT → VISUAL PRIORITY */}
+                                  <div className="flex items-center gap-2 text-[11px]">
+                                    <span className="text-muted-foreground">Impact:</span>
+                                    <span
+                                      className={cn(
+                                        "px-2 py-0.5 rounded font-semibold capitalize",
+                                        reason.impact === "high" && "bg-red-500/10 text-red-500",
+                                        reason.impact === "medium" && "bg-yellow-500/10 text-yellow-500",
+                                        reason.impact === "low" && "bg-green-500/10 text-green-500"
+                                      )}
+                                    >
+                                      {reason.impact}
+                                    </span>
+
+                                    <span className="ml-auto text-[10px] text-muted-foreground">
+                                      {reason.confidence}% confidence
+                                    </span>
+                                  </div>
+
+                                  {/* DETAIL → DE-EMPHASIZED */}
+                                  <div className="text-xs text-muted-foreground leading-relaxed">
+                                    {reason.detail}
                                   </div>
                                 </div>
                               ))}
@@ -428,6 +477,27 @@ export default function ComplexityResultPage() {
               <p className="text-sm text-muted-foreground">Adjust your filters to see more analysis data.</p>
             </div>
           )}
+          <div className="flex justify-center items-center gap-4 mt-6">
+            <Button
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(p => p - 1)}
+              className="px-3 py-1 border rounded shadow-primary/20 disabled:opacity-50"
+            >
+              Prev
+            </Button>
+
+            <span className="text-sm">
+              Page {currentPage} of {totalPages}
+            </span>
+
+            <Button
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage(p => p + 1)}
+              className="px-3 py-1 border rounded shadow-primary/20 disabled:opacity-50"
+            >
+              Next
+            </Button>
+          </div>
         </div>
       </div>
     </DashboardLayout>

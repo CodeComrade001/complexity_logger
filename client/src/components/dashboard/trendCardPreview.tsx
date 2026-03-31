@@ -28,7 +28,7 @@ export default function TrendCardPreview({ apiComplexitydetails }: TrendCardPrev
           <p className="text-xs text-muted-foreground italic">No results yet</p>
         ) : (
           <ul className="divide-y divide-border/20 gap-3 p-y-3 max-h-60 overflow-y-scroll">
-            {files.map((file, idx) => {
+            {files.slice(0, 10).map((file, idx) => {
               const report = file; // ✅ TYPE ASSERTION
 
               return (

@@ -24,8 +24,8 @@ export class GetComplexityGenerator {
         return { success: false, message: "No analyzable code found", data: null };
       }
 
-      // const reportGenerated = await this.tierRunner.runFree(normalized);
-      const reportGenerated = await this.tierRunner.runPaid(normalized);
+      const reportGenerated = await this.tierRunner.runFree(normalized);
+      // const reportGenerated = await this.tierRunner.runPaid(normalized);
 
       return {
         success: true,
