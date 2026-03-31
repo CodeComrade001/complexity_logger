@@ -1,124 +1,120 @@
-import { getLlama, LlamaChatSession, Llama3ChatWrapper } from "node-llama-cpp";
-import path from "path";
-import { ComplexityNotation } from "../../../interfaces/complexityGeneratorInterface.js";
-import { fileURLToPath } from "url";
+import { ComplexityProfile, SignalProfile } from "../../../interfaces/complexityGeneratorInterface.js";
+import { COMPLEXITY_REASONS } from "./paidTierReason.js";
 
-export class AIComplexityExplainer {
-  private session!: LlamaChatSession;
-  private initPromise: Promise<void>;
+/**
+ * Generates human-readable reasons that justify why a particular
+ * time/space complexity is detected given a signal profile.
+ * 
+ * Uses a modular, rule-based system for easy maintenance and updates.
+ */
+export class ComplexityReasonGenerator {
+  /**
+   * Returns a single heuristic reason based on notation and signals.
+   * Prioritizes more specific/relevant reasons when multiple match.
+   */
+  public getReason(notation: ComplexityProfile, signals: SignalProfile): string {
+    const reasons = this.getAllReasons(notation, signals);
 
-  constructor() {
-    this.initPromise = this.init();
+    if (reasons.length === 0) {
+      return "Complexity determined by signal analysis";
+    }
+
+    // Pick one randomly to keep users engaged (weighted by priority)
+    return this._weightedRandomSelect(reasons);
   }
 
-  private async init() {
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
+  /**
+   * Returns all matching heuristic reasons based on notation and signals.
+   * Filters rules by their condition functions and sorts by priority.
+   */
+  public getAllReasons(notation: ComplexityProfile, signals: SignalProfile): string[] {
+    const timeReasons = this._getMatchingReasons(
+      notation.timeNotation,
+      signals,
+      "time"
+    );
 
-    const llama = await getLlama();
+    const spaceReasons = this._getMatchingReasons(
+      notation.spaceNotation,
+      signals,
+      "space"
+    );
 
-    const model = await llama.loadModel({
-      modelPath: path.resolve(
-        __dirname,
-        "../../../../../models/Qwen2.5-Coder-3B-Instruct-abliterated-Q6_K_L.gguf"
-      ),
-      // gpuLayers: 0  // Force CPU only if needed
-    });
-
-    const context = await model.createContext({
-      contextSize: 128,
-      threads: 2,
-    });
-
-    // Force plain chat wrapper to skip Jinja template
-    this.session = new LlamaChatSession({
-      contextSequence: context.getSequence(),
-      chatWrapper: new Llama3ChatWrapper()
-    });
+    // Combine and deduplicate
+    const allReasons = [...timeReasons, ...spaceReasons];
+    return [...new Set(allReasons)];
   }
 
-  private async ready() {
-    await this.initPromise;
+  /**
+   * Gets all time complexity reasons that match the current signals
+   */
+  private getTimeReasons(notation: string, signals: SignalProfile): string[] {
+    return this._getMatchingReasons(notation, signals, "time");
   }
 
-  // ---------- helpers ----------
-
-  private async prompt(
-    prompt: string,
-    maxTokens: number
-  ): Promise<string> {
-    const result = await this.session.prompt(prompt, {
-      maxTokens
-      // temperature: 0.7,
-      // topP: 0.9,
-    });
-
-    return result.trim();
+  /**
+   * Gets all space complexity reasons that match the current signals
+   */
+  private getSpaceReasons(notation: string, signals: SignalProfile): string[] {
+    return this._getMatchingReasons(notation, signals, "space");
   }
 
-  // ---------- explanations ----------
+  /**
+   * Internal: Filters and returns reasons that match the signal profile
+   */
+  private _getMatchingReasons(
+    notation: string,
+    signals: SignalProfile,
+    type: "time" | "space"
+  ): string[] {
+    const rulesForNotation = COMPLEXITY_REASONS[type][notation];
 
-  async explainComplexity(
-    notation: { time: ComplexityNotation; space: ComplexityNotation },
-    signals: string[]
-  ): Promise<string> {
-    await this.ready();
+    if (!rulesForNotation || rulesForNotation.length === 0) {
+      return [];
+    }
 
-    // const response = await this.prompt(
-    //   `You are a strict algorithm analysis engine.
-    //     Input:
-    //     - Time Complexity: ${notation.time}
-    //     - Space Complexity: ${notation.space}
-    //     - Signals: ${signals.join(", ")}
+    // Filter rules where condition passes
+    const matchingRules = rulesForNotation.filter((rule) =>
+      rule.condition(signals)
+    );
 
-    //     Task:
-    //     Return EXACTLY one sentence explaining WHY the complexity classification is correct.
+    // Sort by priority (descending) then extract reasons
+    const sortedRules = matchingRules.sort(
+      (a, b) => (b.priority || 1) - (a.priority || 1)
+    );
 
-    //     Rules:
-    //     - Max 25 words
-    //     - No filler words
-    //     - No generic phrases
-    //     - No introduction or conclusion
-    //     - Must reference signals
-    //     - Must be technical
-    //     - no explanation of what the signals mean, only how they relate to the complexity
-    //     - only explanation of the complexity only
-    //   Output ONLY the sentence.`,
-    //   100
-    // );
-
-    const response = "reason generator not Implementation "
-
-    console.log("Turbo Log  ~ AIComplexityExplainer ~ explainComplexity ~ response:", response);
-
-    return response;
+    return sortedRules.map((rule) => rule.reason);
   }
 
-  // ---------- classification ----------
+  /**
+   * Internal: Selects a random reason weighted by priority
+   */
+  private _weightedRandomSelect(reasons: string[]): string {
+    if (reasons.length === 0) return "Complexity determined by signal analysis";
+    if (reasons.length === 1) return reasons[0];
 
-  async detectTimeComplexity(code: string): Promise<ComplexityNotation> {
-    await this.ready();
-
-    return this.prompt(
-      `Return ONLY one label:
-O(1), O(log n), O(n), O(n log n), O(n²), O(n³),
-O(n^k), O(2^n), O(n!), O(sqrt n), UNKNOWN
-Code:
-${code}`,
-      12
-    ) as Promise<ComplexityNotation>;
+    // For simplicity, just pick randomly from top 3 highest priority
+    const topReasons = reasons.slice(0, Math.min(3, reasons.length));
+    return topReasons[Math.floor(Math.random() * topReasons.length)];
   }
 
-  async detectSpaceComplexity(code: string): Promise<ComplexityNotation> {
-    await this.ready();
-
-    return this.prompt(
-      `Return ONLY one label:
-O(1), O(log n), O(n), O(n log n), O(n²), O(n³),
-O(n^k), O(2^n), O(n!), O(sqrt n), UNKNOWN
-Code:
-${code}`,
-      12
-    ) as Promise<ComplexityNotation>;
+  /**
+   * Gets a detailed breakdown of why each complexity was assigned
+   */
+  public getDetailedBreakdown(notation: ComplexityProfile, signals: SignalProfile): {
+    time: { notation: string; reasons: string[] };
+    space: { notation: string; reasons: string[] };
+  } {
+    return {
+      time: {
+        notation: notation.timeNotation,
+        reasons: this.getTimeReasons(notation.timeNotation, signals)
+      },
+      space: {
+        notation: notation.spaceNotation,
+        reasons: this.getSpaceReasons(notation.spaceNotation, signals)
+      }
+    };
   }
-}
+
+};

@@ -1,10 +1,16 @@
 import { Node, SyntaxKind, CallExpression } from "ts-morph";
 import { ALLOCATION_CONSTRUCTOR_NAMES, ComplexityNotation, ComplexityProfile, ComplexityResult, GrowthProfile, LOOP_KINDS, Risk, SignalProfile } from "../../../interfaces/complexityGeneratorInterface.js";
+import { ComplexityReasonGenerator } from "./aI_ReasonGenerator.js";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MAIN CLASS
 // ─────────────────────────────────────────────────────────────────────────────
 export class EnhancedAnalyzer_v2 {
+  private aiExplain: ComplexityReasonGenerator
+
+  constructor(aiExplain: ComplexityReasonGenerator) {
+    this.aiExplain = aiExplain;
+  }
 
   /**
    * Entry point.
@@ -535,6 +541,21 @@ export class EnhancedAnalyzer_v2 {
     }
 
     return { timeNotation, spaceNotation, timeScore, spaceScore };
+  }
+
+
+
+
+
+  private async generateComplexityReason(complexityResult: ComplexityProfile, signals: SignalProfile): Promise<string[]> {
+    // Use the AI explainer to generate a human-readable reason for the complexity result
+    const breakdown = this.aiExplain.getDetailedBreakdown(complexityResult, signals);
+    // Combine time and space reasons into a flat array
+    const reasons = [
+      ...breakdown.time.reasons,
+      ...breakdown.space.reasons
+    ];
+    return reasons;
   }
 
   // ───────────────────────────────────────────────────────────────────────────

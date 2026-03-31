@@ -11,7 +11,6 @@ import {
 import { FastAnalyzer } from "./freeTierResources/fast_analyzer.js";
 import { normalizedPayloadData } from "../complexityOrchestratorHelpers/complexityOrchestratorInterface.js";
 import { fetchUnitPartOfCodeArrayTargets } from "../../interfaces/fetchUnitPartOfCodeProps.js";
-import { AIComplexityExplainer } from "./paidTierResources/aI_ReasonGenerator.js";
 import { EnhancedAnalyzer_v2 } from "./paidTierResources/enhancedAnalyzer_v2.js";
 import { tempManualStorage } from "../../../../disposable_files/manual-storge.js";
 
@@ -19,12 +18,10 @@ type UnitTarget = fetchUnitPartOfCodeArrayTargets;
 
 export class ComplexityOrchestrator_v1 {
   private keywordSet: Set<string>;
-  private aiExplainer: AIComplexityExplainer;
   private enhancedAnalyzer: EnhancedAnalyzer_v2
 
-  constructor(keywordSet: Set<string>, aiExplainer: AIComplexityExplainer, enhancedAnalyzer: EnhancedAnalyzer_v2) {
+  constructor(keywordSet: Set<string>, enhancedAnalyzer: EnhancedAnalyzer_v2) {
     this.keywordSet = keywordSet;
-    this.aiExplainer = aiExplainer;
     this.enhancedAnalyzer = enhancedAnalyzer
   }
 
@@ -180,43 +177,6 @@ export class ComplexityOrchestrator_v1 {
       matchedKeywords: ["No key word added for now"],
       tierUsed: "paid"
     }
-  }
-
-  // ========================================
-  // AI HELPER LOGIC
-  // ========================================
-  private async generateAIReason(
-    classification: ComplexityClassification,
-    signals: ASTSignals
-  ): Promise<PaidComplexityReason> {
-
-    const signalList = [
-      signals.maxLoopDepth > 1 && "nested loops",
-      signals.hasRecursion && "recursion",
-      signals.isBinaryRecursion && "binary recursion",
-      signals.hasSorting && "sorting",
-      signals.hasLinearSearch && "linear search",
-      signals.allocationsInLoop > 0 && "allocations in loops",
-      signals.hasDeepClone && "deep clone"
-    ].filter(Boolean) as string[];
-
-    const explanation = await this.aiExplainer.explainComplexity(
-      {
-        time: classification.timeComplexity.notation,
-        space: classification.spaceComplexity.notation
-      },
-      signalList
-    );
-
-    return {
-      type: "time",
-      timeComplexity: classification.timeComplexity.notation,
-      spaceComplexity: classification.spaceComplexity.notation,
-      pattern: "ai-summary",
-      detail: explanation,
-      impact: classification.riskLevel.toLowerCase() as any,
-      confidence: classification.confidence
-    };
   }
 
 
