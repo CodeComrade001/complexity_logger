@@ -1,7 +1,15 @@
-// workerPool.ts
 import { Worker } from "worker_threads";
-import { Job, JobResult } from "./worker_types/workerTypes.js";
 import path from "path";
+import { fileURLToPath } from "url";
+import { Job, JobResult } from "./worker_types/workerTypes.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+interface WorkerWrapper {
+  worker: Worker;
+  busy: boolean;
+}
 
 interface WorkerTask {
   job: Job;
@@ -9,53 +17,78 @@ interface WorkerTask {
   reject: (err: any) => void;
 }
 
+const MAX_QUEUE = 1000;
+const WORKER_TIMEOUT = 15000;
+const workerPath = path.resolve(__dirname, "./worker.ts");
+
 export class WorkerPool {
-  private maxWorkers: number;
-  private activeWorkers: number = 0;
+  private workers: WorkerWrapper[] = [];
   private queue: WorkerTask[] = [];
+  private maxWorkers: number;
 
   constructor(maxWorkers: number) {
-    this.maxWorkers = maxWorkers;
+    this.maxWorkers = maxWorkers
+    for (let i = 0; i < this.maxWorkers; i++) {
+      const worker = new Worker(workerPath);
+      this.workers.push({ worker, busy: false });
+    }
   }
 
-  // Add a job to the pool
   run(job: Job): Promise<JobResult> {
     return new Promise((resolve, reject) => {
+      if (this.queue.length >= MAX_QUEUE) {
+        return reject(new Error("Queue overflow"));
+      }
+
       this.queue.push({ job, resolve, reject });
-      this.next();
+      this.process();
     });
   }
 
-  private next() {
-    if (this.activeWorkers >= this.maxWorkers) return;
+  private process() {
+    for (const wrapper of this.workers) {
+      if (wrapper.busy) continue;
 
-    const task = this.queue.shift();
-    if (!task) return;
+      const task = this.queue.shift();
+      if (!task) return;
 
-    this.activeWorkers++;
-    // Use absolute path for worker
-    const workerPath = path.resolve("./worker.js");
-    const worker = new Worker(workerPath);
+      wrapper.busy = true;
 
-    worker.on("message", (msg: JobResult) => {
-      task.resolve(msg);
-      worker.terminate();
-      this.activeWorkers--;
-      this.next(); // run next queued job
-    });
+      let finished = false;
 
-    worker.on("error", (err) => {
-      task.reject(err);
-      this.activeWorkers--;
-      this.next();
-    });
+      const done = (err?: any, result?: JobResult) => {
+        if (finished) return;
+        finished = true;
 
-    worker.on("exit", (code) => {
-      if (code !== 0) task.reject(new Error(`Worker stopped with code ${code}`));
-      this.activeWorkers--;
-      this.next();
-    });
+        clearTimeout(timeout);
 
-    worker.postMessage(task.job);
+        wrapper.busy = false;
+
+        if (err) task.reject(err);
+        else task.resolve(result!);
+
+        this.process();
+      };
+
+      const timeout = setTimeout(() => {
+        wrapper.worker.terminate();
+        done(new Error("Worker timeout"));
+      }, WORKER_TIMEOUT);
+
+      const handleMessage = (msg: JobResult) => {
+        done(undefined, msg);
+      };
+
+      const handleError = (err: any) => {
+        done(err);
+      };
+
+      wrapper.worker.once("message", handleMessage);
+      wrapper.worker.once("error", handleError);
+      // wrapper.worker.on("exit", () => respawnWorker())
+
+
+      wrapper.worker.postMessage(task.job);
+    }
   }
 }

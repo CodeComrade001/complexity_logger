@@ -1,5 +1,5 @@
 import { Node, SyntaxKind, CallExpression } from "ts-morph";
-import { ALLOCATION_CONSTRUCTOR_NAMES, ComplexityNotation, ComplexityProfile, ComplexityResult, GrowthProfile, LOOP_KINDS, Risk, SignalProfile } from "../../../interfaces/complexityGeneratorInterface.js";
+import { ALLOCATION_CONSTRUCTOR_NAMES, ComplexityNotation, ComplexityProfile, ComplexityReason, ComplexityResult, GrowthProfile, LOOP_KINDS, Lowercase_RiskLevelType, Risk, SignalProfile } from "../../../interfaces/complexityGeneratorInterface.js";
 import { ComplexityReasonGenerator } from "./aI_ReasonGenerator.js";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -29,6 +29,9 @@ export class EnhancedAnalyzer_v2 {
       // 2. Map raw signals → named Big-O categories + numeric scores
       const profile = this.buildComplexityProfile(signals);
 
+      // 2b. Generate human-readable reasons for the detected complexity
+      const reasons = this.generateComplexityReason(profile, signals);
+
       // 3. Combine time + space into a unified growth object
       const growth = this.modelGrowth(profile);
 
@@ -36,7 +39,7 @@ export class EnhancedAnalyzer_v2 {
       const composed = this.composeGrowth(growth);
 
       // 5. Format and return the final ComplexityResult
-      const result = this.buildResult(node, functionName, composed);
+      const result = this.buildResult(node, reasons, functionName, composed);
 
       return { success: true, result, message: "Complexity calculated" };
 
@@ -543,19 +546,43 @@ export class EnhancedAnalyzer_v2 {
     return { timeNotation, spaceNotation, timeScore, spaceScore };
   }
 
+  private generateComplexityReason(
+    profile: ComplexityProfile,
+    signals: SignalProfile
+  ): ComplexityReason[] {
 
+    const breakdown = this.aiExplain.getDetailedBreakdown(profile, signals);
 
+    const reasons: ComplexityReason[] = [];
 
+    // TIME reasons
+    for (const r of breakdown.time.reasons) {
+      reasons.push({
+        type: "time",
+        detail: r || r,
+        impact: this.mapImpact(profile.timeScore),
+        confidence: 85,
+      });
+    }
 
-  private async generateComplexityReason(complexityResult: ComplexityProfile, signals: SignalProfile): Promise<string[]> {
-    // Use the AI explainer to generate a human-readable reason for the complexity result
-    const breakdown = this.aiExplain.getDetailedBreakdown(complexityResult, signals);
-    // Combine time and space reasons into a flat array
-    const reasons = [
-      ...breakdown.time.reasons,
-      ...breakdown.space.reasons
-    ];
+    // SPACE reasons
+    for (const r of breakdown.space.reasons) {
+      reasons.push({
+        type: "space",
+        detail: r || r,
+        impact: this.mapImpact(profile.spaceScore),
+        confidence: 85,
+      });
+    }
+
     return reasons;
+  }
+
+  private mapImpact(score: number): Lowercase_RiskLevelType {
+    if (score <= 3) return "low";
+    if (score <= 6) return "medium";
+    if (score <= 8) return "high";
+    return "critical";
   }
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -602,6 +629,7 @@ export class EnhancedAnalyzer_v2 {
 
   private buildResult(
     node: Node,
+    reasons: ComplexityReason[],
     functionName: string | null,
     data: GrowthProfile
   ): ComplexityResult {
@@ -633,7 +661,7 @@ export class EnhancedAnalyzer_v2 {
       riskLevel: data.riskLevel,
 
       matchedKeywords: [],
-      reasons: [],
+      reasons: reasons,
 
       tierUsed: "paid",
 

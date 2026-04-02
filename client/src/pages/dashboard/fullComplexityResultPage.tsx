@@ -18,7 +18,7 @@ export default function ComplexityResultPage() {
   const [selectedFile, setSelectedFile] = useState<string>("all");
   const [fileComplexityResult, setFileComplexityResult] = useState<FileComplexityData | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 20;
   const { notify } = useNotification();
 
   // Helper for cleaner class merging

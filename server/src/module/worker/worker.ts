@@ -1,25 +1,30 @@
 import { parentPort } from "worker_threads";
 import { Job, JobResult } from "./worker_types/workerTypes.js";
-import { editResult, readResult, saveResult } from "../utils/fileStorage.js";
-import { FilePayload, normalizedPayloadData } from "../../compilers/TS_JS_Compiler/modules/complexityOrchestratorHelpers/complexityOrchestratorInterface.js";
+
 import { ComplexityOrchestrator_v1 } from "../../compilers/TS_JS_Compiler/modules/complexityGenerator_v1/complexity_orchestrator.js";
 import { PayloadNormalizer } from "../../compilers/TS_JS_Compiler/modules/complexityOrchestratorHelpers/payloadNormalizer.js";
 import { GetUnitPartOfCode } from "../../compilers/TS_JS_Compiler/modules/fetchPartOfCode.js";
-import { AIComplexityExplainer } from "../../compilers/TS_JS_Compiler/modules/complexityGenerator_v1/paidTierResources/aI_ReasonGenerator.js";
+import { EnhancedAnalyzer_v2 } from "../../compilers/TS_JS_Compiler/modules/complexityGenerator_v1/paidTierResources/enhancedAnalyzer_v2.js";
+import { ComplexityReasonGenerator } from "../../compilers/TS_JS_Compiler/modules/complexityGenerator_v1/paidTierResources/aI_ReasonGenerator.js";
 
+const port = parentPort!;
+if (!port) throw new Error("Must run as worker");
 
-// Listen for job messages
-if (!parentPort) throw new Error("This script must be run as a worker");
-parentPort?.on("message", (job: Job) => {
-  let result: any;
+// persistent instances
+const aiReasonEXplainer = new ComplexityReasonGenerator();
+const enhancedAnalyzer = new EnhancedAnalyzer_v2(aiReasonEXplainer);
+const complexityOrchestrator = new ComplexityOrchestrator_v1(new Set<string>(), enhancedAnalyzer);
+const normalizer = new PayloadNormalizer();
+const extractor = new GetUnitPartOfCode();
 
+port.on("message", async (job: Job) => {
+  const start = Date.now();
+  console.log("Turbo Log  ~ start:", start);
+  console.log("Turbo Log  ~ start:", start);
 
-  const aiReasoning = new AIComplexityExplainer()
-  const complexityOrchestrator = new ComplexityOrchestrator_v1(new Set<string>(), aiReasoning);
-  const normalizer = new PayloadNormalizer();
-  const extractor = new GetUnitPartOfCode();
+  try {
+    let result: any;
 
-  (async () => {
     switch (job.task) {
       case "freeTierAnalysis":
         result = await complexityOrchestrator.executeFreeTier(job.data);
@@ -34,27 +39,42 @@ parentPort?.on("message", (job: Job) => {
         break;
 
       case "ExtractUnitPartOfCode":
-        result = extractor.extract(job.data.props, job.data.files, job.data.unitIndex);
+        result = extractor.extract(
+          job.data.props,
+          job.data.files,
+          job.data.unitIndex
+        );
         break;
 
-      case "AIReasoning":
-        result = aiReasoning.explainComplexity(job.data.notation, job.data.signals);
+      case "EnhancedAnalyzer_v2":
+        // ⚠️ Ensure node is NOT a complex object from main thread
+        result = enhancedAnalyzer.run(
+          job.data.nodeText, // pass raw text instead of complex object
+          job.data.functionName,
+          job.data.keywordSet // safe rebuild
+        );
         break;
 
       default:
-        const _exhaustiveCheck: never = job; // will error if a new task is added but not handled
-        result = null;
+        throw new Error(`Unknown task: ${job.task}`);
     }
-  })();
 
-  const jobResult: JobResult = {
-    jobId: job.id,
-    task: job.task,
-    result,
-  };
+    const jobResult: JobResult = {
+      jobId: job.id,
+      task: job.task,
+      result,
+    };
 
+    port.postMessage(jobResult);
 
+    console.log(`Worker completed job ${job.id} in ${Date.now() - start}ms`);
 
-  saveResult(job.id, jobResult);
-  parentPort?.postMessage(jobResult);
+  } catch (err: any) {
+    port.postMessage({
+      jobId: job.id,
+      task: job.task,
+      result: null,
+      error: err.message,
+    });
+  }
 });

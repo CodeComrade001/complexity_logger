@@ -1,22 +1,37 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import TrendCardFullOverlay from "./trendCardFullOverlay";
-import { FileComplexityData } from "@/types/apiDataInterface";
+import { ComplexityReport, ComplexitySummary, FileComplexityData } from "@/types/apiDataInterface";
 import { Link } from "wouter";
+import { fetchSession } from "@/utils/sessionStorage";
+import { InfoIcon } from "lucide-react";
 
 interface TrendCardPreviewProps {
-  apiComplexitydetails: FileComplexityData | null; // ✅ FIXED
+  apiComplexityDetailsProp: FileComplexityData | null; // ✅ FIXED
+  sendFileSummary: (FileSummary: ComplexitySummary, FileName: string) => void;
 }
 
-export default function TrendCardPreview({ apiComplexitydetails }: TrendCardPreviewProps) {
-  console.log("Turbo Log  ~ TrendCardPreview ~ apiComplexitydetails:", apiComplexitydetails);
+export default function TrendCardPreview({ apiComplexityDetailsProp, sendFileSummary }: TrendCardPreviewProps) {
+  const [files, setFiles] = useState<ComplexityReport[]>([])
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // ✅ SAFE DERIVATION (no mutation)
-  const files = apiComplexitydetails?.data ?? [];
 
-  // const UpdatedFileFormat: FileComplexityData[] = files.map((testingFiles) =>
-  //   console.log("testing data in files ", testingFiles))
+  const UpdatePreviousData = useMemo(() => {
+    if (apiComplexityDetailsProp == null) {
+      return setFiles([])
+    }
+    return setFiles(apiComplexityDetailsProp.data)
+  }, [apiComplexityDetailsProp])
+
+  useEffect(() => {
+    UpdatePreviousData
+  }, [UpdatePreviousData])
+
+  function SendFileSummaryDetails(summary: ComplexitySummary, index: number) {
+    if (!summary) return
+    const fileName = files[index].nameOfFile
+    sendFileSummary(summary, fileName)
+  }
 
 
   return (
@@ -37,6 +52,12 @@ export default function TrendCardPreview({ apiComplexitydetails }: TrendCardPrev
                   className="flex flex-col sm:flex-row sm:justify-between glass-panel m-2 px-2 rounded-xl shadow-sm border-card-border sm:items-center gap-4 overflow-x-hidden overflow-y-hidden"
                 >
                   {/* LEFT */}
+                  <Button
+                    onClick={() => SendFileSummaryDetails(file.summary, idx)}
+                    className="w-4 h-4 shadow-primary/20"
+                  >
+                    <InfoIcon />
+                  </Button>
                   <div className="flex-1">
                     <p className="text-sm font-mono font-bold truncate">
                       {report.nameOfFile}

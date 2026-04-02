@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { Badge } from "@/components/ui/badge";
-import { Code2, GitMerge, AlertTriangle, ShieldCheck, Plus, Play, Zap, FileCode, Folder, DeleteIcon } from "lucide-react";
+import { Plus, Play, Zap, FileCode, Folder, DeleteIcon, Save } from "lucide-react";
 import { ResponsiveContainer } from "recharts";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import type { SingleFile } from "@/types/fileUploadInterface";
 import { CodeEditor } from "@/components/dashboard/CodeEditor";
 import TrendCardPreview from "@/components/dashboard/trendCardPreview";
 import { useNotification } from "@/context/useNotification";
-import { FileComplexityData, FileComplexityReceivedPayload } from "@/types/apiDataInterface";
+import { ComplexitySummary, FileComplexityData, FileComplexityReceivedPayload } from "@/types/apiDataInterface";
 import { MetricsGrid } from "@/components/dashboard/MetricCard";
 import { fetchSession, storeSession } from "@/utils/sessionStorage";
 
@@ -49,10 +49,10 @@ export default function DashboardOverview() {
   const [selectedFile, setSelectedFile] = useState<string>("");
   const [selectedFileText, setSelectedFileText] = useState<string>("");
   const [analyzedApiResult, setAnalyzedApiResult] = useState<FileComplexityData | null>(null)
-  console.log("Turbo Log  ~ DashboardOverview ~ analyzedApiResult:", analyzedApiResult);
   const [uploadFilesForComplexity, setUploadFilesForComplexity] = useState<SingleFile[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const { notify } = useNotification()
+  const [selectedFileMetric, setSelectedFileMetric] = useState<{ nameOfFile: string, summary: ComplexitySummary } | null>(null)
 
   const importUserFileFolder = async () => {
     const input = document.createElement("input");
@@ -67,6 +67,7 @@ export default function DashboardOverview() {
     };
     input.click();
   };
+
 
 
   const submitForAnalysis = async () => {
@@ -94,7 +95,7 @@ export default function DashboardOverview() {
       const response = await uploadAndAnalyzeFiles(formData);
       console.log("Turbo Log  ~ submitForAnalysis ~ response:", response);
 
-      const { success, data } = response.data;
+      const { success } = response.data;
 
       storeSession<FileComplexityData>("code-analysis", response.data)
 
@@ -102,7 +103,7 @@ export default function DashboardOverview() {
         notify("Files analysis error", "error");
       }
       notify("Files analyzed successfully", "success");
-      setAnalyzedApiResult(data);
+      setAnalyzedApiResult(response.data);
     } catch (error) {
       console.error("Upload error:", error);
       notify("Internal Server Error", "error");
@@ -111,9 +112,21 @@ export default function DashboardOverview() {
     }
   };
 
+
+  const deleteFiles = () => {
+    setFiles([])
+  }
+
+  const saveFiles = () => {
+    notify("Saving Of files feature coming soon", "info")
+  }
+
+  const updateSummaryMetricCard = (summary: ComplexitySummary, nameOfFile: string) => {
+    setSelectedFileMetric({ nameOfFile, summary })
+  }
+
   useEffect(() => {
     const storedCodeAnalysis = fetchSession<FileComplexityData>("code-analysis")
-    console.log("Turbo Log  ~ DashboardOverview ~ storedCodeAnalysis:", storedCodeAnalysis);
     if (storedCodeAnalysis == null) {
       setAnalyzedApiResult(null)
     }
@@ -130,9 +143,12 @@ export default function DashboardOverview() {
             <Button onClick={importUserFileFolder} size="icon" className="h-8 shadow-primary/20 w-8">
               <Plus className="h-4 w-4" />
             </Button>
-            {/* <Button onClick={DeleteFiles} variant="ghost" size="icon" className="h-8 w-8">
+            <Button onClick={deleteFiles} variant="ghost" size="icon" className="h-8 shadow-primary/20 w-8">
               <DeleteIcon className="h-4 w-4" />
-            </Button> */}
+            </Button>
+            <Button onClick={saveFiles} variant="ghost" size="icon" className="h-8 shadow-primary/20 w-8">
+              <Save className="h-4 w-4" />
+            </Button>
           </div>
           <ScrollArea className="flex-1 p-2">
             <div className="space-y-1">
@@ -156,7 +172,8 @@ export default function DashboardOverview() {
         {/* MAIN CONTENT */}
         <div className="flex-1 flex flex-col gap-6  pr-2">
           <header className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold tracking-tight">Code Analysis</h1>
+            <h1 className="text-3xl font-bold tracking-tight">{`${selectedFileMetric?.nameOfFile} Code Analysis`}
+            </h1>
             <Button onClick={submitForAnalysis} disabled={isAnalyzing} className="gap-2 mt-5 shadow-lg shadow-primary/20">
               {isAnalyzing ? <Zap className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
               {isAnalyzing ? "Analyzing..." : "Generate Complexity"}
@@ -164,10 +181,9 @@ export default function DashboardOverview() {
           </header>
 
           {/* Metrics */}
-          {/* {(analyzedApiResult !== null) && (
-            <MetricsGrid metricValues={analyzedApiResult.data.summary} />
-          )} */}
-          {/* <MetricsGrid metricValues={analyzedApiResult?.complexityAnalysis.data?.summary ?? null} /> */}
+          {(selectedFileMetric !== null) && (
+            <MetricsGrid metricValues={selectedFileMetric.summary} />
+          )}
 
           {/* Complexity & Trends */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -180,25 +196,6 @@ export default function DashboardOverview() {
             </Card>
 
             <div className="space-y-6">
-              <Card className="glass-panel p-4 rounded-xl shadow-sm border-card-border bg-card/50">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm">Complexity Distribution</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {TEMP_DIST.map((d: DistItem, i: number) => (
-                    <div key={i} className="space-y-1">
-                      <div className="flex justify-between text-[10px] font-mono">
-                        <span>{d.label}</span>
-                        <span>{d.value}%</span>
-                      </div>
-                      <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
-                        <motion.div initial={{ width: 0 }} animate={{ width: `${d.value}%` }} className={`h-full ${d.color} rounded-full`} />
-                      </div>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-
               <Card className="border-border/50 bg-card/50">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm">Complexity Result</CardTitle>
@@ -206,9 +203,9 @@ export default function DashboardOverview() {
                 <CardContent className="h-auto">
                   <ResponsiveContainer width="100%" height="100%">
                     {(analyzedApiResult !== null && !analyzedApiResult.success) ?
-                      <TrendCardPreview apiComplexitydetails={null} />
+                      <TrendCardPreview apiComplexityDetailsProp={null} sendFileSummary={(summary, nameOfFile) => updateSummaryMetricCard(summary, nameOfFile)} />
                       :
-                      <TrendCardPreview apiComplexitydetails={analyzedApiResult} />
+                      <TrendCardPreview apiComplexityDetailsProp={analyzedApiResult} sendFileSummary={(summary, nameOfFile) => updateSummaryMetricCard(summary, nameOfFile)} />
                     }
                   </ResponsiveContainer>
                 </CardContent>

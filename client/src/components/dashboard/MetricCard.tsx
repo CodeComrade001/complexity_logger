@@ -65,16 +65,16 @@ export function MetricsGrid({ metricValues }: { metricValues: ComplexitySummary 
   return (
     <div className="relative">
       {/* MAIN GRID */}
+      {hidden.length > 0 && (
+        <Button onClick={() => setOpen(!open)} className="gap-2 mt-5 absolute right-[16%] top-[-105%] shadow-lg shadow-primary/20">
+          {open ? "Hide details" : "Show more"}
+        </Button>
+      )}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {visible.map(renderCard)}
       </div>
 
       {/* TOGGLE */}
-      {hidden.length > 0 && (
-        <Button onClick={() => setOpen(!open)} className="gap-2 mt-5 shadow-lg shadow-primary/20">
-          {open ? "Hide details" : "Show more"}
-        </Button>
-      )}
 
       {/* DROPDOWN OVERLAY */}
       {open && (

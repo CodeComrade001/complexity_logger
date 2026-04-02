@@ -1,4 +1,4 @@
-import { ComplexityProfile, SignalProfile } from "../../../interfaces/complexityGeneratorInterface.js";
+import { ComplexityProfile, ComplexityReason, SignalProfile } from "../../../interfaces/complexityGeneratorInterface.js";
 import { COMPLEXITY_REASONS } from "./paidTierReason.js";
 
 /**
