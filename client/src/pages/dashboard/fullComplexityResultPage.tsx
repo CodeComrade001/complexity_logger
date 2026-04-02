@@ -19,7 +19,6 @@ export default function ComplexityResultPage() {
   const [fileComplexityResult, setFileComplexityResult] = useState<FileComplexityData | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
-  const { notify } = useNotification();
 
   // Helper for cleaner class merging
   const cn = (...classes: (string | boolean | undefined)[]) => classes.filter(Boolean).join(' ');
