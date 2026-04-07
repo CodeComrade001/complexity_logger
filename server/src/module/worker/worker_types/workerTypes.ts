@@ -24,6 +24,11 @@ export interface PayloadNormalizerJob extends BaseJob {
   data: FilePayload;
 }
 
+export interface PayloadDeepScanJob extends BaseJob {
+  task: "payloadDeepScan";
+  data: FileUploadModel[];
+}
+
 export interface EnhancedAnalyzer_v2Job extends BaseJob {
   task: "EnhancedAnalyzer_v2";
   data: {
@@ -57,7 +62,8 @@ export type Job =
   | PayloadNormalizerJob
   | ExtractUnitPartOfCodeJob
   | EnhancedAnalyzer_v2Job
-  | AIReasoningJob;
+  | AIReasoningJob
+  | PayloadDeepScanJob
 
 export interface JobResult {
   jobId: string;

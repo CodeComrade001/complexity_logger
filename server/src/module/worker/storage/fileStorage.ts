@@ -6,19 +6,21 @@ import { JobResult } from "../worker_types/workerTypes.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const RESULTS_DIR = path.resolve(__dirname, "../worker/worker_results");
+// Define the folder, not the file
+const RESULTS_FOLDER = path.join(__dirname, "storage");
 
-if (!fs.existsSync(RESULTS_DIR)) {
-  fs.mkdirSync(RESULTS_DIR, { recursive: true });
+// Ensure the folder exists
+if (!fs.existsSync(RESULTS_FOLDER)) {
+  fs.mkdirSync(RESULTS_FOLDER, { recursive: true });
 }
 
 export function saveResult(jobId: string | number, data: JobResult): void {
-  const filePath = path.resolve(RESULTS_DIR, `${jobId}.json`);
+  const filePath = path.join(RESULTS_FOLDER, `${jobId}.json`);
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
 }
 
 export function readResult(jobId: string | number): JobResult | null {
-  const filePath = path.resolve(RESULTS_DIR, `${jobId}.json`);
+  const filePath = path.join(RESULTS_FOLDER, `${jobId}.json`);
   if (!fs.existsSync(filePath)) return null;
   return JSON.parse(fs.readFileSync(filePath, "utf-8"));
 }

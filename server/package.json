@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/app/server.js",
   "scripts": {
-    "dev": "tsx watch src/app/server.ts",
+    "dev": "tsx watch src/app/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
     "prisma:dev": "prisma migrate dev",
@@ -26,6 +26,7 @@
     "fs": "0.0.1-security",
     "mongoose": "^8.20.0",
     "node-llama-cpp": "^3.15.1",
+    "piscina": "^5.1.4",
     "ts-morph": "^27.0.2"
   },
   "devDependencies": {

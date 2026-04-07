@@ -136,29 +136,6 @@ export class ComplexityOrchestrator_v1 {
       throw new Error("Paid complexity failed to run")
     }
 
-    const resultFormat = {
-      id: `${name || "anon"}:${startLine}`,
-      kind,
-      name,
-      startLine,
-      endLine,
-      text,
-      timeComplexity: newComplexityEnhancer.timeComplexity,
-      spaceComplexity: newComplexityEnhancer.spaceComplexity,
-      timeScore: Math.round(newComplexityEnhancer.timeScore),
-      spaceScore: Math.round(newComplexityEnhancer.spaceScore),
-      totalScore: newComplexityEnhancer.totalScore,
-      riskLevel: newComplexityEnhancer.riskLevel,
-      confidence: newComplexityEnhancer.confidence,
-      reasons,
-      matchedKeywords: ["No key word added for now"],
-      tierUsed: "paid"
-    };
-
-    // temprarily store result
-    await tempManualStorage(resultFormat, "paid-complexity-result.json")
-
-
     return {
       id: `${name || "anon"}:${startLine}`,
       kind,

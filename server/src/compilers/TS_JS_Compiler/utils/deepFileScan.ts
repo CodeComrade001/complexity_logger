@@ -1,9 +1,6 @@
-
 import path from "path";
-import { FileUploadModel } from "../file_Interface/fileInterface.js";
-import { IFileRepository } from "../ports/IFileRepository.js";
-import { streamToString } from "../utils/parserFileData.js";
-import { WorkerClient } from "../worker/workerClient.js";
+import { FileUploadModel } from "../../../module/file_Interface/fileInterface.js";
+import { streamToString } from "../../../module/utils/parserFileData.js";
 
 const IGNORED_FILES = [
   ".DS_Store",
@@ -30,20 +27,11 @@ const ALLOWED_LANGUAGES = [
 
 const MAX_FILES = 300;
 const MAX_TOTAL_SIZE = 10 * 1024 * 1024; // 10MB
-const MAX_FILE_SIZE = 200 * 1024;       // 200KB
+const MAX_FILE_SIZE = 200 * 1024;
 
+export class DeepFileSanitization {
 
-export class GetFileAnalyzer {
-  private repo: IFileRepository;
-  private workerClient: WorkerClient;
-
-  constructor(repo: IFileRepository, workerClient: WorkerClient) {
-    this.repo = repo;
-    this.workerClient = workerClient;
-  }
-
-  public async dataSecurityAndSanitization(
-    files: FileUploadModel[]
+  async ts_js_deepFileScan(files: FileUploadModel[]
   ): Promise<{ success: boolean; data: FileUploadModel[] }> {
 
 
@@ -122,28 +110,5 @@ export class GetFileAnalyzer {
     console.info("File sanitization stats:", rejectionStats);
 
     return { success: true, data: sanitized };
-  }
-
-  public async execute(filesToAnalyze: FileUploadModel[]) {
-    const { success, data } = await this.dataSecurityAndSanitization(filesToAnalyze);
-
-    if (!success) {
-      return {
-        success: false,
-        data: null,
-        message: "File sanitization failed.",
-      };
-    }
-
-    // ✅ ALL heavy work goes to worker
-    const result = await this.workerClient.execute(
-      "paidTierAnalysis",
-      data
-    );
-
-    return {
-      success: true,
-      data: result,
-    };
   }
 }

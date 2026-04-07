@@ -50,31 +50,39 @@ export default class Compiler {
 
   private async complexityGenerator(
     payload: ComplexityGeneratorPayload,
-    concurrency = COMPLEXITYGENERATORMAXFILES
+    concurrency = 2 // ✅ SAFE default for your system
   ): Promise<AnalysisSummary[]> {
+
     const entries = Object.entries(payload);
+    const results: AnalysisSummary[] = [];
 
-    const results: any[] = [];
+    // 🧠 Clamp concurrency to avoid overload
+    const safeConcurrency = Math.max(1, Math.min(concurrency, 4));
 
-    for (let i = 0; i < entries.length; i += concurrency) {
-      const slice = entries.slice(i, i + concurrency);
+    for (let i = 0; i < entries.length; i += safeConcurrency) {
+      const batch = entries.slice(i, i + safeConcurrency);
 
-      const promises = slice.map(([fileName, data]) => {
-        return this.getComplexityGenerator.execute({
+      const promises = batch.map(([fileName, data]) =>
+        this.getComplexityGenerator.execute({
           [fileName]: data,
-        });
-      });
+        })
+      );
 
-      // execute result in batch
-      const batchResults = await Promise.all(promises);
+      // ✅ Use allSettled to prevent total failure
+      const settledResults = await Promise.allSettled(promises);
 
-      //store only successful result
-      batchResults.map((item) => {
-        const { success, data } = item
-        if (success && data) {
-          results.push(data);
+      for (const result of settledResults) {
+        if (result.status === "fulfilled") {
+          const { success, data } = result.value;
+
+          if (success && data) {
+            results.push(data);
+          }
+        } else {
+          // Optional: log rejected promise
+          console.error("Batch task failed:", result.reason);
         }
-      })
+      }
     }
 
     return results;

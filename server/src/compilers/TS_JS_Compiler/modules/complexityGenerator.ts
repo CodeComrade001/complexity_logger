@@ -1,40 +1,50 @@
+// GetComplexityGenerator.ts
+
 import { AnalysisSummary } from "../interfaces/complexityGeneratorInterface.js";
 import { ComplexityOrchestrator_v1 } from "./complexityGenerator_v1/complexity_orchestrator.js";
-import { FilePayload } from "./complexityOrchestratorHelpers/complexityOrchestratorInterface.js";
-import { PayloadNormalizer } from "./complexityOrchestratorHelpers/payloadNormalizer.js";
+import { FilePayload, normalizedPayloadData } from "./complexityOrchestratorHelpers/complexityOrchestratorInterface.js";
 import { TierRunner } from "./complexityOrchestratorHelpers/tierRunner.js";
 
 export class GetComplexityGenerator {
-  private normalizer = new PayloadNormalizer();
   private tierRunner: TierRunner;
+  private normalize: (payload: FilePayload) => normalizedPayloadData | null;
 
-  constructor(engine: ComplexityOrchestrator_v1) {
+  constructor(
+    engine: ComplexityOrchestrator_v1,
+    normalizeFn: (payload: FilePayload) => normalizedPayloadData | null // ✅ injected
+  ) {
     this.tierRunner = new TierRunner(engine);
+    this.normalize = normalizeFn;
   }
 
-  public async execute(payload: FilePayload): Promise<{ success: boolean, message: string, data: AnalysisSummary | null }> {
+  public async execute(
+    payload: FilePayload
+  ): Promise<{ success: boolean; message: string; data: AnalysisSummary | null }> {
     try {
-      const normalized = this.normalizer.normalize(payload);
+      const normalized = this.normalize(payload); // ✅ no compiler creation
 
-      if (!normalized) {
-        return { success: false, message: "No analyzable code found", data: null };
+      if (!normalized || !Object.keys(normalized).length || normalized === null) {
+        return {
+          success: false,
+          message: "No analyzable code found",
+          data: null,
+        };
       }
 
-      if (!Object.keys(normalized).length) {
-        return { success: false, message: "No analyzable code found", data: null };
-      }
-
-      // const reportGenerated = await this.tierRunner.runFree(normalized);
       const reportGenerated = await this.tierRunner.runPaid(normalized);
 
       return {
         success: true,
         message: "Complexity analysis complete",
-        data: reportGenerated
+        data: reportGenerated,
       };
     } catch (error) {
-      console.log("Turbo Log  ~ GetComplexityGenerator ~ execute ~ error:", error);
-      return { success: false, message: "Compiler Execute error", data: null };
+      console.log("GetComplexityGenerator error:", error);
+      return {
+        success: false,
+        message: "Compiler Execute error",
+        data: null,
+      };
     }
   }
 }

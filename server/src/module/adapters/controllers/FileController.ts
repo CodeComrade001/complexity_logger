@@ -1,16 +1,16 @@
+// FileController.ts
+
 import { GetFileHealth } from "../../usecases/GetFileHealth.js";
 import { IFileRepository } from "../../ports/IFileRepository.js";
 import { GetFileAnalyzer } from "../../usecases/getFileAnalyzer.js";
-import Compiler from "../../../compilers/TS_JS_Compiler/compiler.js";
 import { GetFileData } from "../../usecases/GetFileData.js";
 import { GetSingleFileReport } from "../../usecases/getSingleFileReport.js";
 import { GetFilePatchApply } from "../../usecases/getFilePatchApply.js";
 import { GetUser } from "../../usecases/getUser.js";
 import { IMongoRepository } from "../../ports/IMongoRepository.js";
 import { FileUploadModel } from "../../file_Interface/fileInterface.js";
+import { WorkerClient } from "../../worker/workerClient.js";
 
-// The controller adapter is thin: it only calls use-cases and maps results to HTTP-friendly objects.
-// Keep it simple: no DB, no heavy logic.
 export class FileController {
   private getHealthUsecase: GetFileHealth;
   private getFileDataUsecase: GetFileData;
@@ -19,48 +19,24 @@ export class FileController {
   private getFilePatchApplyUsecase: GetFilePatchApply;
   private getUserUsecase: GetUser;
 
-  constructor(postgresRepo: IFileRepository, mongoRepo: IMongoRepository, compiler: Compiler) {
+  constructor(
+    postgresRepo: IFileRepository,
+    mongoRepo: IMongoRepository,
+    workerClient: WorkerClient // ✅ instead of compiler
+  ) {
     this.getHealthUsecase = new GetFileHealth(postgresRepo, mongoRepo);
     this.getFileDataUsecase = new GetFileData(postgresRepo);
-
     this.getSingleFileReportUsecase = new GetSingleFileReport(postgresRepo);
     this.getFilePatchApplyUsecase = new GetFilePatchApply(postgresRepo);
     this.getUserUsecase = new GetUser(postgresRepo);
-    this.getFileAnalyzerUsecase = new GetFileAnalyzer(postgresRepo, compiler);
+    workerClient = new WorkerClient()
 
+    this.getFileAnalyzerUsecase = new GetFileAnalyzer(
+      postgresRepo,
+      workerClient
+    );
   }
 
-  public async getHealth(_request: any, reply: any) {
-    const result = await this.getHealthUsecase.execute();
-    return reply.code(200).send(result);
-  }
-
-  public async getFile(request: any, reply: any) {
-    const { id } = request.params;
-    const result = await this.getFileDataUsecase.execute(id);
-    return reply.code(200).send(result);
-  }
-
-
-
-  //these is for testing purpose remember to delete later
-  // public async getFileAnalyzer(request: any, reply: any) {
-  //   try {
-  //     const files: FileUploadModel[] = [];
-
-
-  //     const { success, data, message } = await this.getFileAnalyzerUsecase.execute(files);
-  //     if (!success) {
-  //       return reply.code(400).send({ success: false, message: message || "File analysis failed." });
-  //     }
-  //     return reply.code(200).send(data);
-  //   } catch (err) {
-  //     console.error("Error in getFileAnalyzer:", err);
-  //     return reply.code(500).send({ success: false, message: "Internal server error" });
-  //   }
-  // }
-
-  // Handle file upload and analysis - for production use
   public async getFileAnalyzer(request: any, reply: any) {
     try {
       const files: FileUploadModel[] = [];
@@ -70,40 +46,34 @@ export class FileController {
           files.push({
             name: part.filename,
             size: part.file.bytesRead,
-            language: "typescript", // or read from fields
-            file: part.file,        // Readable stream ✅
+            language: "typescript",
+            file: part.file,
+            fileContent: part.text,
           });
         }
       }
 
-      if (!files || files.length === 0) {
-        return { success: false, message: "No files provided for analysis" };
+      if (!files.length) {
+        return reply.code(400).send({
+          success: false,
+          message: "No files provided",
+        });
       }
-      const { success, data, message } = await this.getFileAnalyzerUsecase.execute(files);
-      if (!success) {
-        return reply.code(400).send({ success: false, message: message || "File analysis failed." });
+
+
+      const result = await this.getFileAnalyzerUsecase.execute(files);
+
+      if (!result.success) {
+        return reply.code(400).send(result);
       }
-      return reply.code(200).send(data);
-    } catch (err) {
+
+      return reply.code(200).send(result);
+    } catch (err: any) {
       console.error("Error in getFileAnalyzer:", err);
-      return reply.code(500).send({ success: false, message: "Internal server error" });
+      return reply.code(500).send({
+        success: false,
+        message: "Internal server error",
+      });
     }
   }
-
-
-  public async getSingleFileReport(_request: any, reply: any) {
-    const result = await this.getSingleFileReportUsecase.execute();
-    return reply.code(200).send(result);
-  }
-
-  public async getFilePatchApply(_request: any, reply: any) {
-    const result = await this.getFilePatchApplyUsecase.execute();
-    return reply.code(200).send(result);
-  }
-
-  public async getUser(_request: any, reply: any) {
-    const result = await this.getUserUsecase.execute();
-    return reply.code(200).send(result);
-  }
-
 }
