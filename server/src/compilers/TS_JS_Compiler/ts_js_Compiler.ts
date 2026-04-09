@@ -1,29 +1,19 @@
 import { FileUploadModel } from "../../module/file_Interface/fileInterface.js";
+import { CreateCompiler } from "./bootstrap.js";
 import { AnalysisSummary } from "./interfaces/complexityGeneratorInterface.js";
-import { COMPLEXITYGENERATORMAXFILES } from "./interfaces/fetchUnitPartOfCodeProps.js";
-import { CancelRunningTask } from "./modules/cancelTask.js";
-import { GetCodeChanges } from "./modules/codeChange.js";
 import { GetComplexityGenerator } from "./modules/complexityGenerator.js";
 import { CodeParts } from "./modules/complexityOrchestratorHelpers/complexityOrchestratorInterface.js";
-import { GetUnitPartOfCode } from "./modules/fetchPartOfCode.js";
 export type ComplexityGeneratorPayload = Record<string, CodeParts>;
 
 
-export default class Compiler {
-  private getUnitPartOfCode: GetUnitPartOfCode;
-  private getIfCodeChange: GetCodeChanges;
-  private cancelRunningTask: CancelRunningTask;
+const compiler = new CreateCompiler().init();
+
+export default class Ts_JS_Compiler {
   private getComplexityGenerator: GetComplexityGenerator;
 
   constructor(
-    getUnitPartOfCode: GetUnitPartOfCode,
-    getIfCodeChange: GetCodeChanges,
-    cancelRunningTask: CancelRunningTask,
     getComplexityGenerator: GetComplexityGenerator
   ) {
-    this.getUnitPartOfCode = getUnitPartOfCode;
-    this.getIfCodeChange = getIfCodeChange;
-    this.cancelRunningTask = cancelRunningTask;
     this.getComplexityGenerator = getComplexityGenerator;
   }
 
@@ -31,7 +21,8 @@ export default class Compiler {
   private async fetchPartOfCode(allFilesToAnalyze: FileUploadModel[]) {
 
 
-    const fetchedPart = await this.getUnitPartOfCode.extract({
+
+    const { success, data: fetchedPart } = await compiler.utils.extract({
       targets: [
         "functions",
         "arrows",
@@ -44,7 +35,12 @@ export default class Compiler {
         "staticBlocks",
         "topLevelStatements"
       ]
-    }, allFilesToAnalyze);
+    }, allFilesToAnalyze, 20);
+
+    if (!success) {
+      return { success: false, data: null };
+    }
+
     return fetchedPart;
   }
 
@@ -81,6 +77,7 @@ export default class Compiler {
         } else {
           // Optional: log rejected promise
           console.error("Batch task failed:", result.reason);
+          return []
         }
       }
     }

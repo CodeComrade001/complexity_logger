@@ -1,8 +1,6 @@
 import { Node } from "ts-morph";
 import {
   AnalysisSummary,
-  ASTSignals,
-  ComplexityClassification,
   ComplexityNotation,
   ComplexityResult,
   PaidComplexityReason,
@@ -12,7 +10,6 @@ import { FastAnalyzer } from "./freeTierResources/fast_analyzer.js";
 import { normalizedPayloadData } from "../complexityOrchestratorHelpers/complexityOrchestratorInterface.js";
 import { fetchUnitPartOfCodeArrayTargets } from "../../interfaces/fetchUnitPartOfCodeProps.js";
 import { EnhancedAnalyzer_v2 } from "./paidTierResources/enhancedAnalyzer_v2.js";
-import { tempManualStorage } from "../../../../disposable_files/manual-storge.js";
 
 type UnitTarget = fetchUnitPartOfCodeArrayTargets;
 

@@ -1,6 +1,7 @@
 import path from "path";
 import { FileUploadModel } from "../../../module/file_Interface/fileInterface.js";
 import { streamToString } from "../../../module/utils/parserFileData.js";
+import { WorkerFile } from "../../../module/worker/worker_types/workerTypes.js";
 
 const IGNORED_FILES = [
   ".DS_Store",
@@ -32,7 +33,7 @@ const MAX_FILE_SIZE = 200 * 1024;
 export class DeepFileSanitization {
 
   async ts_js_deepFileScan(files: FileUploadModel[]
-  ): Promise<{ success: boolean; data: FileUploadModel[] }> {
+  ): Promise<{ success: boolean; data: any[] }> {
 
 
     if (!Array.isArray(files) || files.length === 0) {
@@ -41,7 +42,7 @@ export class DeepFileSanitization {
 
 
     let totalSize = 0;
-    const sanitized: FileUploadModel[] = [];
+    const sanitized: WorkerFile[] = [];
 
     const rejectionStats = {
       tooManyFiles: 0,
@@ -101,8 +102,9 @@ export class DeepFileSanitization {
       }
 
       sanitized.push({
-        ...file,
-        fileContent: text // string
+        name: file.name,
+        language: file.language,
+        content: text,
       });
     }
 

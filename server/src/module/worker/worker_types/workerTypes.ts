@@ -16,7 +16,7 @@ export interface FreeTierAnalysisJob extends BaseJob {
 
 export interface PaidTierAnalysisJob extends BaseJob {
   task: "paidTierAnalysis";
-  data: normalizedPayloadData;
+  data: WorkerFile[];
 }
 
 export interface PayloadNormalizerJob extends BaseJob {
@@ -55,6 +55,11 @@ export interface AIReasoningJob extends BaseJob {
   };
 }
 
+export interface Ts_js_compiler_Job extends BaseJob {
+  task: "ts_js_compiler";
+  data: WorkerFile[];
+}
+
 // ✅ FIXED: included missing type
 export type Job =
   | FreeTierAnalysisJob
@@ -64,6 +69,10 @@ export type Job =
   | EnhancedAnalyzer_v2Job
   | AIReasoningJob
   | PayloadDeepScanJob
+  | Ts_js_compiler_Job;
+
+
+
 
 export interface JobResult {
   jobId: string;
@@ -71,3 +80,9 @@ export interface JobResult {
   result: any;
   error?: string;
 }
+
+export type WorkerFile = {
+  name: string;
+  content: string;
+  language: string;
+};

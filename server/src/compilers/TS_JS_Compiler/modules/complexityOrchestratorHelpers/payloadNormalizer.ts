@@ -4,6 +4,7 @@ export class PayloadNormalizer {
   normalize(payload: FilePayload): normalizedPayloadData | null {
 
     if (!payload || typeof payload !== "object") {
+      console.log("⚠️ PayloadNormalizer: Invalid payload format. Expected an object with file data.");
       return null;
     }
 
