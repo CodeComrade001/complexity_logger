@@ -26,7 +26,7 @@ export interface PayloadNormalizerJob extends BaseJob {
 
 export interface PayloadDeepScanJob extends BaseJob {
   task: "payloadDeepScan";
-  data: FileUploadModel[];
+  data: WorkerFile[];
 }
 
 export interface EnhancedAnalyzer_v2Job extends BaseJob {

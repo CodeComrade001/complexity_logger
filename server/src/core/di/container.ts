@@ -3,6 +3,7 @@ import cors from "@fastify/cors";
 import fastifyMultipart from "@fastify/multipart";
 import fileRoute from "../../module/routes/fileRoute.js";
 import { WorkerClient } from "../../module/worker/workerClient.js";
+import { CreateCompiler } from "../../compilers/TS_JS_Compiler/ts_js_bootstrap.js";
 
 export async function createApp() {
   const app = fastify({ logger: true });
@@ -24,6 +25,10 @@ export async function createApp() {
 
   // ---------- GLOBAL SERVICES ----------
   app.decorate("workerClient", new WorkerClient());
+
+
+  // ---------- COMPILER SERVICES ----------
+  app.decorate("ts_js_compiler", new CreateCompiler());
 
   // ---------- ROUTES ----------
   await app.register(fileRoute, { prefix: "/api/file" });

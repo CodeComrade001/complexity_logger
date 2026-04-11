@@ -1,18 +1,24 @@
-import { Job } from "./worker_types/workerTypes.js";
-import { saveResult } from "./storage/fileStorage.js";
-import { CompilerInterface, CreateCompiler } from "../../compilers/TS_JS_Compiler/bootstrap.js";
-import { Project, SourceFile } from "ts-morph";
-import {
-  getCachedResult,
-  hashContent,
-  setCachedResult,
-} from "./cache/workerCache.js";
+console.log("👷 Worker booted");
 
+import { Project } from "ts-morph";
+import { saveResult } from "./storage/fileStorage.js";
+import {
+  CompilerInterface,
+  CreateCompiler,
+} from "../../compilers/TS_JS_Compiler/ts_js_bootstrap.js";
+import {
+  hashContent,
+} from "./cache/workerCache.js";
+import { Job } from "./worker_types/workerTypes.js";
+import { enforceProjectLimit, processFile, processFilesBatch } from "./utils/file_process.js";
+
+/* ================================
+   SINGLETONS
+================================ */
 
 let compilerInstance: CompilerInterface | null = null;
 let projectInstance: Project | null = null;
 
-// ✅ Compiler singleton (per worker thread)
 function getCompiler(): CompilerInterface {
   if (!compilerInstance) {
     console.log("🚀 Initializing compiler ONCE per worker thread");
@@ -22,8 +28,7 @@ function getCompiler(): CompilerInterface {
   return compilerInstance;
 }
 
-// ✅ Project singleton (CRITICAL OPTIMIZATION)
-export function getProject(): Project {
+function getProject(): Project {
   if (!projectInstance) {
     console.log("🔥 Initializing Project ONCE per worker");
     projectInstance = new Project({
@@ -33,8 +38,14 @@ export function getProject(): Project {
   return projectInstance;
 }
 
-// 🚀 Piscina worker entry
+
+/* ================================
+   WORKER ENTRY
+================================ */
+
 export default async function workerFunction(job: Job) {
+  console.log("👷 Worker Function booted");
+
   const start = Date.now();
 
   const compiler = getCompiler();
@@ -44,62 +55,18 @@ export default async function workerFunction(job: Job) {
     let result;
 
     switch (job.task) {
-      case "ts_js_compiler":
-        result = await compiler.compiler.execute(job.data);
-        break;
-
       case "freeTierAnalysis":
         result = await compiler.analysis.freeTier(job.data);
         break;
 
-      case "paidTierAnalysis": {
+      case "ts_js_compiler": {
         const files = job.data as any[];
 
-        const results = [];
+        result = await processFilesBatch(files, project, compiler);
 
-        for (const f of files) {
-          const fileHash = hashContent(f.content);
+        // ✅ CLEANUP PROJECT MEMORY
+        enforceProjectLimit(project);
 
-          // ✅ CACHE HIT (skip EVERYTHING)
-          const cached = getCachedResult(fileHash);
-          if (cached) {
-            results.push(cached);
-            continue;
-          }
-
-          // ✅ REUSE SOURCE FILE (CRITICAL)
-          let sourceFile: SourceFile;
-          const existing = project.getSourceFile(f.name);
-
-          if (existing) {
-            existing.replaceWithText(f.content);
-            sourceFile = existing;
-          } else {
-            sourceFile = project.createSourceFile(f.name, f.content);
-          }
-
-          // ✅ NORMALIZE (sync, not async)
-          const normalized = compiler.utils.normalize([sourceFile]);
-
-          if (!normalized) {
-            results.push({
-              success: false,
-              message: "Normalization failed",
-              data: null,
-            });
-            continue;
-          }
-
-          // ✅ RUN ANALYSIS (FIXED: execute, not exec ❌)
-          const fileResult = await compiler.compiler.execute(normalized);
-
-          // ✅ CACHE RESULT
-          setCachedResult(fileHash, fileResult);
-
-          results.push(fileResult);
-        }
-
-        result = results;
         break;
       }
 
@@ -114,8 +81,7 @@ export default async function workerFunction(job: Job) {
       case "ExtractUnitPartOfCode":
         result = compiler.utils.extract(
           job.data.props,
-          job.data.files,
-          job.data.unitIndex
+          job.data.files
         );
         break;
 
@@ -123,14 +89,18 @@ export default async function workerFunction(job: Job) {
         throw new Error(`Unknown task: ${job.task}`);
     }
 
-    // ✅ Persist result
+    // ✅ Persist
     await saveResult(job.id, {
       jobId: job.id,
       task: job.task,
       result,
     });
 
-    return { jobId: job.id, task: job.task, result };
+    return {
+      jobId: job.id,
+      task: job.task,
+      result,
+    };
   } catch (err: any) {
     return {
       jobId: job.id,
@@ -139,6 +109,8 @@ export default async function workerFunction(job: Job) {
       error: err.message,
     };
   } finally {
-    console.log(`Worker finished ${job.id} in ${Date.now() - start}ms`);
+    console.log(
+      `⏱ Worker finished ${job.id} in ${Date.now() - start}ms`
+    );
   }
 }

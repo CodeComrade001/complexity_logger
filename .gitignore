@@ -249,4 +249,5 @@ Thumbs.db
 server/src/models/
 /server/src/disposable_files/manual-storge
 /server/src/module/download/result.json
+server/src/module/worker/storage/jobs_storage/
 

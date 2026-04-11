@@ -97,7 +97,7 @@ export default function DashboardOverview() {
 
       const { success } = response.data;
 
-      storeSession<FileComplexityData>("code-analysis", response.data)
+      // storeSession<FileComplexityData>("code-analysis", response.data)
 
       if (!success) {
         notify("Files analysis error", "error");

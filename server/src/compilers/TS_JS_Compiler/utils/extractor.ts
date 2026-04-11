@@ -1,4 +1,7 @@
-import { SyntaxKind } from "ts-morph";
+import { SourceFile, SyntaxKind } from "ts-morph";
+import { FileUploadModel } from "../../../module/file_Interface/fileInterface.js";
+import { WorkerFile } from "../../../module/worker/worker_types/workerTypes.js";
+import { streamToString } from "../../../module/utils/parserFileData.js";
 
 export enum CodeUnitType {
   FUNCTIONS = "functions",
@@ -14,7 +17,7 @@ export enum CodeUnitType {
 }
 
 
-export const extractors: Record<CodeUnitType, (source: any) => any[]> = {
+export const extractors: Record<CodeUnitType, (source: SourceFile) => any[]> = {
   [CodeUnitType.FUNCTIONS]: (source) =>
     source.getFunctions(),
 
@@ -46,3 +49,21 @@ export const extractors: Record<CodeUnitType, (source: any) => any[]> = {
     source.getStatements(),
 };
 
+
+export async function extractFiles(
+  files: FileUploadModel[]
+): Promise<WorkerFile[]> {
+  const result: WorkerFile[] = [];
+
+  for (const file of files) {
+    const text = await streamToString(file.file);
+
+    result.push({
+      name: file.name,
+      language: file.language,
+      content: text,
+    });
+  }
+
+  return result;
+}

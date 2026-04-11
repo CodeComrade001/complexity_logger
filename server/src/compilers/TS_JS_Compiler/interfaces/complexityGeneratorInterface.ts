@@ -169,7 +169,9 @@ export interface ComplexityReason {
   type: "time" | "space" | "unknown";
   detail: string;
   impact: Lowercase_RiskLevelType;
+  pattern?: string;
   confidence: number; // 0-100
+  lineNumber?: number;
 }
 
 export interface PaidComplexityReason {

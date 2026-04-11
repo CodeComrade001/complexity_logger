@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Define the folder, not the file
-const RESULTS_FOLDER = path.join(__dirname, "storage");
+const RESULTS_FOLDER = path.join(__dirname, "jobs_storage");
 
 // Ensure the folder exists
 if (!fs.existsSync(RESULTS_FOLDER)) {

@@ -31,15 +31,13 @@ const MAX_TOTAL_SIZE = 10 * 1024 * 1024; // 10MB
 const MAX_FILE_SIZE = 200 * 1024;
 
 export class DeepFileSanitization {
-
-  async ts_js_deepFileScan(files: FileUploadModel[]
-  ): Promise<{ success: boolean; data: any[] }> {
-
+  ts_js_deepFileScan(
+    files: WorkerFile[]
+  ): { success: boolean; data: WorkerFile[] } {
 
     if (!Array.isArray(files) || files.length === 0) {
       return { success: false, data: [] };
     }
-
 
     let totalSize = 0;
     const sanitized: WorkerFile[] = [];
@@ -55,17 +53,19 @@ export class DeepFileSanitization {
     };
 
     for (const file of files) {
+      const size = Buffer.byteLength(file.content, "utf-8");
+
       if (sanitized.length >= MAX_FILES) {
         rejectionStats.tooManyFiles++;
         return { success: false, data: [] };
       }
 
-      if (file.size > MAX_FILE_SIZE) {
+      if (size > MAX_FILE_SIZE) {
         rejectionStats.fileTooLarge++;
         return { success: false, data: [] };
       }
 
-      totalSize += file.size;
+      totalSize += size;
       if (totalSize > MAX_TOTAL_SIZE) {
         rejectionStats.totalSizeExceeded++;
         return { success: false, data: [] };
@@ -92,25 +92,17 @@ export class DeepFileSanitization {
         continue;
       }
 
-      // const text = await this.streamToString(file.file);
-      const text = await streamToString(file.file);
-
-      // const text = await file.file.text();
-      if (text.includes("\u0000")) {
+      if (file.content.includes("\u0000")) {
         rejectionStats.binaryFile++;
         continue;
       }
 
-      sanitized.push({
-        name: file.name,
-        language: file.language,
-        content: text,
-      });
+      sanitized.push(file);
     }
 
-    // Optional: log aggregated stats (safe)
     console.info("File sanitization stats:", rejectionStats);
 
     return { success: true, data: sanitized };
   }
+
 }

@@ -1,12 +1,11 @@
 import { FileUploadModel } from "../../module/file_Interface/fileInterface.js";
-import { CreateCompiler } from "./bootstrap.js";
+import { CreateCompiler } from "./ts_js_bootstrap.js";
 import { AnalysisSummary } from "./interfaces/complexityGeneratorInterface.js";
 import { GetComplexityGenerator } from "./modules/complexityGenerator.js";
 import { CodeParts } from "./modules/complexityOrchestratorHelpers/complexityOrchestratorInterface.js";
 export type ComplexityGeneratorPayload = Record<string, CodeParts>;
 
 
-const compiler = new CreateCompiler().init();
 
 export default class Ts_JS_Compiler {
   private getComplexityGenerator: GetComplexityGenerator;
@@ -19,10 +18,9 @@ export default class Ts_JS_Compiler {
 
 
   private async fetchPartOfCode(allFilesToAnalyze: FileUploadModel[]) {
+    const ts_js_compiler = new CreateCompiler().init();
 
-
-
-    const { success, data: fetchedPart } = await compiler.utils.extract({
+    const { success, data: fetchedPart } = await ts_js_compiler.utils.extract({
       targets: [
         "functions",
         "arrows",
@@ -35,7 +33,7 @@ export default class Ts_JS_Compiler {
         "staticBlocks",
         "topLevelStatements"
       ]
-    }, allFilesToAnalyze, 20);
+    }, allFilesToAnalyze);
 
     if (!success) {
       return { success: false, data: null };

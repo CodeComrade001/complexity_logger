@@ -26,7 +26,7 @@ export interface CompilerInterface {
   utils: {
     normalize: (data: any) => any;
     deepScan: (data: any) => any;
-    extract: (props: any, files: any, unitIndex: number) => any;
+    extract: (props: any, files: any) => any;
   };
 }
 
@@ -35,7 +35,7 @@ export class CreateCompiler {
   public init(): CompilerInterface {
     // 🔹 SINGLE INSTANCES (no duplication)
     const project = new Project()
-    const extractor = new GetUnitPartOfCode(project);
+    const extractor = new GetUnitPartOfCode();
     const payloadNormalizer = new PayloadNormalizer();
     const deepScan = new DeepFileSanitization();
 
@@ -70,12 +70,14 @@ export class CreateCompiler {
       normalizeWithCache
     );
 
-    const compiler = new Ts_JS_Compiler(complexityGenerator);
+
+    // 🔹 TS_JS_Compiler 
+    const ts_js_compiler = new Ts_JS_Compiler(complexityGenerator);
 
     // 🔹 CLEAN INTERFACE (NO GOD OBJECT)
     return {
       compiler: {
-        execute: (payload: any) => compiler.execute(payload),
+        execute: (payload: any) => ts_js_compiler.execute(payload),
       },
 
       analysis: {
@@ -85,8 +87,8 @@ export class CreateCompiler {
 
       utils: {
         normalize: (data: any) => normalizeWithCache(data),
-        extract: (props: any, files: any, unitIndex: number) =>
-          extractor.extract(props, files, unitIndex),
+        extract: (props: any, files: any) =>
+          extractor.extract(props, files),
         deepScan: (data: any) => deepScan.ts_js_deepFileScan(data),
       },
     };

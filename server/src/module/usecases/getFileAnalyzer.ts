@@ -1,6 +1,7 @@
 
 import { FileUploadModel } from "../file_Interface/fileInterface.js";
 import { IFileRepository } from "../ports/IFileRepository.js";
+import { WorkerFile } from "../worker/worker_types/workerTypes.js";
 import { WorkerClient } from "../worker/workerClient.js";
 
 export class GetFileAnalyzer {
@@ -12,10 +13,12 @@ export class GetFileAnalyzer {
     this.workerClient = workerClient;
   }
 
-  public async execute(filesToAnalyze: FileUploadModel[]) {
+
+
+  public async execute(filesToAnalyze: WorkerFile[]) {
     const { success, data } = await this.workerClient.execute("payloadDeepScan", filesToAnalyze);
     console.log("Turbo Log  ~ GetFileAnalyzer  Worker deep scan ~ execute ~ success:", success);
-    console.log("Turbo Log  ~ GetFileAnalyzer ~ execute ~ data:", data[0]);
+    console.log("Turbo Log  ~ GetFileAnalyzer ~ execute ~ data:", data[0].name);
 
     if (!success) {
       return {
@@ -30,6 +33,14 @@ export class GetFileAnalyzer {
       "ts_js_compiler",
       data
     );
+    console.log("Turbo Log  ~ GetFileAnalyzer ~ execute ~ result:", result);
+
+    if (!result.success) {
+      return {
+        success: false,
+        data: null,
+      };
+    }
 
     return {
       success: true,

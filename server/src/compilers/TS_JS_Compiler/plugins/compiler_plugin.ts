@@ -1,6 +1,7 @@
 import fp from "fastify-plugin";
-import { createCompiler } from "../bootstrap.js";
+import { CreateCompiler } from "../ts_js_bootstrap.js";
 
 export default fp(async function (fastify) {
-  fastify.decorate("compiler", createCompiler());
+
+  fastify.decorate("compiler", new CreateCompiler().init());
 });

@@ -10,6 +10,7 @@ import { GetUser } from "../../usecases/getUser.js";
 import { IMongoRepository } from "../../ports/IMongoRepository.js";
 import { FileUploadModel } from "../../file_Interface/fileInterface.js";
 import { WorkerClient } from "../../worker/workerClient.js";
+import { extractFiles } from "../../../compilers/TS_JS_Compiler/utils/extractor.js";
 
 export class FileController {
   private getHealthUsecase: GetFileHealth;
@@ -60,8 +61,10 @@ export class FileController {
         });
       }
 
+      const extractedData = await extractFiles(files);
 
-      const result = await this.getFileAnalyzerUsecase.execute(files);
+
+      const result = await this.getFileAnalyzerUsecase.execute(extractedData);
 
       if (!result.success) {
         return reply.code(400).send(result);
