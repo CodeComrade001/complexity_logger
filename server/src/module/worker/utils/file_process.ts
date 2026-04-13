@@ -3,6 +3,7 @@ import { CompilerInterface } from "../../../compilers/TS_JS_Compiler/ts_js_boots
 import { getCachedResult, hashContent, setCachedResult } from "../cache/workerCache.js";
 
 const MAX_PROJECT_FILES = 1000;
+export const GetUnitPartOfCode_BATCHLIMIT = 50;
 
 export function enforceProjectLimit(project: Project) {
   const files = project.getSourceFiles();
@@ -11,7 +12,7 @@ export function enforceProjectLimit(project: Project) {
     const excess = files.length - MAX_PROJECT_FILES;
 
     for (let i = 0; i < excess; i++) {
-      files[i].delete(); // remove oldest
+      files[i].delete();
     }
 
     console.log(`🧹 Evicted ${excess} old files from project`);
@@ -19,97 +20,104 @@ export function enforceProjectLimit(project: Project) {
 }
 
 export async function processFile(
-  f: any,
+  input: any | any[],
   project: Project,
   compiler: CompilerInterface
 ) {
-  const fileHash = hashContent(f.content);
+  const files = Array.isArray(input) ? input : [input];
 
-  // ✅ CACHE HIT
-  const cached = getCachedResult(fileHash);
-  if (cached) return cached;
-
-  // ✅ SOURCE FILE CREATION / REUSE
-  let sourceFile: SourceFile;
-
-  const existing = project.getSourceFile(f.name);
-
-  if (existing) {
-    existing.replaceWithText(f.fileContent ?? f.content);
-    sourceFile = existing;
-  } else {
-    sourceFile = project.createSourceFile(
-      f.name,
-      f.fileContent ?? f.content,
-      { overwrite: true }
-    );
+  if (files.length > GetUnitPartOfCode_BATCHLIMIT) {
+    throw new Error(`Max batch size is ${GetUnitPartOfCode_BATCHLIMIT}`);
   }
 
-  // ✅ EXTRACT (ONLY RESPONSIBILITY HERE)
-  const extracted = await compiler.utils.extract([
-    "functions",
-    "arrows",
-    "methods",
-    "constructors",
-    "getters",
-    "setters",
-    "callbacks",
-    "handlers",
-    "staticBlocks",
-    "topLevelStatements"
-  ], sourceFile);
-  console.log("Turbo Log  ~ processFile ~ extracted:", extracted);
+  const seen = new Map();
+  const extractedBatch: any[] = [];
 
-  // ✅ NORMALIZE
-  const normalized = await compiler.utils.normalize({
-    [extracted.name]: extracted.data,
+  for (const file of files) {
+    const content = file.fileContent ?? file.content;
+    const fileHash = hashContent(content);
+
+    // ✅ CACHE HIT
+    if (seen.has(fileHash)) {
+      continue;
+    }
+
+    const cached = getCachedResult(fileHash);
+    if (cached) {
+      seen.set(fileHash, cached);
+      continue;
+    }
+
+    // ✅ create/update source file
+    let sourceFile: SourceFile;
+
+    const existing = project.getSourceFile(file.name);
+
+    if (existing) {
+      existing.replaceWithText(content);
+      sourceFile = existing;
+    } else {
+      sourceFile = project.createSourceFile(file.name, content, {
+        overwrite: true,
+      });
+    }
+
+    enforceProjectLimit(project);
+
+    // ✅ EXTRACT ONLY (NO EXECUTE HERE)
+    const extracted = await compiler.utils.extract(
+      [
+        "functions",
+        "arrows",
+        "methods",
+        "constructors",
+        "getters",
+        "setters",
+        "callbacks",
+        "handlers",
+        "staticBlocks",
+        "topLevelStatements",
+      ],
+      sourceFile
+    );
+    console.log("Turbo Log  ~ processFile ~ extracted:", extracted);
+
+    // if (!extracted || !extracted.data) {
+    //   throw new Error(`Extraction failed for ${file.name}`);
+    // }
+
+    extractedBatch.push({
+      hash: fileHash,
+      payload: extracted,
+    });
+  }
+
+  // 🚨 CRITICAL FIX: execute ONCE with ARRAY
+  const payloadArray = extractedBatch.map((e) => e.payload[0]);
+
+  if (payloadArray.length === 0) {
+    return [];
+  }
+
+  const results = await compiler.compiler.execute(payloadArray);
+  console.log("Turbo Log  ~ processFile ~ results:", results);
+
+  // ✅ map results back to cache
+  results?.data?.forEach((res: any, index: number) => {
+    const hash = extractedBatch[index]?.hash;
+    if (hash) {
+      setCachedResult(hash, res);
+      seen.set(hash, res);
+    }
   });
 
-  if (!normalized) {
-    return {
-      success: false,
-      message: "Normalization failed",
-      data: null,
-    };
-  }
-
-  // ✅ EXECUTE
-  const result = await compiler.compiler.execute(normalized);
-
-  // ✅ CACHE STORE
-  setCachedResult(fileHash, result);
-
-  return result;
+  return results;
 }
-
-export const GetUnitPartOfCode_BATCHLIMIT = 30;
 
 export async function processFilesBatch(
   files: any[],
   project: Project,
   compiler: CompilerInterface
 ) {
-  const results: any[] = [];
-  const seen = new Map(); // dedupe within batch
-
-  for (let i = 0; i < files.length; i += GetUnitPartOfCode_BATCHLIMIT) {
-    const batch = files.slice(i, i + GetUnitPartOfCode_BATCHLIMIT);
-
-    const batchResults = await Promise.all(
-      batch.map(async (f) => {
-        const hash = hashContent(f.content);
-
-        // ✅ DEDUPLICATION
-        if (seen.has(hash)) return seen.get(hash);
-
-        const res = await processFile(f, project, compiler);
-        seen.set(hash, res);
-        return res;
-      })
-    );
-
-    results.push(...batchResults);
-  }
-
-  return results;
+  return processFile(files, project, compiler);
 }

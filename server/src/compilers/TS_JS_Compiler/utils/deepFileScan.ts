@@ -100,8 +100,6 @@ export class DeepFileSanitization {
       sanitized.push(file);
     }
 
-    console.info("File sanitization stats:", rejectionStats);
-
     return { success: true, data: sanitized };
   }
 

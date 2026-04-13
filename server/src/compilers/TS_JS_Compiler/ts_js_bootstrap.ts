@@ -48,26 +48,9 @@ export class CreateCompiler {
       enhancedAnalyzer
     );
 
-    // 🔹 SIMPLE IN-MEMORY CACHE (replace with Redis later)
-    const normalizationCache = new Map<string, any>();
-
-    const normalizeWithCache = (payload: any) => {
-      const key = JSON.stringify(payload);
-
-      if (normalizationCache.has(key)) {
-        return normalizationCache.get(key);
-      }
-
-      const result = payloadNormalizer.normalize(payload);
-      normalizationCache.set(key, result);
-
-      return result;
-    };
-
     // 🔹 Generator (REAL injection)
     const complexityGenerator = new GetComplexityGenerator(
       orchestrator,
-      normalizeWithCache
     );
 
 
@@ -86,7 +69,7 @@ export class CreateCompiler {
       },
 
       utils: {
-        normalize: (data: any) => normalizeWithCache(data),
+        normalize: (data: any) => payloadNormalizer.normalize(data),
         extract: (props: any, files: any) =>
           extractor.extract(props, files),
         deepScan: (data: any) => deepScan.ts_js_deepFileScan(data),

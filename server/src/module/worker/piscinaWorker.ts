@@ -6,11 +6,8 @@ import {
   CompilerInterface,
   CreateCompiler,
 } from "../../compilers/TS_JS_Compiler/ts_js_bootstrap.js";
-import {
-  hashContent,
-} from "./cache/workerCache.js";
 import { Job } from "./worker_types/workerTypes.js";
-import { enforceProjectLimit, processFile, processFilesBatch } from "./utils/file_process.js";
+import { enforceProjectLimit, processFilesBatch } from "./utils/file_process.js";
 
 /* ================================
    SINGLETONS
@@ -19,7 +16,7 @@ import { enforceProjectLimit, processFile, processFilesBatch } from "./utils/fil
 let compilerInstance: CompilerInterface | null = null;
 let projectInstance: Project | null = null;
 
-function getCompiler(): CompilerInterface {
+export function getCompiler(): CompilerInterface {
   if (!compilerInstance) {
     console.log("🚀 Initializing compiler ONCE per worker thread");
     const instance = new CreateCompiler();

@@ -4,7 +4,6 @@ export class PayloadNormalizer {
   normalize(payload: FilePayload): normalizedPayloadData | null {
 
     if (!payload || typeof payload !== "object") {
-      console.log("⚠️ PayloadNormalizer: Invalid payload format. Expected an object with file data.");
       return null;
     }
 
@@ -23,7 +22,6 @@ export class PayloadNormalizer {
       const topLevelStatements = Array.isArray(fileData.topLevelStatements) ? fileData.topLevelStatements : [];
       if (!functions.length && !arrows.length && !methods.length) {
         continue;
-
       }
 
       return {

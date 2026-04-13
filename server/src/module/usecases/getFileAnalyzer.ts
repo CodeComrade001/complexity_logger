@@ -17,8 +17,6 @@ export class GetFileAnalyzer {
 
   public async execute(filesToAnalyze: WorkerFile[]) {
     const { success, data } = await this.workerClient.execute("payloadDeepScan", filesToAnalyze);
-    console.log("Turbo Log  ~ GetFileAnalyzer  Worker deep scan ~ execute ~ success:", success);
-    console.log("Turbo Log  ~ GetFileAnalyzer ~ execute ~ data:", data[0].name);
 
     if (!success) {
       return {
@@ -29,13 +27,12 @@ export class GetFileAnalyzer {
     }
 
     // ✅ ALL heavy work goes to worker
-    const result = await this.workerClient.execute(
+    const { success: isCompilerWorkerTrue, data: compilerWorkerData } = await this.workerClient.execute(
       "ts_js_compiler",
       data
     );
-    console.log("Turbo Log  ~ GetFileAnalyzer ~ execute ~ result:", result);
 
-    if (!result.success) {
+    if (!isCompilerWorkerTrue) {
       return {
         success: false,
         data: null,
@@ -44,7 +41,7 @@ export class GetFileAnalyzer {
 
     return {
       success: true,
-      data: result,
+      data: compilerWorkerData,
     };
   }
 }
