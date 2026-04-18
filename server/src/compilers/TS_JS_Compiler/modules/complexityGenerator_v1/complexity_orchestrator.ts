@@ -6,10 +6,10 @@ import {
   PaidComplexityReason,
   TierLevel
 } from "../../interfaces/complexityGeneratorInterface.js";
-import { FastAnalyzer } from "./freeTierResources/fast_analyzer.js";
 import { normalizedPayloadData } from "../complexityOrchestratorHelpers/complexityOrchestratorInterface.js";
 import { fetchUnitPartOfCodeArrayTargets } from "../../interfaces/fetchUnitPartOfCodeProps.js";
-import { EnhancedAnalyzer_v2 } from "./paidTierResources/enhancedAnalyzer_v2.js";
+import { FastAnalyzer } from "./freeTierResources/fast-analyzer-v2.js";
+import { EnhancedAnalyzer_v2 } from "./paidTierResources/enhanced-analyzer-v3-paid.js";
 
 type UnitTarget = fetchUnitPartOfCodeArrayTargets;
 
@@ -277,7 +277,5 @@ export class ComplexityOrchestrator_v1 {
 
     return complexityOrder[maxIndex];
   }
-
-
 
 }

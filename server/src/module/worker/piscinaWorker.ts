@@ -8,22 +8,14 @@ import {
 } from "../../compilers/TS_JS_Compiler/ts_js_bootstrap.js";
 import { Job } from "./worker_types/workerTypes.js";
 import { enforceProjectLimit, processFilesBatch } from "./utils/file_process.js";
+import { get_Js_Ts_Compiler } from "../../compilers/allCompilerInstance.js";
 
 /* ================================
    SINGLETONS
 ================================ */
 
-let compilerInstance: CompilerInterface | null = null;
 let projectInstance: Project | null = null;
 
-export function getCompiler(): CompilerInterface {
-  if (!compilerInstance) {
-    console.log("🚀 Initializing compiler ONCE per worker thread");
-    const instance = new CreateCompiler();
-    compilerInstance = instance.init();
-  }
-  return compilerInstance;
-}
 
 function getProject(): Project {
   if (!projectInstance) {
@@ -45,7 +37,7 @@ export default async function workerFunction(job: Job) {
 
   const start = Date.now();
 
-  const compiler = getCompiler();
+  const compiler = get_Js_Ts_Compiler();
   const project = getProject();
 
   try {

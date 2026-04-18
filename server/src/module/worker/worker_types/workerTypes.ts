@@ -4,10 +4,18 @@ import { FilePayload, normalizedPayloadData } from "../../../compilers/TS_JS_Com
 import { FileUploadModel } from "../../file_Interface/fileInterface.js";
 import { Node as TsMorphNode } from "ts-morph";
 
+// ============================================================================
+// BASE
+// ============================================================================
+
 export interface BaseJob {
   id: string;
   task: string;
 }
+
+// ============================================================================
+// EXISTING TS/JS JOBS (LEGACY)
+// ============================================================================
 
 export interface FreeTierAnalysisJob extends BaseJob {
   task: "freeTierAnalysis";
@@ -32,8 +40,8 @@ export interface PayloadDeepScanJob extends BaseJob {
 export interface EnhancedAnalyzer_v2Job extends BaseJob {
   task: "EnhancedAnalyzer_v2";
   data: {
-    nodeText: TsMorphNode
-    keywordSet: Set<string>
+    nodeText: TsMorphNode;
+    keywordSet: Set<string>;
     functionName: string | null;
   };
 }
@@ -60,7 +68,44 @@ export interface Ts_js_compiler_Job extends BaseJob {
   data: WorkerFile[];
 }
 
-// ✅ FIXED: included missing type
+// ============================================================================
+// PLUGIN EXTENSIONS (NEW COMPILERS ADDED CLEANLY)
+// ============================================================================
+
+export interface Go_compiler_Job extends BaseJob {
+  task: "go_compiler";
+  data: WorkerFile[];
+}
+
+export interface Java_compiler_Job extends BaseJob {
+  task: "java_compiler";
+  data: WorkerFile[];
+}
+
+export interface Python_compiler_Job extends BaseJob {
+  task: "python_compiler";
+  data: WorkerFile[];
+}
+
+export interface Zig_compiler_Job extends BaseJob {
+  task: "zig_compiler";
+  data: WorkerFile[];
+}
+
+export interface Rust_compiler_Job extends BaseJob {
+  task: "rust_compiler";
+  data: WorkerFile[];
+}
+
+export interface Kotlin_compiler_Job extends BaseJob {
+  task: "kotlin_compiler";
+  data: WorkerFile[];
+}
+
+// ============================================================================
+// UNION TYPE (UPDATED LEGACY + PLUGINS)
+// ============================================================================
+
 export type Job =
   | FreeTierAnalysisJob
   | PaidTierAnalysisJob
@@ -69,10 +114,17 @@ export type Job =
   | EnhancedAnalyzer_v2Job
   | AIReasoningJob
   | PayloadDeepScanJob
-  | Ts_js_compiler_Job;
+  | Ts_js_compiler_Job
+  | Go_compiler_Job
+  | Java_compiler_Job
+  | Python_compiler_Job
+  | Zig_compiler_Job
+  | Rust_compiler_Job
+  | Kotlin_compiler_Job;
 
-
-
+// ============================================================================
+// RESULT TYPE (UNCHANGED)
+// ============================================================================
 
 export interface JobResult {
   jobId: string;
@@ -80,6 +132,10 @@ export interface JobResult {
   result: any;
   error?: string;
 }
+
+// ============================================================================
+// WORKER FILE (UNCHANGED)
+// ============================================================================
 
 export type WorkerFile = {
   name: string;

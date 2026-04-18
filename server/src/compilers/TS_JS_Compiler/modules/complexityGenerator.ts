@@ -1,6 +1,6 @@
 // GetComplexityGenerator.ts
 
-import { getCompiler } from "../../../module/worker/piscinaWorker.js";
+import { get_Js_Ts_Compiler } from "../../allCompilerInstance.js";
 import { AnalysisSummary } from "../interfaces/complexityGeneratorInterface.js";
 import { ComplexityOrchestrator_v1 } from "./complexityGenerator_v1/complexity_orchestrator.js";
 import { FilePayload, normalizedPayloadData } from "./complexityOrchestratorHelpers/complexityOrchestratorInterface.js";
@@ -20,7 +20,7 @@ export class GetComplexityGenerator {
   ): Promise<{ success: boolean; message: string; data: AnalysisSummary | null }> {
     try {
       //Get singleton create compiler instance
-      const compiler = getCompiler()
+      const compiler = get_Js_Ts_Compiler()
 
       const normalized = compiler.utils.normalize(payload); // ✅ no compiler creation
 

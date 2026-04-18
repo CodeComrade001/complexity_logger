@@ -1,3 +1,5 @@
+//paid version 2.0.0
+
 import { Node, SyntaxKind, CallExpression } from "ts-morph";
 import { ALLOCATION_CONSTRUCTOR_NAMES, ComplexityNotation, ComplexityProfile, ComplexityReason, ComplexityResult, GrowthProfile, LOOP_KINDS, Lowercase_RiskLevelType, Risk, SignalProfile } from "../../../interfaces/complexityGeneratorInterface.js";
 import { ComplexityReasonGenerator } from "./aI_ReasonGenerator.js";

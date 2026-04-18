@@ -1,44 +1,61 @@
 // FileController.ts
 
-import { GetFileHealth } from "../../usecases/GetFileHealth.js";
 import { IFileRepository } from "../../ports/IFileRepository.js";
-import { GetFileAnalyzer } from "../../usecases/getFileAnalyzer.js";
-import { GetFileData } from "../../usecases/GetFileData.js";
-import { GetSingleFileReport } from "../../usecases/getSingleFileReport.js";
-import { GetFilePatchApply } from "../../usecases/getFilePatchApply.js";
-import { GetUser } from "../../usecases/getUser.js";
 import { IMongoRepository } from "../../ports/IMongoRepository.js";
 import { FileUploadModel } from "../../file_Interface/fileInterface.js";
 import { WorkerClient } from "../../worker/workerClient.js";
 import { extractFiles } from "../../../compilers/TS_JS_Compiler/utils/extractor.js";
+import { Get_Go_FileAnalyzer } from "../../usecases/get_go_FileAnalyzer.js";
+import { Get_Java_FileAnalyzer } from "../../usecases/get_java_FileAnalyzer.js";
+import { Get_Python_FileAnalyzer } from "../../usecases/get_python_FileAnalyzer.js";
+import { Get_Zig_FileAnalyzer } from "../../usecases/get_zig_FileAnalyzer.js";
+import { Get_Rust_FileAnalyzer } from "../../usecases/get_rust_FileAnalyzer.js";
+import { Get_Kotlin_FileAnalyzer } from "../../usecases/get_kotlin_FileAnalyzer.js";
+import { Get_js_TS_FileAnalyzer } from "../../usecases/get_ts_js_FileAnalyzer.js";
 
 export class FileController {
-  private getHealthUsecase: GetFileHealth;
-  private getFileDataUsecase: GetFileData;
-  private getFileAnalyzerUsecase: GetFileAnalyzer;
-  private getSingleFileReportUsecase: GetSingleFileReport;
-  private getFilePatchApplyUsecase: GetFilePatchApply;
-  private getUserUsecase: GetUser;
+  private get_go_FileAnalyzerUsecase: Get_Go_FileAnalyzer;
+  private get_java_FileAnalyzerUsecase: Get_Java_FileAnalyzer;
+  private get_python_FileAnalyzerUsecase: Get_Python_FileAnalyzer;
+  private get_ts_js_FileAnalyzerUsecase: Get_js_TS_FileAnalyzer;
+  private get_zig_FileAnalyzerUsecase: Get_Zig_FileAnalyzer;
+  private get_rust_FileAnalyzerUsecase: Get_Rust_FileAnalyzer;
+  private get_kotlin_FileAnalyzerUsecase: Get_Kotlin_FileAnalyzer;
 
   constructor(
     postgresRepo: IFileRepository,
     mongoRepo: IMongoRepository,
     workerClient: WorkerClient // ✅ instead of compiler
   ) {
-    this.getHealthUsecase = new GetFileHealth(postgresRepo, mongoRepo);
-    this.getFileDataUsecase = new GetFileData(postgresRepo);
-    this.getSingleFileReportUsecase = new GetSingleFileReport(postgresRepo);
-    this.getFilePatchApplyUsecase = new GetFilePatchApply(postgresRepo);
-    this.getUserUsecase = new GetUser(postgresRepo);
-    workerClient = new WorkerClient()
-
-    this.getFileAnalyzerUsecase = new GetFileAnalyzer(
-      postgresRepo,
-      workerClient
-    );
+    this.get_go_FileAnalyzerUsecase = new Get_Go_FileAnalyzer(postgresRepo, workerClient);
+    this.get_java_FileAnalyzerUsecase = new Get_Java_FileAnalyzer(postgresRepo, workerClient);
+    this.get_python_FileAnalyzerUsecase = new Get_Python_FileAnalyzer(postgresRepo, workerClient);
+    this.get_zig_FileAnalyzerUsecase = new Get_Zig_FileAnalyzer(postgresRepo, workerClient);
+    this.get_rust_FileAnalyzerUsecase = new Get_Rust_FileAnalyzer(postgresRepo, workerClient);
+    this.get_kotlin_FileAnalyzerUsecase = new Get_Kotlin_FileAnalyzer(postgresRepo, workerClient);
+    this.get_ts_js_FileAnalyzerUsecase = new Get_js_TS_FileAnalyzer(postgresRepo, workerClient);
   }
 
-  public async getFileAnalyzer(request: any, reply: any) {
+  public async getGoFileAnalyzer(request: any, reply: any) {
+    try {
+      const files = request.body;
+
+      const result = await this.get_go_FileAnalyzerUsecase.execute(files);
+
+      if (!result.success) {
+        return reply.code(400).send(result);
+      }
+
+      return reply.code(200).send(result);
+    } catch (err) {
+      return reply.code(500).send({
+        success: false,
+        message: "Internal server error",
+      });
+    }
+  }
+
+  public async get_js_ts_Analyzer(request: any, reply: any) {
     try {
       const files: FileUploadModel[] = [];
 
@@ -64,7 +81,7 @@ export class FileController {
       const extractedData = await extractFiles(files);
 
 
-      const result = await this.getFileAnalyzerUsecase.execute(extractedData);
+      const result = await this.get_ts_js_FileAnalyzerUsecase.execute(extractedData);
 
       if (!result.success) {
         return reply.code(400).send(result);
@@ -73,6 +90,101 @@ export class FileController {
       return reply.code(200).send(result);
     } catch (err: any) {
       console.error("Error in getFileAnalyzer:", err);
+      return reply.code(500).send({
+        success: false,
+        message: "Internal server error",
+      });
+    }
+  }
+
+  public async getJavaFileAnalyzer(request: any, reply: any) {
+    try {
+      const files = request.body;
+
+      const result = await this.get_java_FileAnalyzerUsecase.execute(files);
+
+      if (!result.success) {
+        return reply.code(400).send(result);
+      }
+
+      return reply.code(200).send(result);
+    } catch (err) {
+      return reply.code(500).send({
+        success: false,
+        message: "Internal server error",
+      });
+    }
+  }
+
+  public async getPythonFileAnalyzer(request: any, reply: any) {
+    try {
+      const files = request.body;
+
+      const result = await this.get_python_FileAnalyzerUsecase.execute(files);
+
+      if (!result.success) {
+        return reply.code(400).send(result);
+      }
+
+      return reply.code(200).send(result);
+    } catch (err) {
+      return reply.code(500).send({
+        success: false,
+        message: "Internal server error",
+      });
+    }
+  }
+
+  public async getZigFileAnalyzer(request: any, reply: any) {
+    try {
+      const files = request.body;
+
+      const result = await this.get_zig_FileAnalyzerUsecase.execute(files);
+
+      if (!result.success) {
+        return reply.code(400).send(result);
+      }
+
+      return reply.code(200).send(result);
+    } catch (err) {
+      return reply.code(500).send({
+        success: false,
+        message: "Internal server error",
+      });
+    }
+  }
+
+  public async getRustFileAnalyzer(request: any, reply: any) {
+    try {
+      const files = request.body;
+
+      const result = await this.get_rust_FileAnalyzerUsecase.execute(files);
+
+      if (!result.success) {
+        return reply.code(400).send(result);
+      }
+
+      return reply.code(200).send(result);
+    } catch (err) {
+      return reply.code(500).send({
+        success: false,
+        message: "Internal server error",
+      });
+    }
+  }
+
+  public async getKotlinFileAnalyzer(request: any, reply: any) {
+    try {
+      const files = request.body;
+
+      const result = await this.get_kotlin_FileAnalyzerUsecase.execute(files);
+
+      if (!result.success) {
+        return reply.code(400).send(result);
+      }
+
+      return reply.code(200).send(result);
+    } catch (err) {
       return reply.code(500).send({
         success: false,
         message: "Internal server error",

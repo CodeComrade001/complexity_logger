@@ -23,13 +23,12 @@ export default async function fileRoute(
 
   const controller = new FileController(postgresRepo, mongoRepo, compiler);
 
-  // fastify.get("/health", controller.getHealth.bind(controller));
-  // fastify.get("/file/:id", controller.getFile.bind(controller));
 
-
-  fastify.post("/repos/analyze", controller.getFileAnalyzer.bind(controller));
-  // fastify.get("/repos/{id}/report", controller.getSingleFileReport.bind(controller));
-  // fastify.post("/patches/apply", controller.getFilePatchApply.bind(controller));
-  // fastify.get("/user/me", controller.getUser.bind(controller));
-
+  fastify.post("/repos/js/analyze", controller.get_js_ts_Analyzer.bind(controller));
+  fastify.post("/repos/go/analyze", controller.getGoFileAnalyzer.bind(controller));
+  fastify.post("/repos/java/analyze", controller.getJavaFileAnalyzer.bind(controller));
+  fastify.post("/repos/python/analyze", controller.getPythonFileAnalyzer.bind(controller));
+  fastify.post("/repos/zig/analyze", controller.getZigFileAnalyzer.bind(controller));
+  fastify.post("/repos/rust/analyze", controller.getRustFileAnalyzer.bind(controller));
+  fastify.post("/repos/kotlin/analyze", controller.getKotlinFileAnalyzer.bind(controller));
 }

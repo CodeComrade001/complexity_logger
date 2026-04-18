@@ -3,11 +3,11 @@ import Ts_JS_Compiler from "./ts_js_Compiler.js";
 import { GetComplexityGenerator } from "./modules/complexityGenerator.js";
 import { ComplexityOrchestrator_v1 } from "./modules/complexityGenerator_v1/complexity_orchestrator.js";
 import { ComplexityReasonGenerator } from "./modules/complexityGenerator_v1/paidTierResources/aI_ReasonGenerator.js";
-import { EnhancedAnalyzer_v2 } from "./modules/complexityGenerator_v1/paidTierResources/enhancedAnalyzer_v2.js";
 import { BuildKeywordSet } from "./modules/complexityGenerator_v1/utils/buildkeyword.js";
 import { PayloadNormalizer } from "./modules/complexityOrchestratorHelpers/payloadNormalizer.js";
 import { GetUnitPartOfCode } from "./modules/fetchPartOfCode.js";
 import { DeepFileSanitization } from "./utils/deepFileScan.js";
+import { EnhancedAnalyzer_v2 } from "./modules/complexityGenerator_v1/paidTierResources/enhanced-analyzer-v3-paid.js";
 
 
 /*//////////////////////////////////////////////////////////////
