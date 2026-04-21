@@ -12,6 +12,25 @@ import { Get_Zig_FileAnalyzer } from "../../usecases/get_zig_FileAnalyzer.js";
 import { Get_Rust_FileAnalyzer } from "../../usecases/get_rust_FileAnalyzer.js";
 import { Get_Kotlin_FileAnalyzer } from "../../usecases/get_kotlin_FileAnalyzer.js";
 import { Get_js_TS_FileAnalyzer } from "../../usecases/get_ts_js_FileAnalyzer.js";
+import { AnalysisSummary } from "../../../compilers/shared/interfaces.js";
+
+
+/*//////////////////////////////////////////////////////////////
+                                TYPES
+    //////////////////////////////////////////////////////////////*/
+
+type SupportedLanguage = "typescript"
+  | "go"
+  | "java"
+  | "python"
+  | "zig"
+  | "rust"
+  | "kotlin"
+  | "csharp"
+  | "haskell"
+  | "swift"
+
+
 
 export class FileController {
   private get_go_FileAnalyzerUsecase: Get_Go_FileAnalyzer;
@@ -38,9 +57,13 @@ export class FileController {
 
   public async getGoFileAnalyzer(request: any, reply: any) {
     try {
-      const files = request.body;
+      const { success: isFileTOStreamSuccessful, data: fileToStreamData } = await this.fileToStream(request, "go"); // ✅ hardcoded HERE
 
-      const result = await this.get_go_FileAnalyzerUsecase.execute(files);
+      if (!isFileTOStreamSuccessful || !fileToStreamData) {
+        return reply.code(400).send(fileToStreamData);
+      }
+
+      const result = await this.get_go_FileAnalyzerUsecase.execute(fileToStreamData);
 
       if (!result.success) {
         return reply.code(400).send(result);
@@ -57,37 +80,20 @@ export class FileController {
 
   public async get_js_ts_Analyzer(request: any, reply: any) {
     try {
-      const files: FileUploadModel[] = [];
+      const { success: isFileTOStreamSuccessful, data: fileToStreamData } = await this.fileToStream(request, "typescript"); // ✅ hardcoded HERE
 
-      for await (const part of request.parts()) {
-        if (part.type === "file") {
-          files.push({
-            name: part.filename,
-            size: part.file.bytesRead,
-            language: "typescript",
-            file: part.file,
-            fileContent: part.text,
-          });
-        }
+      if (!isFileTOStreamSuccessful || !fileToStreamData) {
+        return reply.code(400).send(fileToStreamData);
       }
 
-      if (!files.length) {
-        return reply.code(400).send({
-          success: false,
-          message: "No files provided",
-        });
+      const analysis = await this.get_ts_js_FileAnalyzerUsecase.execute(fileToStreamData);
+
+
+      if (!analysis.success) {
+        return reply.code(400).send(analysis);
       }
 
-      const extractedData = await extractFiles(files);
-
-
-      const result = await this.get_ts_js_FileAnalyzerUsecase.execute(extractedData);
-
-      if (!result.success) {
-        return reply.code(400).send(result);
-      }
-
-      return reply.code(200).send(result);
+      return reply.code(200).send(analysis);
     } catch (err: any) {
       console.error("Error in getFileAnalyzer:", err);
       return reply.code(500).send({
@@ -99,9 +105,13 @@ export class FileController {
 
   public async getJavaFileAnalyzer(request: any, reply: any) {
     try {
-      const files = request.body;
+      const { success: isFileTOStreamSuccessful, data: fileToStreamData } = await this.fileToStream(request, "java"); // ✅ hardcoded HERE
 
-      const result = await this.get_java_FileAnalyzerUsecase.execute(files);
+      if (!isFileTOStreamSuccessful || !fileToStreamData) {
+        return reply.code(400).send(fileToStreamData);
+      }
+
+      const result = await this.get_java_FileAnalyzerUsecase.execute(fileToStreamData);
 
       if (!result.success) {
         return reply.code(400).send(result);
@@ -118,9 +128,13 @@ export class FileController {
 
   public async getPythonFileAnalyzer(request: any, reply: any) {
     try {
-      const files = request.body;
+      const { success: isFileTOStreamSuccessful, data: fileToStreamData } = await this.fileToStream(request, "typescript"); // ✅ hardcoded HERE
 
-      const result = await this.get_python_FileAnalyzerUsecase.execute(files);
+      if (!isFileTOStreamSuccessful || !fileToStreamData) {
+        return reply.code(400).send(fileToStreamData);
+      }
+
+      const result = await this.get_python_FileAnalyzerUsecase.execute(fileToStreamData);
 
       if (!result.success) {
         return reply.code(400).send(result);
@@ -137,9 +151,13 @@ export class FileController {
 
   public async getZigFileAnalyzer(request: any, reply: any) {
     try {
-      const files = request.body;
+      const { success: isFileTOStreamSuccessful, data: fileToStreamData } = await this.fileToStream(request, "typescript"); // ✅ hardcoded HERE
 
-      const result = await this.get_zig_FileAnalyzerUsecase.execute(files);
+      if (!isFileTOStreamSuccessful || !fileToStreamData) {
+        return reply.code(400).send(fileToStreamData);
+      }
+
+      const result = await this.get_zig_FileAnalyzerUsecase.execute(fileToStreamData);
 
       if (!result.success) {
         return reply.code(400).send(result);
@@ -156,9 +174,13 @@ export class FileController {
 
   public async getRustFileAnalyzer(request: any, reply: any) {
     try {
-      const files = request.body;
+      const { success: isFileTOStreamSuccessful, data: fileToStreamData } = await this.fileToStream(request, "typescript"); // ✅ hardcoded HERE
 
-      const result = await this.get_rust_FileAnalyzerUsecase.execute(files);
+      if (!isFileTOStreamSuccessful || !fileToStreamData) {
+        return reply.code(400).send(fileToStreamData);
+      }
+
+      const result = await this.get_rust_FileAnalyzerUsecase.execute(fileToStreamData);
 
       if (!result.success) {
         return reply.code(400).send(result);
@@ -175,9 +197,13 @@ export class FileController {
 
   public async getKotlinFileAnalyzer(request: any, reply: any) {
     try {
-      const files = request.body;
+      const { success: isFileTOStreamSuccessful, data: fileToStreamData } = await this.fileToStream(request, "typescript"); // ✅ hardcoded HERE
 
-      const result = await this.get_kotlin_FileAnalyzerUsecase.execute(files);
+      if (!isFileTOStreamSuccessful || !fileToStreamData) {
+        return reply.code(400).send(fileToStreamData);
+      }
+
+      const result = await this.get_kotlin_FileAnalyzerUsecase.execute(fileToStreamData);
 
       if (!result.success) {
         return reply.code(400).send(result);
@@ -191,4 +217,55 @@ export class FileController {
       });
     }
   }
+
+  /*//////////////////////////////////////////////////////////////
+                           HELPER FUNCTIONS
+    //////////////////////////////////////////////////////////////*/
+
+  private async fileToStream(request: any, language: SupportedLanguage) {
+    try {
+      const files: FileUploadModel[] = [];
+
+      for await (const part of request.parts()) {
+        if (part.type === "file") {
+          files.push({
+            name: part.filename,
+            size: part.file.bytesRead,
+            language: language, // ✅ use the param, not hardcoded
+            file: part.file,
+            fileContent: part.text,
+          });
+        }
+      }
+
+      if (!files.length) {
+        return {
+          success: false,
+          message: "No files provided",
+        };
+      }
+
+      const extractedData = await extractFiles(files);
+
+      if (!extractedData) {
+        return {
+          success: false,
+          message: "Failed to extract files",
+        };
+      }
+
+      return { success: true, data: extractedData };
+    } catch (err: any) {
+      console.error("Error in fileToStream:", err);
+      return {
+        success: false,
+        message: "Internal server error",
+      };
+    }
+  }
+
+  // isLanguageSupported(lang: string): lang is SupportedLanguage {
+  //   return lang in this.registry;
+  // }
+
 }

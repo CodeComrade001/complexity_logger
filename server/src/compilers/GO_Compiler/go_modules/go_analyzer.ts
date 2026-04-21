@@ -22,7 +22,7 @@ import {
   buildAnalysisSummary,
 } from "../../shared/growth-model.js";
 import { InputValidator } from "../../shared/complexity-utils.js";
-import { extractSignals } from "./GO_signals.js";
+import { extractSignals } from "./go_signals.js";
 
 const require = createRequire(import.meta.url);
 
