@@ -1,5 +1,5 @@
 import Parser from "tree-sitter";
-import { GoAnalyzer } from "./go_modules/GO_analyzer.js";
+import { GoAnalyzer } from "./go_modules/go_analyzer.js";
 import { AnalysisSummary } from "../shared/interfaces.js";
 
 export interface GO_CompilerInterface {
@@ -24,6 +24,7 @@ export class GO_CreateCompiler {
     const parser = new Parser()
 
     const GO_compiler = new GoAnalyzer(parser)
+    parser.setLanguage(require("tree-sitter-go"));
 
     // 🔹 CLEAN INTERFACE (NO GOD OBJECT)
     return {

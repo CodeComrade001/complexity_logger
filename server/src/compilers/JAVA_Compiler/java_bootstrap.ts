@@ -11,6 +11,7 @@ export interface JAVA_CompilerInterface {
 export class JAVA_CreateCompiler {
   public init(): JAVA_CompilerInterface {
     const parser = new Parser();
+    parser.setLanguage(require("tree-sitter-java"));
 
     const JAVA_compiler = new JavaAnalyzer(parser);
 

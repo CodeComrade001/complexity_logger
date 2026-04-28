@@ -252,3 +252,4 @@ server/src/models/
 server/src/module/worker/storage/jobs_storage/
 .qodo/
 .continue/
+.sixth/

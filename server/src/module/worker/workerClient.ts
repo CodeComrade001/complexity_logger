@@ -1,6 +1,5 @@
 // workerClient.ts
 import { piscina } from "./piscinaPool.js";
-import crypto from "crypto";
 import { Job } from "./worker_types/workerTypes.js";
 
 export class WorkerClient {

@@ -11,6 +11,7 @@ export interface RUST_CompilerInterface {
 export class RUST_CreateCompiler {
   public init(): RUST_CompilerInterface {
     const parser = new Parser();
+    parser.setLanguage(require("tree-sitter-rust"));
 
     const RUST_compiler = new RustAnalyzer(parser);
 

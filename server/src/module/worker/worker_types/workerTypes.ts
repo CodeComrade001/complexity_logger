@@ -102,6 +102,11 @@ export interface Kotlin_compiler_Job extends BaseJob {
   data: WorkerFile[];
 }
 
+export interface Csharp_compiler_Job extends BaseJob {
+  task: "csharp_compiler";
+  data: WorkerFile[];
+}
+
 // ============================================================================
 // UNION TYPE (UPDATED LEGACY + PLUGINS)
 // ============================================================================
@@ -120,7 +125,8 @@ export type Job =
   | Python_compiler_Job
   | Zig_compiler_Job
   | Rust_compiler_Job
-  | Kotlin_compiler_Job;
+  | Kotlin_compiler_Job
+  | Csharp_compiler_Job;
 
 // ============================================================================
 // RESULT TYPE (UNCHANGED)

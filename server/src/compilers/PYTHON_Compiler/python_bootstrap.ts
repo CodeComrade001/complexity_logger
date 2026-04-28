@@ -13,6 +13,7 @@ export class PYTHON_CreateCompiler {
     const parser = new Parser();
 
     const PYTHON_compiler = new PythonAnalyzer(parser);
+    parser.setLanguage(require("tree-sitter-python"));
 
     return {
       compiler: {

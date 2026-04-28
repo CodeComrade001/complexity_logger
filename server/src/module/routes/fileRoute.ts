@@ -1,7 +1,7 @@
-import { FastifyInstance, FastifyPluginOptions } from "fastify";
 import { FileController } from "../adapters/controllers/FileController.js";
 import { PostgresFileRepository } from "../adapters/repositories/PostgresFileRepository.js";
 import { MongoFileRepository } from "../adapters/repositories/MongoFileRepository.js";
+import { FastifyInstance, FastifyPluginOptions } from "fastify";
 
 /**
  * This plugin uses the DI-provided resources on fastify (postgres pool / mongoose model).
@@ -12,23 +12,21 @@ export default async function fileRoute(
   _opts: FastifyPluginOptions
 ) {
   // gather infra from fastify decorators (set at bootstrap)
-  const pgPool = (fastify as any).pgPool;       // typed in composition root
-  const compiler = (fastify as any).compiler;   // typed in composition root
-  const mongoose = (fastify as any).mongoose;  // typed in composition root
+  const pgPool = (fastify as any).pgPool; // typed in composition root
+  const workerClient = (fastify as any).workerClient; // typed in composition root
+  const mongoose = (fastify as any).mongoose; // typed in composition root
 
   // choose repository implementation depending on your infra
   const postgresRepo = new PostgresFileRepository(pgPool);
   const mongoRepo = new MongoFileRepository(mongoose);
 
+  const controller = new FileController(postgresRepo, mongoRepo, workerClient);
 
-  const controller = new FileController(postgresRepo, mongoRepo, compiler);
 
-
-  fastify.post("/repos/js/analyze", controller.get_js_ts_Analyzer.bind(controller));
+  fastify.post("/repos/csharp/analyze", controller.getCsharpAnalyzer.bind(controller));
   fastify.post("/repos/go/analyze", controller.getGoFileAnalyzer.bind(controller));
   fastify.post("/repos/java/analyze", controller.getJavaFileAnalyzer.bind(controller));
   fastify.post("/repos/python/analyze", controller.getPythonFileAnalyzer.bind(controller));
-  fastify.post("/repos/zig/analyze", controller.getZigFileAnalyzer.bind(controller));
   fastify.post("/repos/rust/analyze", controller.getRustFileAnalyzer.bind(controller));
-  fastify.post("/repos/kotlin/analyze", controller.getKotlinFileAnalyzer.bind(controller));
+  fastify.post("/repos/js/analyze", controller.get_js_ts_Analyzer.bind(controller));
 }

@@ -1,6 +1,5 @@
 import { getGoCompiler } from "../allCompilerInstance.js";
 import { GoUploadModel } from "../shared/model/payloadUploadModel.js";
-import { GoAnalyzer } from "./go_modules/GO_analyzer.js";
 
 
 export default class Go_Compiler {

@@ -1,71 +1,165 @@
-// ============================================================================
-// C# ANALYZER
-// ============================================================================
-import Parser from "tree-sitter";
-// @ts-ignore
-import CSharp from "tree-sitter-c-sharp";
-import { ReasonRule, SupportedLanguage } from "../../shared_v2/interfaces.js";
-import { BaseLanguageAnalyzer, CodeUnit } from "../../shared_v2/base-analyzer.js";
+
+import type { AnalysisSummary, ComplexityResult, fetchUnitPartOfCodeArrayTargets, } from "../../shared/interfaces.js";
+import { buildComplexityProfile } from "../../shared/profile-builder.js";
+import { PaidTierReasonGenerator } from "../../shared/reason-generator.js";
+import { modelGrowth, composeGrowth, buildResult, buildAnalysisSummary, } from "../../shared/growth-model.js";
+
+import { InputValidator } from "../../shared/complexity-utils.js";
 import { extractCSharpSignals } from "./csharp_signal_extractor.js";
-import { CSHARP_EXTRA_SPACE_RULES, CSHARP_EXTRA_TIME_RULES } from "./csharp_reason_generator.js";
+import Parser from "tree-sitter";
 
-const CSHARP_FUNCTION_TYPES = new Set([
-  "method_declaration",
-  "constructor_declaration",
-  "local_function_statement",
-  "lambda_expression",
-  "anonymous_method_expression",
-]);
+// ─────────────────────────────────────────────────────────────────────────────
+// Types
+// ─────────────────────────────────────────────────────────────────────────────
 
-function extractCSharpCodeUnits(tree: Parser.Tree): CodeUnit[] {
-  const units: CodeUnit[] = [];
-
-  const visit = (node: Parser.SyntaxNode): void => {
-    if (node.type === "method_declaration") {
-      const nameNode = node.childForFieldName("name");
-      units.push({ node, name: nameNode?.text ?? null, kind: "method" });
-    } else if (node.type === "constructor_declaration") {
-      const nameNode = node.childForFieldName("name");
-      units.push({ node, name: nameNode?.text ?? null, kind: "constructor" });
-    } else if (node.type === "local_function_statement") {
-      const nameNode = node.childForFieldName("name");
-      units.push({ node, name: nameNode?.text ?? null, kind: "function" });
-    } else if (
-      node.type === "lambda_expression" ||
-      node.type === "anonymous_method_expression"
-    ) {
-      units.push({ node, name: null, kind: "lambda" });
-    }
-    for (const child of node.children) visit(child);
-  };
-
-  visit(tree.rootNode);
-  return units;
+interface CodeUnit {
+  node: Parser.SyntaxNode;
+  name: string | null;
+  kind: fetchUnitPartOfCodeArrayTargets;
 }
 
-export class CSharpAnalyzer extends BaseLanguageAnalyzer {
-  readonly language: SupportedLanguage = "csharp";
+// ─────────────────────────────────────────────────────────────────────────────
+// Analyzer
+// ─────────────────────────────────────────────────────────────────────────────
 
-  protected createParser(): Parser {
-    const parser = new Parser();
-    parser.setLanguage(CSharp);
-    return parser;
-  }
+export class CSharpAnalyzer {
+  private parser: Parser;
 
-  protected extractCodeUnits(tree: Parser.Tree, _source: string): CodeUnit[] {
-    return extractCSharpCodeUnits(tree);
-  }
-
-  protected extractSignals(
-    node: Parser.SyntaxNode,
-    source: string,
-    functionName: string | null
+  constructor(
+    parser: Parser
   ) {
-    return extractCSharpSignals(node, source, functionName);
+    this.parser = parser;
   }
 
-  protected extraTimeRules(): ReasonRule[] { return CSHARP_EXTRA_TIME_RULES; }
-  protected extraSpaceRules(): ReasonRule[] { return CSHARP_EXTRA_SPACE_RULES; }
+  // ── Public API ─────────────────────────────────────────────────────────
+
+  async execute(sourceCode: string, fileName: string): Promise<AnalysisSummary> {
+    const tree = this.parser.parse(sourceCode);
+    const units = this.extractCodeUnits(tree.rootNode);
+    const results: ComplexityResult[] = [];
+
+    for (const unit of units) {
+      const result = this.analyzeUnit(unit);
+      if (result) results.push(result);
+    }
+
+    return buildAnalysisSummary(results, fileName);
+  }
+
+  // ── Code unit extraction (Rust-style walker) ───────────────────────────
+
+  private extractCodeUnits(root: Parser.SyntaxNode): CodeUnit[] {
+    const units: CodeUnit[] = [];
+    this.walk(root, units, {
+      insideClass: false,
+    });
+    return units;
+  }
+
+  private walk(
+    node: Parser.SyntaxNode,
+    units: CodeUnit[],
+    context: { insideClass: boolean }
+  ): void {
+    switch (node.type) {
+      case "class_declaration": {
+        const body = node.childForFieldName("body");
+        if (body) {
+          for (const child of body.namedChildren) {
+            this.walk(child, units, { insideClass: true });
+          }
+        }
+        return;
+      }
+
+      case "method_declaration": {
+        const nameNode = node.childForFieldName("name");
+        units.push({
+          node,
+          name: nameNode?.text ?? null,
+          kind: context.insideClass ? "methods" : "functions",
+        });
+        return;
+      }
+
+      case "constructor_declaration": {
+        const nameNode = node.childForFieldName("name");
+        units.push({
+          node,
+          name: nameNode?.text ?? null,
+          kind: "constructors",
+        });
+        return;
+      }
+
+      case "local_function_statement": {
+        const nameNode = node.childForFieldName("name");
+        units.push({
+          node,
+          name: nameNode?.text ?? null,
+          kind: "functions",
+        });
+        return;
+      }
+
+      case "lambda_expression":
+      case "anonymous_method_expression": {
+        units.push({
+          node,
+          name: null,
+          kind: "callbacks",
+        });
+        return;
+      }
+    }
+
+    for (const child of node.namedChildren) {
+      this.walk(child, units, context);
+    }
+  }
+
+  // ── Analysis pipeline (same as Rust) ───────────────────────────────────
+
+  private analyzeUnit(unit: CodeUnit): ComplexityResult | null {
+    try {
+      const validatedName = InputValidator.validateFunctionName(
+        unit.name,
+        (msg) =>
+          console.warn(
+            `[CSharpAnalyzer] ${msg} - Line ${unit.node.startPosition.row + 1}`
+          )
+      );
+
+      const signals = extractCSharpSignals(
+        unit.node,
+        unit.node.text,
+        validatedName
+      );
+
+      const profile = buildComplexityProfile(signals);
+      const reasons = PaidTierReasonGenerator.generateReasons(profile, signals);
+      const growth = composeGrowth(modelGrowth(profile));
+
+      return buildResult(
+        {
+          kind: unit.kind,
+          name: validatedName,
+          startLine: unit.node.startPosition.row + 1,
+          endLine: unit.node.endPosition.row + 1,
+          text: unit.node.text,
+        },
+        reasons,
+        growth
+      );
+    } catch (err) {
+      console.error(
+        `[CSharpAnalyzer] Failed to analyse "${unit.name ?? "<anonymous>"
+        }" at line ${unit.node.startPosition.row + 1}:`,
+        (err as Error).message
+      );
+      return null;
+    }
+  }
 }
 
-export default new CSharpAnalyzer();
+// Default instance (optional, matches previous export style)

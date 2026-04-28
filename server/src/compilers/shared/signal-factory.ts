@@ -351,6 +351,7 @@ export function createSignalExtractor(
       loops: s.loops,
       nestedLoops: s.maxLoopDepth,
       conditionals: s.conditionals,
+      recursionCallCount: s.recursionCallCount,
       recursion: s.recursion,
       recursionDoubled: s.recursionDoubled,
       hasBreakOrContinue: s.hasBreakOrContinue,
@@ -373,6 +374,7 @@ export function createSignalExtractor(
       hasJSONOperations,
       hasSpreadOperator,
       functionalLoopCount,
+      languageSpecific: {},
     };
   };
 }

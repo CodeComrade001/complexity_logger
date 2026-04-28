@@ -8,11 +8,10 @@ import { extractFiles } from "../../../compilers/TS_JS_Compiler/utils/extractor.
 import { Get_Go_FileAnalyzer } from "../../usecases/get_go_FileAnalyzer.js";
 import { Get_Java_FileAnalyzer } from "../../usecases/get_java_FileAnalyzer.js";
 import { Get_Python_FileAnalyzer } from "../../usecases/get_python_FileAnalyzer.js";
-import { Get_Zig_FileAnalyzer } from "../../usecases/get_zig_FileAnalyzer.js";
 import { Get_Rust_FileAnalyzer } from "../../usecases/get_rust_FileAnalyzer.js";
-import { Get_Kotlin_FileAnalyzer } from "../../usecases/get_kotlin_FileAnalyzer.js";
 import { Get_js_TS_FileAnalyzer } from "../../usecases/get_ts_js_FileAnalyzer.js";
 import { AnalysisSummary } from "../../../compilers/shared/interfaces.js";
+import { Get_Csharp_FileAnalyzer } from "../../usecases/get_csharp_FileAnalyzer.js";
 
 
 /*//////////////////////////////////////////////////////////////
@@ -37,9 +36,8 @@ export class FileController {
   private get_java_FileAnalyzerUsecase: Get_Java_FileAnalyzer;
   private get_python_FileAnalyzerUsecase: Get_Python_FileAnalyzer;
   private get_ts_js_FileAnalyzerUsecase: Get_js_TS_FileAnalyzer;
-  private get_zig_FileAnalyzerUsecase: Get_Zig_FileAnalyzer;
   private get_rust_FileAnalyzerUsecase: Get_Rust_FileAnalyzer;
-  private get_kotlin_FileAnalyzerUsecase: Get_Kotlin_FileAnalyzer;
+  private get_csharp_FileAnalyzerUsecase: Get_Csharp_FileAnalyzer;
 
   constructor(
     postgresRepo: IFileRepository,
@@ -49,10 +47,32 @@ export class FileController {
     this.get_go_FileAnalyzerUsecase = new Get_Go_FileAnalyzer(postgresRepo, workerClient);
     this.get_java_FileAnalyzerUsecase = new Get_Java_FileAnalyzer(postgresRepo, workerClient);
     this.get_python_FileAnalyzerUsecase = new Get_Python_FileAnalyzer(postgresRepo, workerClient);
-    this.get_zig_FileAnalyzerUsecase = new Get_Zig_FileAnalyzer(postgresRepo, workerClient);
     this.get_rust_FileAnalyzerUsecase = new Get_Rust_FileAnalyzer(postgresRepo, workerClient);
-    this.get_kotlin_FileAnalyzerUsecase = new Get_Kotlin_FileAnalyzer(postgresRepo, workerClient);
     this.get_ts_js_FileAnalyzerUsecase = new Get_js_TS_FileAnalyzer(postgresRepo, workerClient);
+    this.get_csharp_FileAnalyzerUsecase = new Get_Csharp_FileAnalyzer(postgresRepo, workerClient);
+  }
+
+  public async getCsharpAnalyzer(request: any, reply: any) {
+    try {
+      const { success: isFileTOStreamSuccessful, data: fileToStreamData } = await this.fileToStream(request, "csharp"); // ✅ hardcoded HERE
+
+      if (!isFileTOStreamSuccessful || !fileToStreamData) {
+        return reply.code(400).send(fileToStreamData);
+      }
+
+      const result = await this.get_csharp_FileAnalyzerUsecase.execute(fileToStreamData);
+
+      if (!result.success) {
+        return reply.code(400).send(result);
+      }
+
+      return reply.code(200).send(result);
+    } catch (err) {
+      return reply.code(500).send({
+        success: false,
+        message: "Internal server error",
+      });
+    }
   }
 
   public async getGoFileAnalyzer(request: any, reply: any) {
@@ -149,28 +169,6 @@ export class FileController {
     }
   }
 
-  public async getZigFileAnalyzer(request: any, reply: any) {
-    try {
-      const { success: isFileTOStreamSuccessful, data: fileToStreamData } = await this.fileToStream(request, "typescript"); // ✅ hardcoded HERE
-
-      if (!isFileTOStreamSuccessful || !fileToStreamData) {
-        return reply.code(400).send(fileToStreamData);
-      }
-
-      const result = await this.get_zig_FileAnalyzerUsecase.execute(fileToStreamData);
-
-      if (!result.success) {
-        return reply.code(400).send(result);
-      }
-
-      return reply.code(200).send(result);
-    } catch (err) {
-      return reply.code(500).send({
-        success: false,
-        message: "Internal server error",
-      });
-    }
-  }
 
   public async getRustFileAnalyzer(request: any, reply: any) {
     try {
@@ -195,28 +193,6 @@ export class FileController {
     }
   }
 
-  public async getKotlinFileAnalyzer(request: any, reply: any) {
-    try {
-      const { success: isFileTOStreamSuccessful, data: fileToStreamData } = await this.fileToStream(request, "typescript"); // ✅ hardcoded HERE
-
-      if (!isFileTOStreamSuccessful || !fileToStreamData) {
-        return reply.code(400).send(fileToStreamData);
-      }
-
-      const result = await this.get_kotlin_FileAnalyzerUsecase.execute(fileToStreamData);
-
-      if (!result.success) {
-        return reply.code(400).send(result);
-      }
-
-      return reply.code(200).send(result);
-    } catch (err) {
-      return reply.code(500).send({
-        success: false,
-        message: "Internal server error",
-      });
-    }
-  }
 
   /*//////////////////////////////////////////////////////////////
                            HELPER FUNCTIONS

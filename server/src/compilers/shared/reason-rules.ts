@@ -22,7 +22,7 @@ export const SHARED_TIME_RULES: ReasonRule[] = [
   {
     id: "factorial-pattern",
     timeNotation: "O(n!)",
-    condition: (_p, s) => s.recursion && s.hasLoopInRecursion && s.hasFilterOrSlice,
+    condition: (_p: any, s: any) => s.recursion && s.hasLoopInRecursion && s.hasFilterOrSlice,
     reason:
       "Factorial time: recursion generates all permutations/combinations by filtering remaining elements in each recursive call",
     impact: "critical",
@@ -34,7 +34,7 @@ export const SHARED_TIME_RULES: ReasonRule[] = [
   {
     id: "binary-recursion-exponential",
     timeNotation: "O(2ⁿ)",
-    condition: (_p, s) => s.recursionDoubled,
+    condition: (_p: any, s: any) => s.recursionDoubled,
     reason:
       "Exponential growth: each recursive call spawns two more, creating a binary computation tree (e.g., naive Fibonacci)",
     impact: "critical",
@@ -46,7 +46,7 @@ export const SHARED_TIME_RULES: ReasonRule[] = [
   {
     id: "cubic-nested-loops",
     timeNotation: "O(n³)",
-    condition: (_p, s) => s.nestedLoops >= 3 && !s.recursion,
+    condition: (_p: any, s: any) => s.nestedLoops >= 3 && !s.recursion,
     reason:
       "Cubic time: three nested loops create n × n × n iterations as input grows",
     impact: "critical",
@@ -58,7 +58,7 @@ export const SHARED_TIME_RULES: ReasonRule[] = [
   {
     id: "quadratic-nested-loops",
     timeNotation: "O(n²)",
-    condition: (_p, s) => s.nestedLoops === 2 && !s.recursion,
+    condition: (_p: any, s: any) => s.nestedLoops === 2 && !s.recursion,
     reason:
       "Quadratic time: two nested loops produce n × n iterations as input size grows",
     impact: "high",
@@ -68,7 +68,7 @@ export const SHARED_TIME_RULES: ReasonRule[] = [
   {
     id: "quadratic-linear-search-in-loop",
     timeNotation: "O(n²)",
-    condition: (_p, s) => s.hasLinearSearchInLoop,
+    condition: (_p: any, s: any) => s.hasLinearSearchInLoop,
     reason:
       "Hidden quadratic: linear search methods inside a loop create nested iteration",
     impact: "high",
@@ -78,7 +78,7 @@ export const SHARED_TIME_RULES: ReasonRule[] = [
   {
     id: "quadratic-nested-array-methods",
     timeNotation: "O(n²)",
-    condition: (_p, s) => s.hasNestedArrayMethods,
+    condition: (_p: any, s: any) => s.hasNestedArrayMethods,
     reason:
       "Nested iteration: array method called inside another array iteration callback",
     impact: "high",
@@ -88,7 +88,7 @@ export const SHARED_TIME_RULES: ReasonRule[] = [
   {
     id: "quadratic-recursion-with-loop",
     timeNotation: "O(n²)",
-    condition: (_p, s) =>
+    condition: (_p: any, s: any) =>
       s.recursion && s.hasLoopInRecursion && !s.hasFilterOrSlice,
     reason:
       "Quadratic: each recursive level performs a linear pass — O(n) work × O(n) depth",
@@ -101,7 +101,7 @@ export const SHARED_TIME_RULES: ReasonRule[] = [
   {
     id: "divide-conquer-with-merge",
     timeNotation: "O(n log n)",
-    condition: (_p, s) =>
+    condition: (_p: any, s: any) =>
       s.recursion &&
       s.allocations > 0 &&
       (s.hasFilterOrSlice || s.hasSpreadOperator),
@@ -114,7 +114,7 @@ export const SHARED_TIME_RULES: ReasonRule[] = [
   {
     id: "builtin-sorting",
     timeNotation: "O(n log n)",
-    condition: (_p, s) => s.hasSorting,
+    condition: (_p: any, s: any) => s.hasSorting,
     reason:
       "Sorting operation: comparison-based sort drives O(n log n) complexity",
     impact: "medium",
@@ -126,7 +126,7 @@ export const SHARED_TIME_RULES: ReasonRule[] = [
   {
     id: "simple-recursion",
     timeNotation: "O(n)",
-    condition: (_p, s) =>
+    condition: (_p: any, s: any) =>
       s.recursion && !s.recursionDoubled && !s.hasLoopInRecursion,
     reason:
       "Linear recursion: single call per frame, depth proportional to input",
@@ -137,7 +137,7 @@ export const SHARED_TIME_RULES: ReasonRule[] = [
   {
     id: "single-loop",
     timeNotation: "O(n)",
-    condition: (_p, s) =>
+    condition: (_p: any, s: any) =>
       (s.loops > 0 || s.functionalLoopCount > 0) &&
       s.nestedLoops === 1 &&
       !s.recursion,
@@ -149,7 +149,7 @@ export const SHARED_TIME_RULES: ReasonRule[] = [
   {
     id: "json-linear",
     timeNotation: "O(n)",
-    condition: (_p, s) => s.hasJSONOperations,
+    condition: (_p: any, s: any) => s.hasJSONOperations,
     reason:
       "JSON serialization/deserialization traverses the entire structure linearly",
     impact: "medium",
@@ -161,7 +161,7 @@ export const SHARED_TIME_RULES: ReasonRule[] = [
   {
     id: "binary-search-pattern",
     timeNotation: "O(log n)",
-    condition: (_p, s) =>
+    condition: (_p: any, s: any) =>
       s.loops === 1 &&
       s.conditionals > 0 &&
       (s.hasBreakOrContinue || s.hasEarlyReturn) &&
@@ -177,7 +177,7 @@ export const SHARED_TIME_RULES: ReasonRule[] = [
   {
     id: "constant-no-loops",
     timeNotation: "O(1)",
-    condition: (_p, s) => s.isConstantBody && !s.recursion,
+    condition: (_p: any, s: any) => s.isConstantBody && !s.recursion,
     reason: "Constant time: fixed operations regardless of input size",
     impact: "low",
     confidence: 98,
@@ -186,7 +186,7 @@ export const SHARED_TIME_RULES: ReasonRule[] = [
   {
     id: "constant-with-conditionals",
     timeNotation: "O(1)",
-    condition: (_p, s) =>
+    condition: (_p: any, s: any) =>
       s.isConstantWithReturn ||
       (s.conditionals > 0 && s.loops === 0 && !s.recursion),
     reason:
@@ -204,7 +204,7 @@ export const SHARED_SPACE_RULES: ReasonRule[] = [
   {
     id: "nested-data-structures",
     spaceNotation: "O(n²)",
-    condition: (_p, s) => s.usesNestedDataStructures,
+    condition: (_p: any, s: any) => s.usesNestedDataStructures,
     reason:
       "Quadratic space: nested data structures (array-of-arrays, map-of-maps) grow with n²",
     impact: "critical",
@@ -214,7 +214,7 @@ export const SHARED_SPACE_RULES: ReasonRule[] = [
   {
     id: "spread-in-nested-loops",
     spaceNotation: "O(n²)",
-    condition: (_p, s) => s.hasSpreadOperator && s.nestedLoops >= 2,
+    condition: (_p: any, s: any) => s.hasSpreadOperator && s.nestedLoops >= 2,
     reason:
       "Quadratic allocation: spread/copy operator inside nested loop creates n² copies",
     impact: "critical",
@@ -224,7 +224,7 @@ export const SHARED_SPACE_RULES: ReasonRule[] = [
   {
     id: "recursion-stack",
     spaceNotation: "O(n)",
-    condition: (_p, s) => s.recursion,
+    condition: (_p: any, s: any) => s.recursion,
     reason:
       "Linear stack space: recursion depth creates call-stack frames proportional to input",
     impact: "medium",
@@ -234,7 +234,7 @@ export const SHARED_SPACE_RULES: ReasonRule[] = [
   {
     id: "loop-allocations",
     spaceNotation: "O(n)",
-    condition: (_p, s) => s.loopWithAllocation && s.nestedLoops === 1,
+    condition: (_p: any, s: any) => s.loopWithAllocation && s.nestedLoops === 1,
     reason:
       "Linear heap growth: memory allocation inside loop creates n new objects",
     impact: "medium",
@@ -244,7 +244,7 @@ export const SHARED_SPACE_RULES: ReasonRule[] = [
   {
     id: "spread-operator-usage",
     spaceNotation: "O(n)",
-    condition: (_p, s) => s.hasSpreadOperator && s.nestedLoops < 2,
+    condition: (_p: any, s: any) => s.hasSpreadOperator && s.nestedLoops < 2,
     reason:
       "Linear space: spread/unpack operator creates a shallow copy of input structure",
     impact: "medium",
@@ -254,7 +254,7 @@ export const SHARED_SPACE_RULES: ReasonRule[] = [
   {
     id: "json-operations-space",
     spaceNotation: "O(n)",
-    condition: (_p, s) => s.hasJSONOperations,
+    condition: (_p: any, s: any) => s.hasJSONOperations,
     reason:
       "Linear space: JSON operations create a full in-memory copy of the data structure",
     impact: "medium",
@@ -264,7 +264,7 @@ export const SHARED_SPACE_RULES: ReasonRule[] = [
   {
     id: "data-structure-usage",
     spaceNotation: "O(n)",
-    condition: (_p, s) =>
+    condition: (_p: any, s: any) =>
       s.usesDataStructures && !s.usesNestedDataStructures,
     reason:
       "Linear auxiliary space: data structure size grows proportionally with input",
@@ -275,7 +275,7 @@ export const SHARED_SPACE_RULES: ReasonRule[] = [
   {
     id: "constant-no-allocations",
     spaceNotation: "O(1)",
-    condition: (_p, s) =>
+    condition: (_p: any, s: any) =>
       s.allocations === 0 && !s.recursion && !s.usesDataStructures,
     reason:
       "Constant space: no dynamic memory allocation, fixed stack variables only",
@@ -286,7 +286,7 @@ export const SHARED_SPACE_RULES: ReasonRule[] = [
   {
     id: "constant-fixed-allocations",
     spaceNotation: "O(1)",
-    condition: (_p, s) =>
+    condition: (_p: any, s: any) =>
       s.allocations > 0 &&
       !s.loopWithAllocation &&
       !s.recursion &&

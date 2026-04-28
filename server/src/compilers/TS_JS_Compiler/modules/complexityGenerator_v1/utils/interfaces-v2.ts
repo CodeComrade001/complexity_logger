@@ -4,7 +4,7 @@
 // ============================================================================
 
 import { SyntaxKind } from "ts-morph";
-import { fetchUnitPartOfCodeArrayTargets } from "./fetchUnitPartOfCodeProps.js";
+import { fetchUnitPartOfCodeArrayTargets } from "../../../interfaces/fetchUnitPartOfCodeProps.js";
 
 export type TierLevel = "free" | "paid";
 export type Risk = "LOW" | "MEDIUM" | "HIGH";

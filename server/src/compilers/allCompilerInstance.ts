@@ -3,34 +3,30 @@
 // Lazy-loaded per worker thread
 // ============================================================================
 
-import { CompilerInterface as TSJSCompilerInterface, CreateCompiler as TSJSCreateCompiler } from "./TS_JS_Compiler/ts_js_bootstrap.js";
-
+import { JS_TS_CompilerInterface, JS_TS_CreateCompiler } from "./TS_JS_Compiler/ts_js_bootstrap.js";
 import { GO_CompilerInterface, GO_CreateCompiler } from "./GO_Compiler/go_bootstrap.js";
 import { JAVA_CompilerInterface, JAVA_CreateCompiler } from "./JAVA_Compiler/java_bootstrap.js";
 import { PYTHON_CompilerInterface, PYTHON_CreateCompiler } from "./PYTHON_Compiler/python_bootstrap.js";
-import { ZIG_CompilerInterface, ZIG_CreateCompiler } from "./ZIG_Compiler/zig_bootstrap.js";
-import { KOTLIN_CompilerInterface, Kotlin_CreateCompiler } from "./KOTLIN_Compiler/kotlin_bootstrap.js";
 import { RUST_CompilerInterface, RUST_CreateCompiler } from "./RUST_Compiler/rust_bootstrap.js";
+import { CSHARP_CompilerInterface, CSHARP_CreateCompiler } from "./CSHARP_Compiler/csharp_bootstrap.js";
 
 // ============================================================================
 // SINGLETON INSTANCES
 // ============================================================================
 
-let tsjsCompiler: TSJSCompilerInterface | null = null;
+let tsjsCompiler: JS_TS_CompilerInterface | null = null;
 let goCompiler: GO_CompilerInterface | null = null;
 let javaCompiler: JAVA_CompilerInterface | null = null;
 let pythonCompiler: PYTHON_CompilerInterface | null = null;
-let zigCompiler: ZIG_CompilerInterface | null = null;
 let rustCompiler: RUST_CompilerInterface | null = null;
-let kotlinCompiler: KOTLIN_CompilerInterface | null = null;
-
+let csharpCompiler: CSHARP_CompilerInterface | null = null;
 // ============================================================================
 // TS/JS COMPILER
 // ============================================================================
-export function get_Js_Ts_Compiler(): TSJSCompilerInterface {
+export function get_Js_Ts_Compiler(): JS_TS_CompilerInterface {
   if (!tsjsCompiler) {
     console.log("🚀 Initializing TS/JS compiler ONCE per worker thread");
-    tsjsCompiler = new TSJSCreateCompiler().init();
+    tsjsCompiler = new JS_TS_CreateCompiler().init();
   }
   return tsjsCompiler;
 }
@@ -68,16 +64,7 @@ export function getPythonCompiler(): PYTHON_CompilerInterface {
   return pythonCompiler;
 }
 
-// ============================================================================
-// ZIG COMPILER
-// ============================================================================
-export function getZigCompiler(): ZIG_CompilerInterface {
-  if (!zigCompiler) {
-    console.log("🚀 Initializing ZIG compiler ONCE per worker thread");
-    zigCompiler = new ZIG_CreateCompiler().init();
-  }
-  return zigCompiler;
-}
+
 
 // ============================================================================
 // RUST COMPILER
@@ -91,12 +78,13 @@ export function getRustCompiler(): RUST_CompilerInterface {
 }
 
 // ============================================================================
-// KOTLIN COMPILER
+// CSHARP COMPILER
 // ============================================================================
-export function getKotlinCompiler(): KOTLIN_CompilerInterface {
-  if (!kotlinCompiler) {
-    console.log("🚀 Initializing KOTLIN compiler ONCE per worker thread");
-    kotlinCompiler = new Kotlin_CreateCompiler().init();
+export function getCsharpCompiler(): CSHARP_CompilerInterface {
+  if (!csharpCompiler) {
+    console.log("🚀 Initializing CSHARP compiler ONCE per worker thread");
+    csharpCompiler = new CSHARP_CreateCompiler().init();
   }
-  return kotlinCompiler;
+  return csharpCompiler;
 }
+

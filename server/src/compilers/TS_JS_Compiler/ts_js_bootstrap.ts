@@ -8,31 +8,21 @@ import { PayloadNormalizer } from "./modules/complexityOrchestratorHelpers/paylo
 import { GetUnitPartOfCode } from "./modules/fetchPartOfCode.js";
 import { DeepFileSanitization } from "./utils/deepFileScan.js";
 import { EnhancedAnalyzer_v2 } from "./modules/complexityGenerator_v1/paidTierResources/enhanced-analyzer-v3-paid.js";
+import { BaseCompilerInterface } from "../baseCompilersInterface.js";
 
 
 /*//////////////////////////////////////////////////////////////
                           TYPES && INTERFACE
     //////////////////////////////////////////////////////////////*/
 
+export interface JS_TS_CompilerInterface
+  extends BaseCompilerInterface {
 
-export interface CompilerInterface {
-  compiler: {
-    execute: (payload: any) => Promise<any>;
-  };
-  analysis: {
-    freeTier: (data: any) => Promise<any>;
-    paidTier: (data: any) => Promise<any>;
-  };
-  utils: {
-    normalize: (data: any) => any;
-    deepScan: (data: any) => any;
-    extract: (props: any, files: any) => any;
-  };
 }
 
 
-export class CreateCompiler {
-  public init(): CompilerInterface {
+export class JS_TS_CreateCompiler {
+  public init(): JS_TS_CompilerInterface {
     // 🔹 SINGLE INSTANCES (no duplication)
     const project = new Project()
     const extractor = new GetUnitPartOfCode();
@@ -70,8 +60,8 @@ export class CreateCompiler {
 
       utils: {
         normalize: (data: any) => payloadNormalizer.normalize(data),
-        extract: (props: any, files: any) =>
-          extractor.extract(props, files),
+        extract: (files: any) =>
+          extractor.extract(files),
         deepScan: (data: any) => deepScan.ts_js_deepFileScan(data),
       },
     };

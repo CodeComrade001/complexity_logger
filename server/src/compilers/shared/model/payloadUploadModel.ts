@@ -34,6 +34,11 @@ export interface GoUploadMeta {
   goVersion?: string;
 }
 
+export interface CsharpUploadMeta {
+  assemblyName?: string;
+  csharpVersion?: string;
+}
+
 export interface JavaUploadMeta {
   classpath?: string[];
   jdkVersion?: string;
@@ -62,6 +67,8 @@ export interface KotlinUploadMeta {
 // ============================================================================
 // 4. FINAL COMPILER-SPECIFIC TYPES (USED IN YOUR SYSTEM)
 // ============================================================================
+
+export type CsharpUploadModel = CompilerUploadModel<CsharpUploadMeta>;
 
 export type GoUploadModel = CompilerUploadModel<GoUploadMeta>;
 

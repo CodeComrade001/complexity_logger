@@ -1,6 +1,8 @@
 import { Project, SourceFile } from "ts-morph";
-import { CompilerInterface } from "../../../compilers/TS_JS_Compiler/ts_js_bootstrap.js";
+import { JS_TS_CompilerInterface } from "../../../compilers/TS_JS_Compiler/ts_js_bootstrap.js";
 import { getCachedResult, hashContent, setCachedResult } from "../cache/workerCache.js";
+import { BaseCompilerInterface } from "../../../compilers/baseCompilersInterface.js";
+import { WorkerFile } from "../worker_types/workerTypes.js";
 
 const MAX_PROJECT_FILES = 1000;
 export const GetUnitPartOfCode_BATCHLIMIT = 50;
@@ -20,9 +22,9 @@ export function enforceProjectLimit(project: Project) {
 }
 
 export async function processFile(
-  input: any | any[],
+  input: WorkerFile | WorkerFile[],
   project: Project,
-  compiler: CompilerInterface
+  compiler: BaseCompilerInterface
 ) {
   const files = Array.isArray(input) ? input : [input];
 
@@ -34,7 +36,7 @@ export async function processFile(
   const extractedBatch: any[] = [];
 
   for (const file of files) {
-    const content = file.fileContent ?? file.content;
+    const content = file.content ?? file.content;
     const fileHash = hashContent(content);
 
     // ✅ CACHE HIT
@@ -66,18 +68,6 @@ export async function processFile(
 
     // ✅ EXTRACT ONLY (NO EXECUTE HERE)
     const extracted = await compiler.utils.extract(
-      [
-        "functions",
-        "arrows",
-        "methods",
-        "constructors",
-        "getters",
-        "setters",
-        "callbacks",
-        "handlers",
-        "staticBlocks",
-        "topLevelStatements",
-      ],
       sourceFile
     );
     console.log("Turbo Log  ~ processFile ~ extracted:", extracted);
@@ -117,7 +107,7 @@ export async function processFile(
 export async function processFilesBatch(
   files: any[],
   project: Project,
-  compiler: CompilerInterface
+  compiler: BaseCompilerInterface
 ) {
   return processFile(files, project, compiler);
 }

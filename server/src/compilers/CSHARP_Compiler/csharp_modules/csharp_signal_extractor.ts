@@ -4,12 +4,12 @@
 // ============================================================================
 
 import Parser from "tree-sitter";
-import { LanguageSpecificSignals, SignalProfile } from "../../shared_v2/interfaces.js";
+import { LanguageSpecificSignals, SignalProfile } from "../../shared/interfaces.js";
 import {
   createBlankSignalProfile,
   InputValidator,
   LoopDepthAnalyzer,
-} from "../../shared_v2/shared-utils.js";
+} from "../../shared/shared-utils.js";
 
 const CSHARP_LOOP_TYPES = new Set([
   "for_statement",
@@ -215,7 +215,7 @@ export function extractCSharpSignals(
   signals.conditionals = conditionals;
   signals.recursion = recursion;
   signals.recursionDoubled = recursionDoubled;
-  signals.recursionCallCount = recursionCallCount;
+  // signals.recursionCallCount = recursionCallCount;
   signals.hasBreakOrContinue = hasBreakOrContinue;
   signals.hasEarlyReturn = hasEarlyReturn;
   signals.conditionDoubled = conditionDoubled;
@@ -230,7 +230,7 @@ export function extractCSharpSignals(
   signals.hasLoopInRecursion = hasLoopInRecursion;
   signals.hasFilterOrSlice = hasFilterOrSlice;
   signals.dataSizeHint = dataSizeHint;
-  signals.languageSpecific = ls;
+  // signals.languageSpecific = ls;
 
   return signals;
 }

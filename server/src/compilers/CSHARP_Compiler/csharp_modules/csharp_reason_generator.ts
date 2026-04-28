@@ -1,7 +1,8 @@
 // ============================================================================
 // C# REASON GENERATOR
 // ============================================================================
-import { ReasonRule } from "../../shared_v2/interfaces.js";
+
+import { ReasonRule } from "../../shared/interfaces.js";
 
 export const CSHARP_EXTRA_TIME_RULES: ReasonRule[] = [
   {

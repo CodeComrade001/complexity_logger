@@ -58,10 +58,14 @@ export interface SignalProfile {
   // Regex-based signals
   hasLinearSearchInLoop: boolean;
   hasNestedArrayMethods: boolean;
+  recursionCallCount: number;
   hasSorting: boolean;
   hasJSONOperations: boolean;
   hasSpreadOperator: boolean;
   functionalLoopCount: number;
+
+  // Language-specific signals (avoid casting — store raw)
+  languageSpecific: LanguageSpecificSignals;
 }
 
 // ============================================================================
@@ -203,3 +207,79 @@ export const RISK_THRESHOLDS = {
   HIGH: 60,
   CRITICAL: 100,
 } as const;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LANGUAGE-SPECIFIC SIGNAL EXTENSIONS
+// Each language gets its own typed bucket.
+// ─────────────────────────────────────────────────────────────────────────────
+export interface LanguageSpecificSignals {
+  // C#
+  hasLinqQuery?: boolean;
+  hasAsyncAwait?: boolean;
+  hasParallelOperations?: boolean;
+
+  // Go
+  hasGoroutine?: boolean;
+  hasChannel?: boolean;
+  hasDefer?: boolean;
+  hasSliceOperation?: boolean;
+
+  // Haskell
+  hasLazyEvaluation?: boolean;
+  hasListComprehension?: boolean;
+  hasFoldOperation?: boolean;
+  hasPatternMatch?: boolean;
+  hasGuards?: boolean;
+  hasWhereClause?: boolean;
+  hasInfiniteList?: boolean;
+
+  // Java
+  hasStreamOperation?: boolean;
+  hasCollectionOperation?: boolean;
+  hasReflection?: boolean;
+  hasGenericBounds?: boolean;
+
+  // Kotlin
+  hasCoroutine?: boolean;
+  hasSequence?: boolean;
+  hasExtensionFunction?: boolean;
+  hasDataClass?: boolean;
+
+  // Python
+  hasGeneratorExpression?: boolean;
+  hasDecorator?: boolean;
+  hasAsyncFor?: boolean;
+  hasDunderMethod?: boolean;
+
+  // Rust
+  hasIteratorChain?: boolean;
+  hasBoxAllocation?: boolean;
+  hasUnsafeBlock?: boolean;
+  hasLifetimeAnnotation?: boolean;
+  hasCollect?: boolean;
+  hasClone?: boolean;
+  hasArcMutex?: boolean;
+
+  // Swift
+  hasOptionalChain?: boolean;
+  hasClosure?: boolean;
+  hasHigherOrderFunction?: boolean;
+  hasProtocolConformance?: boolean;
+
+  // Zig
+  hasComptime?: boolean;
+  hasArenaAllocator?: boolean;
+  hasSliceOp?: boolean;
+  hasErrorUnion?: boolean;
+}
+
+export interface ReasonRule {
+  id: string;
+  timeNotation?: ComplexityNotation;
+  spaceNotation?: ComplexityNotation;
+  condition: (profile: ComplexityProfile, signals: SignalProfile) => boolean;
+  reason: string;
+  impact: Lowercase_RiskLevelType;
+  confidence: number;
+  priority: number;
+}

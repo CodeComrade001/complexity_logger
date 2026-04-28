@@ -1,17 +1,14 @@
 import { SourceFile } from "ts-morph";
 import { extractors } from "../utils/extractor.js";
-import { FetchUnitPartOfCodeProps } from "../interfaces/fetchUnitPartOfCodeProps.js";
+import { DEFAULT_EXTRACTION_TARGETS } from "../interfaces/fetchUnitPartOfCodeProps.js";
 
 export class GetUnitPartOfCode {
   public async extract(
-    targets: FetchUnitPartOfCodeProps,
-    input: SourceFile | SourceFile[] // ✅ accept both
+    input: SourceFile | SourceFile[]
   ) {
-    if (!Array.isArray(targets)) {
-      throw new Error("Invalid targets: expected array");
-    }
+    const targets = DEFAULT_EXTRACTION_TARGETS;
 
-    // ✅ normalize to array
+    // ✅ normalize input
     const sourceFiles = Array.isArray(input) ? input : [input];
 
     const results: any[] = [];
