@@ -9,6 +9,7 @@ import { GetUnitPartOfCode } from "./modules/fetchPartOfCode.js";
 import { DeepFileSanitization } from "./utils/deepFileScan.js";
 import { EnhancedAnalyzer_v2 } from "./modules/complexityGenerator_v1/paidTierResources/enhanced-analyzer-v3-paid.js";
 import { BaseCompilerInterface } from "../baseCompilersInterface.js";
+import CompilerInstanceManager from "../compilerInstanceManager.js";
 
 
 /*//////////////////////////////////////////////////////////////
@@ -22,6 +23,7 @@ export interface JS_TS_CompilerInterface
 
 
 export class JS_TS_CreateCompiler {
+
   public init(): JS_TS_CompilerInterface {
     // 🔹 SINGLE INSTANCES (no duplication)
     const project = new Project()
@@ -38,9 +40,11 @@ export class JS_TS_CreateCompiler {
       enhancedAnalyzer
     );
 
+    const compilerInstancesManager = new CompilerInstanceManager();
+
     // 🔹 Generator (REAL injection)
     const complexityGenerator = new GetComplexityGenerator(
-      orchestrator,
+      orchestrator, compilerInstancesManager
     );
 
 

@@ -7,7 +7,7 @@ import { WorkerFile } from "../worker_types/workerTypes.js";
 const MAX_PROJECT_FILES = 1000;
 export const GetUnitPartOfCode_BATCHLIMIT = 50;
 
-export function enforceProjectLimit(project: Project) {
+export function Js_enforceProjectLimit(project: Project) {
   const files = project.getSourceFiles();
 
   if (files.length > MAX_PROJECT_FILES) {
@@ -21,7 +21,7 @@ export function enforceProjectLimit(project: Project) {
   }
 }
 
-export async function processFile(
+export async function Js_processFile(
   input: WorkerFile | WorkerFile[],
   project: Project,
   compiler: BaseCompilerInterface
@@ -64,7 +64,7 @@ export async function processFile(
       });
     }
 
-    enforceProjectLimit(project);
+    Js_enforceProjectLimit(project);
 
     // ✅ EXTRACT ONLY (NO EXECUTE HERE)
     const extracted = await compiler.utils.extract(
@@ -104,10 +104,10 @@ export async function processFile(
   return results;
 }
 
-export async function processFilesBatch(
+export async function Js_processFilesBatch(
   files: any[],
   project: Project,
   compiler: BaseCompilerInterface
 ) {
-  return processFile(files, project, compiler);
+  return Js_processFile(files, project, compiler);
 }

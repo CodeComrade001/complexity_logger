@@ -12,7 +12,8 @@ export interface CSHARP_CompilerInterface {
 export class CSHARP_CreateCompiler {
   public init(): CSHARP_CompilerInterface {
     const parser = new Parser();
-    parser.setLanguage(require("tree-sitter-c-sharp"));
+    parser.setLanguage(require("tree-sitter-C-sharp"));
+    // parser.setLanguage(CSharp);
 
     const CSHARP_compiler = new CSharpAnalyzer(parser);
 

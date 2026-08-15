@@ -7,14 +7,12 @@ const baseURL = import.meta.env.VITE_LOCAL_BACKEND_URL || "";
 const api = axios.create({
   baseURL,
   withCredentials: true,
-  // timeout: 5000, // optional
 });
 
 api.interceptors.response.use(
   (res) => res,
   (err) => {
     if (err.response?.status === 401) {
-      // session expired or invalid
       window.location.href = "/login";
     }
 
@@ -27,19 +25,69 @@ api.interceptors.response.use(
 );
 
 // --------------------
+// SUPPORTED LANGUAGES
+// --------------------
+
+export type SupportedLanguage =
+  | "csharp"
+  | "go"
+  | "java"
+  | "python"
+  | "rust"
+  | "javascript";
+
+export const SUPPORTED_LANGUAGE_EXTENSIONS: Record<
+  SupportedLanguage,
+  string[]
+> = {
+  csharp: [".cs"],
+  go: [".go"],
+  java: [".java"],
+  python: [".py"],
+  rust: [".rs"],
+  javascript: [".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs"],
+};
+
+export const LANGUAGE_LABELS: Record<SupportedLanguage, string> = {
+  csharp: "C#",
+  go: "Go",
+  java: "Java",
+  python: "Python",
+  rust: "Rust",
+  javascript: "JavaScript / TypeScript",
+};
+
+const ANALYZE_ENDPOINTS: Record<SupportedLanguage, string> = {
+  csharp: "/file/repos/csharp/analyze",
+  go: "/file/repos/go/analyze",
+  java: "/file/repos/java/analyze",
+  python: "/file/repos/python/analyze",
+  rust: "/file/repos/rust/analyze",
+  javascript: "/file/repos/js/analyze",
+};
+
+// --------------------
 // AUTH / SIGNUP
 // --------------------
-export const CreateNewAccount = (data: { phone: string; name?: string }, config?: AxiosRequestConfig) => {
+
+export const CreateNewAccount = (
+  data: { phone: string; name?: string },
+  config?: AxiosRequestConfig
+) => {
   return api.post("user/signin", data, config);
 };
 
-export const LOgInExistingAccount = (data: { phone: string; name?: string }, config?: AxiosRequestConfig) => {
+export const LOgInExistingAccount = (
+  data: { phone: string; name?: string },
+  config?: AxiosRequestConfig
+) => {
   return api.post("user/signup", data, config);
 };
 
 // --------------------
 // USER
 // --------------------
+
 export const getCurrentUser = (config?: AxiosRequestConfig) => {
   return api.get("/user/me", config);
 };
@@ -47,20 +95,109 @@ export const getCurrentUser = (config?: AxiosRequestConfig) => {
 // --------------------
 // FILE
 // --------------------
-export const getFileById = (id: string, config?: AxiosRequestConfig) => {
+
+export const getFileById = (
+  id: string,
+  config?: AxiosRequestConfig
+) => {
   return api.get(`/file/${id}`, config);
 };
 
-export const applyFilePatch = (data: { fileId: string; patch: any }, config?: AxiosRequestConfig) => {
+export const applyFilePatch = (
+  data: { fileId: string; patch: any },
+  config?: AxiosRequestConfig
+) => {
   return api.patch("/patches/apply", data, config);
 };
 
-export const uploadAndAnalyzeFiles = (formData: FormData, config?: AxiosRequestConfig) => {
-  return api.post("file/repos/analyze", formData, config);
-  ;
-}
+// --------------------
+// LANGUAGE ANALYZERS
+// --------------------
+
+export const uploadAndAnalyzeCsharpFiles = (
+  formData: FormData,
+  config?: AxiosRequestConfig
+) => {
+  return api.post("/file/repos/csharp/analyze", formData, config);
+};
+
+export const uploadAndAnalyzeGoFiles = (
+  formData: FormData,
+  config?: AxiosRequestConfig
+) => {
+  return api.post("/file/repos/go/analyze", formData, config);
+};
+
+export const uploadAndAnalyzeJavaFiles = (
+  formData: FormData,
+  config?: AxiosRequestConfig
+) => {
+  return api.post("/file/repos/java/analyze", formData, config);
+};
+
+export const uploadAndAnalyzePythonFiles = (
+  formData: FormData,
+  config?: AxiosRequestConfig
+) => {
+  return api.post("/file/repos/python/analyze", formData, config);
+};
+
+export const uploadAndAnalyzeRustFiles = (
+  formData: FormData,
+  config?: AxiosRequestConfig
+) => {
+  return api.post("/file/repos/rust/analyze", formData, config);
+};
+
+export const uploadAndAnalyzeJavaScriptFiles = (
+  formData: FormData,
+  config?: AxiosRequestConfig
+) => {
+  return api.post("/file/repos/js/analyze", formData, config);
+};
+
+// --------------------
+// GENERIC LANGUAGE ANALYZER
+// --------------------
+
+export const uploadAndAnalyzeFiles = (
+  language: SupportedLanguage,
+  formData: FormData,
+  config?: AxiosRequestConfig
+) => {
+  const endpoint = ANALYZE_ENDPOINTS[language];
+
+  return api.post(endpoint, formData, config);
+};
+
+// --------------------
+// HELPERS
+// --------------------
+
+export const getLanguageFromFileName = (
+  fileName: string
+): SupportedLanguage | null => {
+  const extension = fileName
+    .slice(fileName.lastIndexOf("."))
+    .toLowerCase();
+
+  for (const [language, extensions] of Object.entries(
+    SUPPORTED_LANGUAGE_EXTENSIONS
+  )) {
+    if (extensions.includes(extension)) {
+      return language as SupportedLanguage;
+    }
+  }
+
+  return null;
+};
+
+export const isSupportedFile = (fileName: string): boolean => {
+  return getLanguageFromFileName(fileName) !== null;
+};
 
 // --------------------
 // GENERIC REQUEST
 // --------------------
+
 export default api;

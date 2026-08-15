@@ -1,6 +1,6 @@
-import Parser from "tree-sitter";
 import { AnalysisSummary } from "../shared/interfaces.js";
 import { RustAnalyzer } from '../RUST_Compiler/rust_modules/rust_analyzer.js';
+import Parser from "tree-sitter";
 
 export interface RUST_CompilerInterface {
   compiler: {

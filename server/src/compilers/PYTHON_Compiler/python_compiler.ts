@@ -1,31 +1,55 @@
-import { getPythonCompiler } from "../allCompilerInstance.js";
+import CompilerInstanceManager from "../compilerInstanceManager.js";
 import { PythonUploadModel } from "../shared/model/payloadUploadModel.js";
 
 export default class Python_Compiler {
-  constructor() { }
+  constructor(
+    private readonly compilerInstances: CompilerInstanceManager
+  ) { }
 
   public async execute(
     pythonUploadModel: PythonUploadModel
-  ): Promise<{ success: boolean; data?: any; message?: string }> {
+  ): Promise<{
+    success: boolean;
+    data?: any;
+    message?: string;
+  }> {
     try {
-      const pythonCompiler = getPythonCompiler();
+      console.log(
+        "Turbo Log ~ Python_Compiler ~ execute ~ reached"
+      );
 
-      const pythonResult = await pythonCompiler.compiler.execute(
-        pythonUploadModel.base.fileContent,
-        pythonUploadModel.base.name
+      const pythonCompiler =
+        this.compilerInstances.getPythonCompiler();
+
+      console.log(
+        "Turbo Log ~ Python_Compiler ~ execute ~ pythonCompiler:",
+        pythonCompiler
+      );
+
+      const pythonResult =
+        await pythonCompiler.compiler.execute(
+          pythonUploadModel.base.fileContent,
+          pythonUploadModel.base.name
+        );
+
+      console.log(
+        "Turbo Log ~ Python_Compiler ~ execute ~ pythonResult:",
+        pythonResult
       );
 
       return {
         success: true,
         data: pythonResult,
-        message: "Python code analysis completed successfully.",
+        message:
+          "Python code analysis completed successfully.",
       };
     } catch (error) {
       return {
         success: false,
         message:
-          (error as Error).message ||
-          "An error occurred during Python code analysis.",
+          error instanceof Error
+            ? error.message
+            : "An error occurred during Python code analysis.",
       };
     }
   }

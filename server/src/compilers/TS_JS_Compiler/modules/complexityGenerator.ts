@@ -1,6 +1,6 @@
 // GetComplexityGenerator.ts
 
-import { get_Js_Ts_Compiler } from "../../allCompilerInstance.js";
+import CompilerInstanceManager from "../../compilerInstanceManager.js";
 import { AnalysisSummary } from "../interfaces/complexityGeneratorInterface.js";
 import { ComplexityOrchestrator_v1 } from "./complexityGenerator_v1/complexity_orchestrator.js";
 import { FilePayload, normalizedPayloadData } from "./complexityOrchestratorHelpers/complexityOrchestratorInterface.js";
@@ -8,11 +8,14 @@ import { TierRunner } from "./complexityOrchestratorHelpers/tierRunner.js";
 
 export class GetComplexityGenerator {
   private tierRunner: TierRunner;
+  private readonly compilerInstances: CompilerInstanceManager
 
   constructor(
     engine: ComplexityOrchestrator_v1,
+    CompilerInstances: CompilerInstanceManager
   ) {
     this.tierRunner = new TierRunner(engine);
+    this.compilerInstances = CompilerInstances;
   }
 
   public async execute(
@@ -20,7 +23,7 @@ export class GetComplexityGenerator {
   ): Promise<{ success: boolean; message: string; data: AnalysisSummary | null }> {
     try {
       //Get singleton create compiler instance
-      const compiler = get_Js_Ts_Compiler()
+      const compiler = this.compilerInstances.getJsTsCompiler();
 
       const normalized = compiler.utils.normalize(payload); // ✅ no compiler creation
 

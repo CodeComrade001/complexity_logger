@@ -8,110 +8,214 @@ import { Project } from "ts-morph";
 import { saveResult } from "./storage/fileStorage.js";
 import { Job } from "./worker_types/workerTypes.js";
 
-import { enforceProjectLimit, processFilesBatch } from "./utils/file_process.js";
 
 // 🔥 Individual compiler getters
-import { get_Js_Ts_Compiler, getGoCompiler, getJavaCompiler, getPythonCompiler, getRustCompiler, getCsharpCompiler } from "../../compilers/allCompilerInstance.js";
+import { Js_enforceProjectLimit, Js_processFilesBatch } from "./utils/Js_file_process.js";
+import { Other_Languages_processFilesBatch } from "./utils/Other_file_process.js";
+import { Other_Languages_enforceProjectLimit } from './utils/Other_file_process.js';
+import CompilerInstanceManager from "../../compilers/compilerInstanceManager.js";
+const compilerInstanceManager =
+  new CompilerInstanceManager();
 
-/* ================================
-   SINGLETONS
-================================ */
+/* ============================================================
+   PROJECT SINGLETON
+============================================================ */
 
 let projectInstance: Project | null = null;
 
 function getProject(): Project {
   if (!projectInstance) {
     console.log("🔥 Initializing Project ONCE per worker");
+
     projectInstance = new Project({
       useInMemoryFileSystem: true,
     });
   }
+
   return projectInstance;
 }
 
-/* ================================
-   GENERIC COMPILER EXECUTOR FACTORY
-================================ */
+/* ============================================================
+   GENERIC JAVASCRIPT / TYPESCRIPT COMPILER HANDLER
+============================================================ */
 
-function createCompilerHandler(getCompiler: () => any) {
+function create_Js_CompilerHandler(
+  getCompiler: () => any
+) {
   return async (job: Job) => {
     const compiler = getCompiler();
     const project = getProject();
 
-    const result = await processFilesBatch(job.data as any[], project, compiler);
+    const result = await Js_processFilesBatch(
+      job.data as any[],
+      project,
+      compiler
+    );
 
-    enforceProjectLimit(project);
+    Js_enforceProjectLimit(project);
 
     return result;
   };
 }
 
-/* ================================
-   TASK REGISTRY (NO SWITCH, NO SHARED COMPILER)
-================================ */
+/* ============================================================
+   GENERIC OTHER-LANGUAGE COMPILER HANDLER
+============================================================ */
 
-const TASK_HANDLERS: Record<string, (job: Job) => Promise<any>> = {
-  // ── TS/JS ─────────────────────
-  ts_js_compiler: createCompilerHandler(get_Js_Ts_Compiler),
+function create_other_languages_CompilerHandler(
+  getCompiler: () => any
+) {
+  return async (job: Job) => {
+    const compiler = getCompiler();
+    const project = getProject();
 
-  // ── PLUGINS ───────────────────
-  go_compiler: createCompilerHandler(getGoCompiler),
-  java_compiler: createCompilerHandler(getJavaCompiler),
-  python_compiler: createCompilerHandler(getPythonCompiler),
-  rust_compiler: createCompilerHandler(getRustCompiler),
-  csharp_compiler: createCompilerHandler(getCsharpCompiler),
+    const result =
+      await Other_Languages_processFilesBatch(
+        job.data as any[],
+        project,
+        compiler
+      );
 
-  // ── NON-COMPILER TASKS ────────
-  async freeTierAnalysis(job) {
-    const compiler = get_Js_Ts_Compiler();
+    Other_Languages_enforceProjectLimit(project);
+
+    return result;
+  };
+}
+
+/* ============================================================
+   TASK REGISTRY
+============================================================ */
+
+const TASK_HANDLERS: Record<
+  string,
+  (job: Job) => Promise<any>
+> = {
+
+  /* ==========================================================
+     TS / JS
+  ========================================================== */
+
+  ts_js_compiler:
+    create_Js_CompilerHandler(
+      () =>
+        compilerInstanceManager.getJsTsCompiler()
+    ),
+
+  /* ==========================================================
+     OTHER LANGUAGES
+  ========================================================== */
+
+  go_compiler:
+    create_other_languages_CompilerHandler(
+      () =>
+        compilerInstanceManager.getGoCompiler()
+    ),
+
+  java_compiler:
+    create_other_languages_CompilerHandler(
+      () =>
+        compilerInstanceManager.getJavaCompiler()
+    ),
+
+  python_compiler:
+    create_other_languages_CompilerHandler(
+      () =>
+        compilerInstanceManager.getPythonCompiler()
+    ),
+
+  rust_compiler:
+    create_other_languages_CompilerHandler(
+      () =>
+        compilerInstanceManager.getRustCompiler()
+    ),
+
+  csharp_compiler:
+    create_other_languages_CompilerHandler(
+      () =>
+        compilerInstanceManager.getCsharpCompiler()
+    ),
+
+  /* ==========================================================
+     NON-COMPILER TASKS
+  ========================================================== */
+
+  async freeTierAnalysis(job: Job) {
+    const compiler =
+      compilerInstanceManager.getJsTsCompiler();
+
     if (!compiler?.analysis) {
-      throw new Error("Compiler analysis module unavailable");
+      throw new Error(
+        "Compiler analysis module unavailable"
+      );
     }
+
     return compiler.compiler.execute(job.data);
   },
 
-  async payloadNormalizer(job) {
-    const compiler = get_Js_Ts_Compiler();
+  async payloadNormalizer(job: Job) {
+    const compiler =
+      compilerInstanceManager.getJsTsCompiler();
+
     if (!compiler?.utils) {
-      throw new Error("Compiler utils module unavailable");
+      throw new Error(
+        "Compiler utils module unavailable"
+      );
     }
+
     return compiler.utils.normalize(job.data);
   },
 
-  async payloadDeepScan(job) {
-    const compiler = get_Js_Ts_Compiler();
+  async payloadDeepScan(job: Job) {
+    const compiler =
+      compilerInstanceManager.getJsTsCompiler();
+
     if (!compiler?.utils) {
-      throw new Error("Compiler utils module unavailable");
+      throw new Error(
+        "Compiler utils module unavailable"
+      );
     }
+
     return compiler.utils.deepScan(job.data);
   },
 
-  async ExtractUnitPartOfCode(job) {
-    const compiler = get_Js_Ts_Compiler();
+  async ExtractUnitPartOfCode(job: Job) {
+    const compiler =
+      compilerInstanceManager.getJsTsCompiler();
+
     if (!compiler?.utils) {
-      throw new Error("Compiler utils module unavailable");
+      throw new Error(
+        "Compiler utils module unavailable"
+      );
     }
+
     return compiler.utils.extract(job.data);
   },
 };
 
-/* ================================
+/* ============================================================
    WORKER ENTRY
-================================ */
+============================================================ */
 
-export default async function workerFunction(job: Job) {
-  console.log("👷 Worker Function booted");
+export default async function (job: Job) {
+  console.log(
+    "👷 Worker Function booted:",
+    job.task
+  );
 
   const start = Date.now();
 
   try {
-    const handler = TASK_HANDLERS[job.task];
+    const handler =
+      TASK_HANDLERS[job.task];
 
     if (!handler) {
-      throw new Error(`Unknown task: ${job.task}`);
+      throw new Error(
+        `Unknown task: ${job.task}`
+      );
     }
 
-    const result = await handler(job);
+    const result =
+      await handler(job);
 
     await saveResult(job.id, {
       jobId: job.id,
@@ -124,16 +228,29 @@ export default async function workerFunction(job: Job) {
       task: job.task,
       result,
     };
+
   } catch (err: any) {
+
+    console.error(
+      `❌ Worker failed: ${job.task}`,
+      err
+    );
+
     return {
       jobId: job.id,
       task: job.task,
       result: null,
-      error: err.message,
+      error:
+        err instanceof Error
+          ? err.message
+          : String(err),
     };
+
   } finally {
+
     console.log(
-      `⏱ Worker finished ${job.id} in ${Date.now() - start}ms`
+      `⏱ Worker finished ${job.id} in ${Date.now() - start
+      }ms`
     );
   }
 }

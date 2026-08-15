@@ -6,7 +6,7 @@ export type ComplexityGeneratorPayload = Record<string, CodeParts>;
 
 
 
-export default class Ts_JS_Compiler {
+export default class TS_JS_Compiler {
   private getComplexityGenerator: GetComplexityGenerator;
 
   constructor(
@@ -20,6 +20,7 @@ export default class Ts_JS_Compiler {
   private async complexityGenerator(
     payload: ComplexityGeneratorPayload,
   ): Promise<AnalysisSummary[] | null> {
+    const complexityGenerator = this.getComplexityGenerator;
 
     const entries = Object.entries(payload);
 

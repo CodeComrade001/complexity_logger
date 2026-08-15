@@ -155,6 +155,7 @@ export class FileController {
       }
 
       const result = await this.get_python_FileAnalyzerUsecase.execute(fileToStreamData);
+      console.log("Turbo Log  ~ FileController ~ getPythonFileAnalyzer ~ result:", result);
 
       if (!result.success) {
         return reply.code(400).send(result);

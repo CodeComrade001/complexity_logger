@@ -1,16 +1,20 @@
-import { getCsharpCompiler } from "../allCompilerInstance.js";
+import CompilerInstanceManager from "../compilerInstanceManager.js";
 import { CsharpUploadModel } from "../shared/model/payloadUploadModel.js";
 
 export default class Csharp_Compiler {
 
-  constructor() { }
+  constructor(
+    private readonly compilerInstances: CompilerInstanceManager
+  ) { }
+
 
   public async execute(goUploadModel: CsharpUploadModel): Promise<{ success: boolean; data?: any; message?: string }> {
     try {
 
-      const goCOmpiler = getCsharpCompiler();
+      const csharpCompiler =
+        this.compilerInstances.getCsharpCompiler();
 
-      const goResult = await goCOmpiler.compiler.execute(goUploadModel.base.fileContent, goUploadModel.base.name);
+      const goResult = await csharpCompiler.compiler.execute(goUploadModel.base.fileContent, goUploadModel.base.name);
 
 
       return {

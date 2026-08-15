@@ -1,28 +1,30 @@
-import { getGoCompiler } from "../allCompilerInstance.js";
-import { GoUploadModel } from "../shared/model/payloadUploadModel.js";
+import CompilerInstanceManager from "../compilerInstanceManager.js";
+import { GoUploadModel, JavaUploadModel } from "../shared/model/payloadUploadModel.js";
 
 
-export default class Go_Compiler {
+export default class JAVA_Compiler {
 
-  constructor() { }
+  constructor(
+    private readonly compilerInstances: CompilerInstanceManager
+  ) { }
 
-  public async execute(goUploadModel: GoUploadModel): Promise<{ success: boolean; data?: any; message?: string }> {
+  public async execute(javaUploadModel: JavaUploadModel): Promise<{ success: boolean; data?: any; message?: string }> {
     try {
 
-      const goCOmpiler = getGoCompiler();
+      const javaCompiler = this.compilerInstances.getJavaCompiler();
 
-      const goResult = await goCOmpiler.compiler.execute(goUploadModel.base.fileContent, goUploadModel.base.name);
+      const javaResult = await javaCompiler.compiler.execute(javaUploadModel.base.fileContent, javaUploadModel.base.name);
 
 
       return {
         success: true,
-        data: goResult,
-        message: "Go code analysis completed successfully.",
+        data: javaResult,
+        message: "Java code analysis completed successfully.",
       }
     } catch (error) {
       return {
         success: false,
-        message: (error as Error).message || "An error occurred during Go code analysis.",
+        message: (error as Error).message || "An error occurred during Java code analysis.",
       };
     }
   }

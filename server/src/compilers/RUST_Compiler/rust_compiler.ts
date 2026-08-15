@@ -1,14 +1,16 @@
-import { getRustCompiler } from "../allCompilerInstance.js";
+import CompilerInstanceManager from "../compilerInstanceManager.js";
 import { RustUploadModel } from "../shared/model/payloadUploadModel.js";
 
 export default class Rust_Compiler {
-  constructor() { }
+  constructor(
+    private readonly compilerInstances: CompilerInstanceManager
+  ) { }
 
   public async execute(
     rustUploadModel: RustUploadModel
   ): Promise<{ success: boolean; data?: any; message?: string }> {
     try {
-      const rustCompiler = getRustCompiler();
+      const rustCompiler = this.compilerInstances.getRustCompiler();
 
       const rustResult = await rustCompiler.compiler.execute(
         rustUploadModel.base.fileContent,

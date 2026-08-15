@@ -25,8 +25,10 @@ export class Get_Python_FileAnalyzer {
       };
     }
 
-    const { success: isCompilerWorkerTrue, data: compilerWorkerData } =
-      await this.workerClient.execute("python_compiler", data);
+    const { success: isCompilerWorkerTrue, data: compilerWorkerData } = await this.workerClient.execute("python_compiler", data);
+
+    const DataFound = await this.workerClient.execute("python_compiler", data);
+    console.log("Turbo Log  ~ Get_Python_FileAnalyzer ~ execute ~ DataFound:", DataFound);
 
     if (!isCompilerWorkerTrue) {
       return {
