@@ -1,6 +1,5 @@
-import { ComplexityNotation } from "../../../compilers/TS_JS_Compiler/interfaces/complexityGeneratorInterface.js";
-import { FetchUnitPartOfCodeProps } from "../../../compilers/TS_JS_Compiler/interfaces/fetchUnitPartOfCodeProps.js";
-import { FilePayload, normalizedPayloadData } from "../../../compilers/TS_JS_Compiler/modules/complexityOrchestratorHelpers/complexityOrchestratorInterface.js";
+import { FetchUnitPartOfCodeProps } from "../../../compilers_utils/fetchUnitPartOfCodeProps.js";
+import { FilePayload, normalizedPayloadData } from "../../../compilers_utils/complexityOrchestratorInterface.js";
 import { FileUploadModel } from "../../file_Interface/fileInterface.js";
 import { Node as TsMorphNode } from "ts-morph";
 
@@ -58,7 +57,7 @@ export interface ExtractUnitPartOfCodeJob extends BaseJob {
 export interface AIReasoningJob extends BaseJob {
   task: "AIReasoning";
   data: {
-    notation: { time: ComplexityNotation; space: ComplexityNotation };
+    notation: { time: string; space: string };
     signals: string[];
   };
 }

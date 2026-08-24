@@ -12,21 +12,21 @@ export class Get_Go_FileAnalyzer {
   }
 
   public async execute(filesToAnalyze: WorkerFile[]) {
-    const { success, data } = await this.workerClient.execute(
-      "payloadDeepScan",
-      filesToAnalyze
-    );
+    // const { success, data } = await this.workerClient.execute(
+    //   "payloadDeepScan",
+    //   filesToAnalyze
+    // );
 
-    if (!success) {
-      return {
-        success: false,
-        data: null,
-        message: "Sanitization failed",
-      };
-    }
+    // if (!success) {
+    //   return {
+    //     success: false,
+    //     data: null,
+    //     message: "Sanitization failed",
+    //   };
+    // }
 
     const { success: isCompilerWorkerTrue, data: compilerWorkerData } =
-      await this.workerClient.execute("go_compiler", data);
+      await this.workerClient.execute("go_compiler", filesToAnalyze);
 
     if (!isCompilerWorkerTrue) {
       return {

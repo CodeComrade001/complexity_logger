@@ -12,32 +12,34 @@ export class Get_Csharp_FileAnalyzer {
   }
 
   public async execute(filesToAnalyze: WorkerFile[]) {
-    const { success, data } = await this.workerClient.execute(
-      "payloadDeepScan",
-      filesToAnalyze
-    );
+    // const { success, data } = await this.workerClient.execute(
+    //   "payloadDeepScan",
+    //   filesToAnalyze
+    // );
+    // console.log("Turbo Log  ~ Get_Csharp_FileAnalyzer ~ execute ~ data:", data);
 
-    if (!success) {
-      return {
-        success: false,
-        data: null,
-        message: "Sanitization failed",
-      };
-    }
+    // if (!success) {
+    //   return {
+    //     success: false,
+    //     data: null,
+    //     message: "Sanitization failed",
+    //   };
+    // }
 
-    const { success: isCompilerWorkerTrue, data: compilerWorkerData } =
-      await this.workerClient.execute("csharp_compiler", data);
+    // const { success: isCompilerWorkerTrue, data: compilerWorkerData } = await this.workerClient.execute("csharp_compiler", filesToAnalyze);
+    const compilerWorkerData = await this.workerClient.execute("csharp_compiler", filesToAnalyze);
+    console.log("Turbo Log  ~ Get_Csharp_FileAnalyzer ~ execute ~ compilerWorkerData:", compilerWorkerData);
 
-    if (!isCompilerWorkerTrue) {
-      return {
-        success: false,
-        data: null,
-      };
-    }
+    // if (!data) {
+    //   return {
+    //     success: false,
+    //     data: null,
+    //   };
+    // }
 
     return {
       success: true,
-      data: compilerWorkerData,
+      data: [],
     };
   }
 }

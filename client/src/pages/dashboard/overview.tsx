@@ -472,6 +472,18 @@ export default function DashboardOverview() {
             formData.append("files", file);
           });
 
+          console.log("FormData entries:");
+
+          for (const [key, value] of formData.entries()) {
+            console.log({
+              key,
+              value,
+              name: value instanceof File ? value.name : undefined,
+              size: value instanceof File ? value.size : undefined,
+              type: value instanceof File ? value.type : undefined,
+            });
+          }
+
           const response = await uploadAndAnalyzeFiles(
             language,
             formData

@@ -1,8 +1,7 @@
 import { Project, SourceFile } from "ts-morph";
-import { JS_TS_CompilerInterface } from "../../../compilers/TS_JS_Compiler/ts_js_bootstrap.js";
 import { getCachedResult, hashContent, setCachedResult } from "../cache/workerCache.js";
-import { BaseCompilerInterface } from "../../../compilers/baseCompilersInterface.js";
 import { WorkerFile } from "../worker_types/workerTypes.js";
+import { BaseCompilerInterface } from "../../../compilers_utils/baseCompilersInterface.js";
 
 const MAX_PROJECT_FILES = 1000;
 export const GetUnitPartOfCode_BATCHLIMIT = 50;

@@ -8,14 +8,13 @@ import { Project } from "ts-morph";
 import { saveResult } from "./storage/fileStorage.js";
 import { Job } from "./worker_types/workerTypes.js";
 
-
 // 🔥 Individual compiler getters
-import { Js_enforceProjectLimit, Js_processFilesBatch } from "./utils/Js_file_process.js";
-import { Other_Languages_processFilesBatch } from "./utils/Other_file_process.js";
-import { Other_Languages_enforceProjectLimit } from './utils/Other_file_process.js';
-import CompilerInstanceManager from "../../compilers/compilerInstanceManager.js";
-const compilerInstanceManager =
-  new CompilerInstanceManager();
+import { executeCSharpCompiler } from "./worker_client/csharpCompilerClient.js";
+import { executeJS_Ts_Compiler } from "./worker_client/ts_js_CompilerClient.js";
+import { executeGoCompiler } from "./worker_client/goCompilerClient.js";
+import { executeJavaCompiler } from "./worker_client/javaCompilerClient.js";
+import { executePythonCompiler } from "./worker_client/pythonCompilerClient.js";
+import { executeRustCompiler } from "./worker_client/rustCompilerClient.js";
 
 /* ============================================================
    PROJECT SINGLETON
@@ -36,53 +35,6 @@ function getProject(): Project {
 }
 
 /* ============================================================
-   GENERIC JAVASCRIPT / TYPESCRIPT COMPILER HANDLER
-============================================================ */
-
-function create_Js_CompilerHandler(
-  getCompiler: () => any
-) {
-  return async (job: Job) => {
-    const compiler = getCompiler();
-    const project = getProject();
-
-    const result = await Js_processFilesBatch(
-      job.data as any[],
-      project,
-      compiler
-    );
-
-    Js_enforceProjectLimit(project);
-
-    return result;
-  };
-}
-
-/* ============================================================
-   GENERIC OTHER-LANGUAGE COMPILER HANDLER
-============================================================ */
-
-function create_other_languages_CompilerHandler(
-  getCompiler: () => any
-) {
-  return async (job: Job) => {
-    const compiler = getCompiler();
-    const project = getProject();
-
-    const result =
-      await Other_Languages_processFilesBatch(
-        job.data as any[],
-        project,
-        compiler
-      );
-
-    Other_Languages_enforceProjectLimit(project);
-
-    return result;
-  };
-}
-
-/* ============================================================
    TASK REGISTRY
 ============================================================ */
 
@@ -92,104 +44,55 @@ const TASK_HANDLERS: Record<
 > = {
 
   /* ==========================================================
-     TS / JS
+     TS / JS MICROSERVICE
   ========================================================== */
 
-  ts_js_compiler:
-    create_Js_CompilerHandler(
-      () =>
-        compilerInstanceManager.getJsTsCompiler()
-    ),
+  async ts_js_compiler(job: Job) {
+    return executeJS_Ts_Compiler(job.data as any[]);
+  },
 
   /* ==========================================================
-     OTHER LANGUAGES
+     GO MICROSERVICE
   ========================================================== */
 
-  go_compiler:
-    create_other_languages_CompilerHandler(
-      () =>
-        compilerInstanceManager.getGoCompiler()
-    ),
-
-  java_compiler:
-    create_other_languages_CompilerHandler(
-      () =>
-        compilerInstanceManager.getJavaCompiler()
-    ),
-
-  python_compiler:
-    create_other_languages_CompilerHandler(
-      () =>
-        compilerInstanceManager.getPythonCompiler()
-    ),
-
-  rust_compiler:
-    create_other_languages_CompilerHandler(
-      () =>
-        compilerInstanceManager.getRustCompiler()
-    ),
-
-  csharp_compiler:
-    create_other_languages_CompilerHandler(
-      () =>
-        compilerInstanceManager.getCsharpCompiler()
-    ),
+  async go_compiler(job: Job) {
+    return executeGoCompiler(job.data as any[]);
+  },
 
   /* ==========================================================
-     NON-COMPILER TASKS
+     JAVA MICROSERVICE
   ========================================================== */
 
-  async freeTierAnalysis(job: Job) {
-    const compiler =
-      compilerInstanceManager.getJsTsCompiler();
-
-    if (!compiler?.analysis) {
-      throw new Error(
-        "Compiler analysis module unavailable"
-      );
-    }
-
-    return compiler.compiler.execute(job.data);
+  async java_compiler(job: Job) {
+    return executeJavaCompiler(job.data as any[]);
   },
 
-  async payloadNormalizer(job: Job) {
-    const compiler =
-      compilerInstanceManager.getJsTsCompiler();
+  /* ==========================================================
+     PYTHON MICROSERVICE
+  ========================================================== */
 
-    if (!compiler?.utils) {
-      throw new Error(
-        "Compiler utils module unavailable"
-      );
-    }
-
-    return compiler.utils.normalize(job.data);
+  async python_compiler(job: Job) {
+    return executePythonCompiler(job.data as any[]);
   },
 
-  async payloadDeepScan(job: Job) {
-    const compiler =
-      compilerInstanceManager.getJsTsCompiler();
+  /* ==========================================================
+     RUST MICROSERVICE
+  ========================================================== */
 
-    if (!compiler?.utils) {
-      throw new Error(
-        "Compiler utils module unavailable"
-      );
-    }
-
-    return compiler.utils.deepScan(job.data);
+  async rust_compiler(job: Job) {
+    return executeRustCompiler(job.data as any[]);
   },
 
-  async ExtractUnitPartOfCode(job: Job) {
-    const compiler =
-      compilerInstanceManager.getJsTsCompiler();
 
-    if (!compiler?.utils) {
-      throw new Error(
-        "Compiler utils module unavailable"
-      );
-    }
+  /* ==========================================================
+     C# MICROSERVICE
+  ========================================================== */
 
-    return compiler.utils.extract(job.data);
+  async csharp_compiler(job: Job) {
+    return executeCSharpCompiler(job.data as any[]);
   },
+
+
 };
 
 /* ============================================================

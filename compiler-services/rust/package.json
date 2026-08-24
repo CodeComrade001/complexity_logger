@@ -1,0 +1,36 @@
+{
+  "name": "rust",
+  "version": "1.0.0",
+  "description": "rust_compiler_module",
+  "main": "bindings/node/index.js",
+  "types": "bindings/node/index.js",
+  "module": "NodeNext",
+  "moduleResolution": "NodeNext",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "test": "jest --runInBand",
+    "coverage": "jest --coverage",
+    "test:watch": "jest --watch",
+    "prisma:dev": "prisma migrate dev",
+    "prisma:studio": "prisma studio"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.33.2",
+  "dependencies": {
+    "@fastify/cors": "^11.3.0",
+    "dotenv": "^17.4.2",
+    "fastify": "^5.12.1",
+    "tree-sitter": "^0.25.1",
+    "tree-sitter-rust": "^0.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "tsx": "^4.23.12",
+    "typescript": "^7.0.2"
+  }
+}

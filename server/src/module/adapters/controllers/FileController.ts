@@ -4,13 +4,12 @@ import { IFileRepository } from "../../ports/IFileRepository.js";
 import { IMongoRepository } from "../../ports/IMongoRepository.js";
 import { FileUploadModel } from "../../file_Interface/fileInterface.js";
 import { WorkerClient } from "../../worker/workerClient.js";
-import { extractFiles } from "../../../compilers/TS_JS_Compiler/utils/extractor.js";
+import { extractFiles } from "../../../compilers_utils/extractor.js";
 import { Get_Go_FileAnalyzer } from "../../usecases/get_go_FileAnalyzer.js";
 import { Get_Java_FileAnalyzer } from "../../usecases/get_java_FileAnalyzer.js";
 import { Get_Python_FileAnalyzer } from "../../usecases/get_python_FileAnalyzer.js";
 import { Get_Rust_FileAnalyzer } from "../../usecases/get_rust_FileAnalyzer.js";
 import { Get_js_TS_FileAnalyzer } from "../../usecases/get_ts_js_FileAnalyzer.js";
-import { AnalysisSummary } from "../../../compilers/shared/interfaces.js";
 import { Get_Csharp_FileAnalyzer } from "../../usecases/get_csharp_FileAnalyzer.js";
 
 
