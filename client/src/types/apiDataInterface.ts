@@ -10,9 +10,7 @@ export interface AnalyzeFileUpload {
    ========================= */
 
 export interface FileComplexityReceivedPayload {
-  success: boolean;
-  message: string;
-  data: FileComplexityData;
+  complexityAnalysis: FileComplexityData;
 }
 
 /* =========================
@@ -20,8 +18,9 @@ export interface FileComplexityReceivedPayload {
    ========================= */
 
 export interface FileComplexityData {
-  freeComplexityReport: ComplexityReport;
-  paidComplexityReport: ComplexityReport;
+  data: ComplexityReport[];
+  success: boolean;
+  message: string;
 }
 
 /* =========================

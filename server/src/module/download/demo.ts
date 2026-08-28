@@ -1,8 +1,3 @@
-/**
- * ComplexityShowcase
- * A teaching class demonstrating all major time + space complexities.
- * Each method is short, clear, and represents one complexity category.
- */
 
 export class ComplexityShowcase {
 
@@ -154,21 +149,5 @@ export class ComplexityShowcase {
   }
 
 
-  /**
-   * Summary method to show your students all complexities at once
-   */
-  getAllComplexities() {
-    return {
-      constant: "O(1)",
-      logarithmic: "O(log n)",
-      linear: "O(n)",
-      linearithmic: "O(n log n)",
-      quadratic: "O(n²)",
-      cubic: "O(n³)",
-      exponential: "O(2ⁿ)",
-      factorial: "O(n!)",
-      space_linear: "O(n)",
-      space_quadratic: "O(n²)"
-    };
-  }
+
 }

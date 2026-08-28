@@ -1,44 +1,32 @@
-import { Highlight, themes } from "prism-react-renderer";
+import React from "react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface CodeEditorProps {
   code: string;
-  resolveLanguage?: () => string;
+  resolveLanguage: string;
 }
 
 export function CodeEditor({ code, resolveLanguage }: CodeEditorProps) {
-  const language = resolveLanguage ? resolveLanguage() : "typescript";
-
   return (
-    <div className="rounded-md overflow-hidden border border-border bg-[#0d1117] font-mono text-sm relative group">
-      <div className="absolute top-3 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-        <span className="text-xs text-muted-foreground bg-background/50 px-2 py-1 rounded border border-border">
-          {language}
-        </span>
+    <div className="relative group h-full w-full bg-[#0d1117]  font-mono text-sm">
+      {/* Line Numbers Decoration */}
+      <div className="absolute left-0 top-0 bottom-0 w-12 bg-[#0d1117] border-r border-border/20 flex flex-col items-center pt-4 text-muted-foreground/40 select-none">
+        {code.split('\n').map((_, i) => (
+          <span key={i} className="leading-6 text-[10px]">{i + 1}</span>
+        ))}
       </div>
 
-      <div className="h-fit-content max-h-[700px] overflow-auto custom-scrollbar">
-        <Highlight
-          theme={themes.vsDark}
-          code={code}
-          language={language}
-        >
-          {({ style, tokens, getLineProps, getTokenProps }) => (
-            <pre style={{ ...style, background: "transparent" }} className="p-4 float-left min-w-full">
-              {tokens.map((line, i) => (
-                <div key={i} {...getLineProps({ line })} className="table-row">
-                  <span className="table-cell text-right pr-4 select-none opacity-30 text-xs w-8 border-r border-border/20 mr-4">
-                    {i + 1}
-                  </span>
-                  <span className="table-cell pl-4">
-                    {line.map((token, key) => (
-                      <span key={key} {...getTokenProps({ token })} />
-                    ))}
-                  </span>
-                </div>
-              ))}
-            </pre>
-          )}
-        </Highlight>
+      <ScrollArea className="h-[600px] w-full pl-14 pt-4">
+        <pre className="leading-6 text-slate-300 overflow-auto">
+          <code>{code || "// Select a file to view code"}</code>
+        </pre>
+      </ScrollArea>
+
+      {/* Floating Language Badge */}
+      <div className="absolute bottom-4 right-4 opacity-0  group-hover:opacity-100 transition-opacity">
+        <div className="bg-black/50 backdrop-blur-md border  border-white/10 px-2 py-1 rounded text-[10px] uppercase text-white/50">
+          {resolveLanguage}
+        </div>
       </div>
     </div>
   );

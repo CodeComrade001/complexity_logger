@@ -1,24 +1,28 @@
-**/.classpath
-**/.dockerignore
-**/.env
-**/.git
-**/.gitignore
-**/.project
-**/.settings
-**/.toolstarget
-**/.vs
-**/.vscode
-**/*.*proj.user
-**/*.dbmdl
-**/*.jfm
-**/charts
-**/docker-compose*
-**/compose*
-**/Dockerfile*
-**/node_modules
-**/npm-debug.log
-**/obj
-**/secrets.dev.yaml
-**/values.dev.yaml
-LICENSE
-README.md
+# Node modules (installed locally, not needed in context)
+node_modules
+.pnpm-store
+
+# Git files
+.git
+.gitignore
+
+# Logs
+*.log
+
+# Build outputs
+dist
+build
+pruned
+
+# OS / IDE files
+.DS_Store
+.vscode
+*.swp
+
+# Environment files (if any)
+.env
+
+# Large assets / uploads
+uploads/
+
+**/models

@@ -1,108 +1,247 @@
-import { GetFileHealth } from "../../usecases/GetFileHealth.js";
+// FileController.ts
+
 import { IFileRepository } from "../../ports/IFileRepository.js";
-import { GetFileAnalyzer } from "../../usecases/getFileAnalyzer.js";
-import Compiler from "../../../compliers/TS_JS_Compiler/compiler.js";
-import { GetFileData } from "../../usecases/GetFileData.js";
-import { GetSingleFileReport } from "../../usecases/getSingleFileReport.js";
-import { GetFilePatchApply } from "../../usecases/getFilePatchApply.js";
-import { GetUser } from "../../usecases/getUser.js";
 import { IMongoRepository } from "../../ports/IMongoRepository.js";
 import { FileUploadModel } from "../../file_Interface/fileInterface.js";
+import { WorkerClient } from "../../worker/workerClient.js";
+import { extractFiles } from "../../../compilers_utils/extractor.js";
+import { Get_Go_FileAnalyzer } from "../../usecases/get_go_FileAnalyzer.js";
+import { Get_Java_FileAnalyzer } from "../../usecases/get_java_FileAnalyzer.js";
+import { Get_Python_FileAnalyzer } from "../../usecases/get_python_FileAnalyzer.js";
+import { Get_Rust_FileAnalyzer } from "../../usecases/get_rust_FileAnalyzer.js";
+import { Get_js_TS_FileAnalyzer } from "../../usecases/get_ts_js_FileAnalyzer.js";
+import { Get_Csharp_FileAnalyzer } from "../../usecases/get_csharp_FileAnalyzer.js";
 
-// The controller adapter is thin: it only calls use-cases and maps results to HTTP-friendly objects.
-// Keep it simple: no DB, no heavy logic.
+
+/*//////////////////////////////////////////////////////////////
+                                TYPES
+    //////////////////////////////////////////////////////////////*/
+
+type SupportedLanguage = "typescript"
+  | "go"
+  | "java"
+  | "python"
+  | "zig"
+  | "rust"
+  | "kotlin"
+  | "csharp"
+  | "haskell"
+  | "swift"
+
+
+
 export class FileController {
-  private getHealthUsecase: GetFileHealth;
-  private getFileDataUsecase: GetFileData;
-  private getFileAnalyzerUsecase: GetFileAnalyzer;
-  private getSingleFileReportUsecase: GetSingleFileReport;
-  private getFilePatchApplyUsecase: GetFilePatchApply;
-  private getUserUsecase: GetUser;
+  private get_go_FileAnalyzerUsecase: Get_Go_FileAnalyzer;
+  private get_java_FileAnalyzerUsecase: Get_Java_FileAnalyzer;
+  private get_python_FileAnalyzerUsecase: Get_Python_FileAnalyzer;
+  private get_ts_js_FileAnalyzerUsecase: Get_js_TS_FileAnalyzer;
+  private get_rust_FileAnalyzerUsecase: Get_Rust_FileAnalyzer;
+  private get_csharp_FileAnalyzerUsecase: Get_Csharp_FileAnalyzer;
 
-  constructor(postgresRepo: IFileRepository, mongoRepo: IMongoRepository, compiler: Compiler) {
-    this.getHealthUsecase = new GetFileHealth(postgresRepo, mongoRepo);
-    this.getFileDataUsecase = new GetFileData(postgresRepo);
-
-    this.getSingleFileReportUsecase = new GetSingleFileReport(postgresRepo);
-    this.getFilePatchApplyUsecase = new GetFilePatchApply(postgresRepo);
-    this.getUserUsecase = new GetUser(postgresRepo);
-    this.getFileAnalyzerUsecase = new GetFileAnalyzer(postgresRepo, compiler);
-
+  constructor(
+    postgresRepo: IFileRepository,
+    mongoRepo: IMongoRepository,
+    workerClient: WorkerClient // ✅ instead of compiler
+  ) {
+    this.get_go_FileAnalyzerUsecase = new Get_Go_FileAnalyzer(postgresRepo, workerClient);
+    this.get_java_FileAnalyzerUsecase = new Get_Java_FileAnalyzer(postgresRepo, workerClient);
+    this.get_python_FileAnalyzerUsecase = new Get_Python_FileAnalyzer(postgresRepo, workerClient);
+    this.get_rust_FileAnalyzerUsecase = new Get_Rust_FileAnalyzer(postgresRepo, workerClient);
+    this.get_ts_js_FileAnalyzerUsecase = new Get_js_TS_FileAnalyzer(postgresRepo, workerClient);
+    this.get_csharp_FileAnalyzerUsecase = new Get_Csharp_FileAnalyzer(postgresRepo, workerClient);
   }
 
-  public async getHealth(_request: any, reply: any) {
-    const result = await this.getHealthUsecase.execute();
-    return reply.code(200).send(result);
-  }
-
-  public async getFile(request: any, reply: any) {
-    const { id } = request.params;
-    const result = await this.getFileDataUsecase.execute(id);
-    return reply.code(200).send(result);
-  }
-
-  // Handle file upload and analysis - for production use
-  // public async getFileAnalyzer(request: any, reply: any) {
-  //   try {
-  //     const files: FileUploadModel[] = [];
-
-  //     for await (const part of request.parts()) {
-  //       if (part.type === "file") {
-  //         files.push({
-  //           name: part.filename,
-  //           size: part.file.bytesRead,
-  //           language: "typescript", // or read from fields
-  //           file: part.file,        // Readable stream ✅
-  //         });
-  //       }
-  //     }
-
-  //     if (!files || files.length === 0) {
-  //       return { success: false, message: "No files provided for analysis" };
-  //     }
-  //     const { success, data, message } = await this.getFileAnalyzerUsecase.execute(files);
-  //     if (!success) {
-  //       return reply.code(400).send({ success: false, message: message || "File analysis failed." });
-  //     }
-  //     return reply.code(200).send(data);
-  //   } catch (err) {
-  //     console.error("Error in getFileAnalyzer:", err);
-  //     return reply.code(500).send({ success: false, message: "Internal server error" });
-  //   }
-  // }
-
-
-  //these is for testing purpose remember to delete later
-  public async getFileAnalyzer(request: any, reply: any) {
+  public async getCsharpAnalyzer(request: any, reply: any) {
     try {
-      const files: FileUploadModel[] = [];
+      const { success: isFileTOStreamSuccessful, data: fileToStreamData } = await this.fileToStream(request, "csharp"); // ✅ hardcoded HERE
 
-
-      const { success, data, message } = await this.getFileAnalyzerUsecase.execute(files);
-      if (!success) {
-        return reply.code(400).send({ success: false, message: message || "File analysis failed." });
+      if (!isFileTOStreamSuccessful || !fileToStreamData) {
+        return reply.code(400).send(fileToStreamData);
       }
-      return reply.code(200).send(data);
+
+      const result = await this.get_csharp_FileAnalyzerUsecase.execute(fileToStreamData);
+
+      if (!result.success) {
+        return reply.code(400).send(result);
+      }
+
+      return reply.code(200).send(result);
     } catch (err) {
+      return reply.code(500).send({
+        success: false,
+        message: "Internal server error",
+      });
+    }
+  }
+
+  public async getGoFileAnalyzer(request: any, reply: any) {
+    try {
+      const { success: isFileTOStreamSuccessful, data: fileToStreamData } = await this.fileToStream(request, "go"); // ✅ hardcoded HERE
+
+      if (!isFileTOStreamSuccessful || !fileToStreamData) {
+        return reply.code(400).send(fileToStreamData);
+      }
+
+      const result = await this.get_go_FileAnalyzerUsecase.execute(fileToStreamData);
+
+      if (!result.success) {
+        return reply.code(400).send(result);
+      }
+
+      return reply.code(200).send(result);
+    } catch (err) {
+      return reply.code(500).send({
+        success: false,
+        message: "Internal server error",
+      });
+    }
+  }
+
+  public async get_js_ts_Analyzer(request: any, reply: any) {
+    try {
+      const { success: isFileTOStreamSuccessful, data: fileToStreamData } = await this.fileToStream(request, "typescript"); // ✅ hardcoded HERE
+
+      if (!isFileTOStreamSuccessful || !fileToStreamData) {
+        return reply.code(400).send(fileToStreamData);
+      }
+
+      const analysis = await this.get_ts_js_FileAnalyzerUsecase.execute(fileToStreamData);
+
+
+      if (!analysis.success) {
+        return reply.code(400).send(analysis);
+      }
+
+      return reply.code(200).send(analysis);
+    } catch (err: any) {
       console.error("Error in getFileAnalyzer:", err);
-      return reply.code(500).send({ success: false, message: "Internal server error" });
+      return reply.code(500).send({
+        success: false,
+        message: "Internal server error",
+      });
+    }
+  }
+
+  public async getJavaFileAnalyzer(request: any, reply: any) {
+    try {
+      const { success: isFileTOStreamSuccessful, data: fileToStreamData } = await this.fileToStream(request, "java"); // ✅ hardcoded HERE
+
+      if (!isFileTOStreamSuccessful || !fileToStreamData) {
+        return reply.code(400).send(fileToStreamData);
+      }
+
+      const result = await this.get_java_FileAnalyzerUsecase.execute(fileToStreamData);
+
+      if (!result.success) {
+        return reply.code(400).send(result);
+      }
+
+      return reply.code(200).send(result);
+    } catch (err) {
+      return reply.code(500).send({
+        success: false,
+        message: "Internal server error",
+      });
+    }
+  }
+
+  public async getPythonFileAnalyzer(request: any, reply: any) {
+    try {
+      const { success: isFileTOStreamSuccessful, data: fileToStreamData } = await this.fileToStream(request, "typescript"); // ✅ hardcoded HERE
+
+      if (!isFileTOStreamSuccessful || !fileToStreamData) {
+        return reply.code(400).send(fileToStreamData);
+      }
+
+      const result = await this.get_python_FileAnalyzerUsecase.execute(fileToStreamData);
+      console.log("Turbo Log  ~ FileController ~ getPythonFileAnalyzer ~ result:", result);
+
+      if (!result.success) {
+        return reply.code(400).send(result);
+      }
+
+      return reply.code(200).send(result);
+    } catch (err) {
+      return reply.code(500).send({
+        success: false,
+        message: "Internal server error",
+      });
     }
   }
 
 
-  public async getSingleFileReport(_request: any, reply: any) {
-    const result = await this.getSingleFileReportUsecase.execute();
-    return reply.code(200).send(result);
+  public async getRustFileAnalyzer(request: any, reply: any) {
+    try {
+      const { success: isFileTOStreamSuccessful, data: fileToStreamData } = await this.fileToStream(request, "typescript"); // ✅ hardcoded HERE
+
+      if (!isFileTOStreamSuccessful || !fileToStreamData) {
+        return reply.code(400).send(fileToStreamData);
+      }
+
+      const result = await this.get_rust_FileAnalyzerUsecase.execute(fileToStreamData);
+
+      if (!result.success) {
+        return reply.code(400).send(result);
+      }
+
+      return reply.code(200).send(result);
+    } catch (err) {
+      return reply.code(500).send({
+        success: false,
+        message: "Internal server error",
+      });
+    }
   }
 
-  public async getFilePatchApply(_request: any, reply: any) {
-    const result = await this.getFilePatchApplyUsecase.execute();
-    return reply.code(200).send(result);
+
+  /*//////////////////////////////////////////////////////////////
+                           HELPER FUNCTIONS
+    //////////////////////////////////////////////////////////////*/
+
+  private async fileToStream(request: any, language: SupportedLanguage) {
+    try {
+      const files: FileUploadModel[] = [];
+
+      for await (const part of request.parts()) {
+        if (part.type === "file") {
+          files.push({
+            name: part.filename,
+            size: part.file.bytesRead,
+            language: language, // ✅ use the param, not hardcoded
+            file: part.file,
+            fileContent: part.text,
+          });
+        }
+      }
+
+      if (!files.length) {
+        return {
+          success: false,
+          message: "No files provided",
+        };
+      }
+
+      const extractedData = await extractFiles(files);
+
+      if (!extractedData) {
+        return {
+          success: false,
+          message: "Failed to extract files",
+        };
+      }
+
+      return { success: true, data: extractedData };
+    } catch (err: any) {
+      console.error("Error in fileToStream:", err);
+      return {
+        success: false,
+        message: "Internal server error",
+      };
+    }
   }
 
-  public async getUser(_request: any, reply: any) {
-    const result = await this.getUserUsecase.execute();
-    return reply.code(200).send(result);
-  }
+  // isLanguageSupported(lang: string): lang is SupportedLanguage {
+  //   return lang in this.registry;
+  // }
 
 }

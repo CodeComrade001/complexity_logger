@@ -1,41 +1,32 @@
 import fastify from "fastify";
-import compiler_plugin from "../../compliers/TS_JS_Compiler/plugins/compiler_plugin.js";
-import cors from '@fastify/cors';
+import cors from "@fastify/cors";
 import fastifyMultipart from "@fastify/multipart";
 import fileRoute from "../../module/routes/fileRoute.js";
+import { WorkerClient } from "../../module/worker/workerClient.js";
 
 export async function createApp() {
   const app = fastify({ logger: true });
 
+
   // ---------- CROSS ORIGIN ----------
   await app.register(cors, {
     origin: "http://localhost:5173",
-    methods: ['GET', 'POST'], // Specify allowed methods
-    credentials: true, // Allow cookies, authorization headers, etc.
-  })
-
-  await app.register(fastifyMultipart, {
-    limits: {
-      fileSize: 200 * 1024, // 200KB (match your MAX_FILE_SIZE)
-      files: 300
-    }
+    methods: ["GET", "POST"],
+    credentials: true,
   });
 
+  // ---------- FILE UPLOAD ----------
+  await app.register(fastifyMultipart, {
+    limits: {
+      fileSize: 200 * 1024,
+      files: 300,
+    },
+  });
 
-  // ---------- INFRA ----------
-  // const pgPool = await createPostgresPool();
-  // const mongoose = await createMongooseConnection();
+  // ---------- GLOBAL SERVICES ----------
+  app.decorate("workerClient", new WorkerClient());
 
-  // app.decorate("pgPool", pgPool);
-  // app.decorate("mongoose", mongoose);
 
-  // Mongo models
-  // const fileSchema = new mongoose.Schema({ data: {} }, { strict: false });
-  // const FileModel = mongoose.model("File", fileSchema);
-  // app.decorate("FileModel", FileModel);
-
-  // ---------- PLUGINS ----------
-  await app.register(compiler_plugin);
 
   // ---------- ROUTES ----------
   await app.register(fileRoute, { prefix: "/api/file" });
@@ -48,7 +39,10 @@ export async function createApp() {
   app.setErrorHandler((error: any, _req, reply) => {
     reply.code(500).send({
       error: "Internal Server Error",
-      details: process.env.NODE_ENV === "production" ? undefined : error?.message
+      details:
+        process.env.NODE_ENV === "production"
+          ? undefined
+          : error?.message,
     });
   });
 

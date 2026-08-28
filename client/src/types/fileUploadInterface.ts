@@ -1,71 +1,38 @@
-export type DatasetKey = "typescript" | "python" | "csharp" | "c" | "javascript";
+export type BackendLanguageKey = 'typescript' | 'javascript' | 'csharp' | 'python' | 'java';
 
-export const DATASETS: Record<DatasetKey, RegExp[]> = {
-  typescript: [/\.ts$/],
-  javascript: [/\.js$/],
-  python: [/\.py$/],
-  csharp: [/\.cs$/],
-  c: [/\.c$/, /\.h$/],
-};
-
-export const IGNORED_PATHS = [
-  "node_modules/",
-];
-
-export const IGNORED_FILES = [
-  "package.json",
-];
-
-export const BACKEND_LANGUAGES = [
-  { key: "typescript", label: "TypeScript" },
-  { key: "javascript", label: "JavaScript" },
-  { key: "python", label: "Python" },
-  { key: "java", label: "Java" },
-  { key: "csharp", label: "C#" },
-  { key: "c", label: "C" },
-] as const;
-
-export type BackendLanguageKey = typeof BACKEND_LANGUAGES[number]["key"];
-
-
-
-export type ComplexityReason = {
-  type: "time" | "space";
-  pattern: string;
-  detail: string;
-  impact?: "low" | "medium" | "high" | "critical";
-  confidence?: number;
-  lineNumber?: number;
-};
-
-export type MethodPreview = {
-  id: string;
-  kind: "method";
-  name: string;
-  startLine: number;
-  endLine: number;
-  text: string;
-
-  timeComplexity: string;
-  spaceComplexity: string;
-
-  timeScore: number;
-  spaceScore: number;
-  totalScore: number;
-
-  riskLevel: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
-  confidence: number;
-
-  reasons: ComplexityReason[];
-};
-
-// Type definitions for file tree
 export interface SingleFile {
   id: string;
   name: string;
   type: 'file';
-  language: string;
+  language: BackendLanguageKey;
   size: number;
   dir: string;
   file: File;
 }
+
+export interface MethodPreview {
+  name: string;
+  complexity: number;
+  lineStart: number;
+  lineEnd: number;
+  type: string;
+}
+
+export const BACKEND_LANGUAGES: { key: BackendLanguageKey; label: string }[] = [
+  { key: 'typescript', label: 'TypeScript' },
+  { key: 'javascript', label: 'JavaScript' },
+  { key: 'csharp', label: 'C#' },
+  { key: 'python', label: 'Python' },
+  { key: 'java', label: 'Java' },
+];
+
+export const IGNORED_PATHS = ['node_modules', '.git', 'dist', 'build', 'bin', 'obj'];
+export const IGNORED_FILES = ['package-lock.json', 'yarn.lock', '.DS_Store', 'Thumbs.db'];
+
+export const DATASETS: Record<BackendLanguageKey, RegExp[]> = {
+  typescript: [/\.ts$/, /\.tsx$/],
+  javascript: [/\.js$/, /\.jsx$/],
+  csharp: [/\.cs$/],
+  python: [/\.py$/],
+  java: [/\.java$/],
+};
