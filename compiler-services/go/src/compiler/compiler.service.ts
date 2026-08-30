@@ -11,15 +11,19 @@ import {
   type CompilerJob
 } from "../storage/result.store.js";
 import { GO_CreateCompiler } from './GO_Compiler/go_bootstrap.js';
+import { IMongoRepository } from '../ports/IMongoRepository.js';
 
 
 export class GoCompilerService {
 
   private readonly resultStore: ResultStore;
+  private readonly mongoRepo: IMongoRepository;
 
-  constructor(resultStore: ResultStore) {
+  constructor(resultStore: ResultStore, mongoRepo: IMongoRepository) {
     this.resultStore = resultStore;
+    this.mongoRepo = mongoRepo;
   }
+
 
   async submit(
     payload: CompilerPayload | CompilerPayload[]
@@ -43,6 +47,7 @@ export class GoCompilerService {
     };
 
     this.resultStore.create(job);
+    this.mongoRepo.storeCreatedJob(jobId, payloads)
 
     const compiler =
       this.createCompiler();
@@ -91,6 +96,8 @@ export class GoCompilerService {
             fileName: payload.name,
             result
           });
+
+          this.mongoRepo.storeCreatedJob(jobId, result);
 
         } catch (error) {
 

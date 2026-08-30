@@ -1,62 +1,112 @@
-// import type { Model } from "mongoose";
+import type { Model } from "mongoose";
 import { IMongoRepository } from "../../ports/IMongoRepository.js";
-import { Mongoose } from "mongoose";
+
+interface JobDocument {
+  _id: string;
+  payload: unknown;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 export class MongoFileRepository implements IMongoRepository {
+  private readonly jobModel: Model<JobDocument>
 
-  public async getCompilerResult(): Promise<{ status: boolean; message: string; data: any; }> {
-    throw new Error("Method not implemented.");
+  constructor(
+    jobModel: Model<JobDocument>
+  ) {
+    this.jobModel = jobModel;
   }
-  constructor(private mongo: Mongoose) { }
 
-  public async getHealth() {
+  async storeCreatedJob(
+    jobId: string,
+    payload: unknown
+  ): Promise<{
+    success: boolean;
+    message: string;
+  }> {
     try {
-      const conn = this.mongo.connection;
-      if (!conn || !conn.db) {
-        throw new Error("Mongo connection not ready");
+      if (!jobId || jobId.trim().length === 0) {
+        return {
+          success: false,
+          message: "Job ID is required",
+        };
       }
 
-      const admin = conn.db.admin();
-      await admin.ping();
+      await this.jobModel.create({
+        _id: jobId,
+        payload,
+      });
 
       return {
-        status: "OK",
-        dependency: "mongo",
-        message: "Mongo reachable",
-        timestamp: new Date().toISOString()
+        success: true,
+        message: "Job stored successfully",
       };
-    } catch (err) {
+    } catch (error: unknown) {
+      console.error(
+        "MongoFileRepository.storeCreatedJob:",
+        error
+      );
+
       return {
-        status: "ERROR",
-        dependency: "mongo",
-        message: "Mongo unreachable",
-        timestamp: new Date().toISOString()
+        success: false,
+        message: "Failed to store job",
       };
     }
   }
 
+  async fetchCreatedJob(
+    jobId: string
+  ): Promise<{
+    success: boolean;
+    message: string;
+    data: unknown | null;
+  }> {
+    try {
+      if (!jobId || jobId.trim().length === 0) {
+        return {
+          success: false,
+          message: "Job ID is required",
+          data: null,
+        };
+      }
 
+      const job = await this.jobModel
+        .findById(jobId)
+        .lean()
+        .exec();
 
-  public async findById() {
-    // const doc = await this.model.findById(fileId).lean().exec();
-    // if (!doc) return null;
-    return { fileId: "doc._id.toString()", data: "doc.data" };
+      if (!job) {
+        return {
+          success: false,
+          message: "Job not found",
+          data: null,
+        };
+      }
+
+      return {
+        success: true,
+        message: "Job fetched successfully",
+        data: job.payload,
+      };
+    } catch (error: unknown) {
+      console.error(
+        "MongoFileRepository.fetchCreatedJob:",
+        error
+      );
+
+      return {
+        success: false,
+        message: "Failed to fetch job",
+        data: null,
+      };
+    }
   }
 
-  public async getFileAnalyzer() {
-    // Placeholder implementation
-    return { success: true, message: "File analyzed successfully" };
-  }
-  public async getSingleFileReport() {
-    // Placeholder implementation
-    return { success: true, message: "File report successfully" };
-  }
-  public async getFilePatchApply() {
-    // Placeholder implementation
-    return { success: true, message: "File patch successfully" };
-  }
-  public async getUser() {
-    // Placeholder implementation
-    return { success: true, message: "user found successfully" };
+  async getCompilerResult(): Promise<{
+    status: boolean;
+    message: string;
+    data: any;
+  }> {
+    throw new Error("Method not implemented.");
   }
 }

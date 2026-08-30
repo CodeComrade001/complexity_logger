@@ -18,10 +18,11 @@ interface ResultParams {
 export async function compilerRoutes(
   app: FastifyInstance
 ): Promise<void> {
+  const mongoose = (app as any).mongoose; // typed in composition root
   const resultStore = new ResultStore();
 
   const compilerService =
-    new CSharpCompilerService(resultStore);
+    new CSharpCompilerService(resultStore, mongoose);
 
   /**
    * POST /compiler/analyze

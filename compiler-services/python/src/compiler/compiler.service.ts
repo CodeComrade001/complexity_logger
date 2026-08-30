@@ -10,15 +10,19 @@ import {
   type CompilerJob
 } from "../storage/result.store.js";
 import { PYTHON_CreateCompiler } from './PYTHON_Compiler/python_bootstrap.js';
+import { IMongoRepository } from '../ports/IMongoRepository.js';
 
 
 export class PythonCompilerService {
 
   private readonly resultStore: ResultStore;
+  private readonly mongoRepo: IMongoRepository;
 
-  constructor(resultStore: ResultStore) {
+  constructor(resultStore: ResultStore, mongoRepo: IMongoRepository) {
     this.resultStore = resultStore;
+    this.mongoRepo = mongoRepo;
   }
+
 
   async submit(
     payload: CompilerPayload | CompilerPayload[]
@@ -42,6 +46,7 @@ export class PythonCompilerService {
     };
 
     this.resultStore.create(job);
+    this.mongoRepo.storeCreatedJob(jobId, payloads)
 
     const compiler =
       this.createCompiler();
@@ -90,6 +95,8 @@ export class PythonCompilerService {
             fileName: payload.name,
             result
           });
+
+          this.mongoRepo.storeCreatedJob(jobId, result);
 
         } catch (error) {
 

@@ -11,14 +11,17 @@ import {
   type CompilerJob
 } from "../storage/result.store.js";
 import { RUST_CreateCompiler } from './RUST_Compiler/rust_bootstrap.js';
+import { IMongoRepository } from '../ports/IMongoRepository.js';
 
 
 export class RustCompilerService {
 
   private readonly resultStore: ResultStore;
+  private readonly mongoRepo: IMongoRepository;
 
-  constructor(resultStore: ResultStore) {
+  constructor(resultStore: ResultStore, mongoRepo: IMongoRepository) {
     this.resultStore = resultStore;
+    this.mongoRepo = mongoRepo;
   }
 
   async submit(
@@ -43,6 +46,7 @@ export class RustCompilerService {
     };
 
     this.resultStore.create(job);
+    this.mongoRepo.storeCreatedJob(jobId, payloads)
 
     const compiler =
       this.createCompiler();
@@ -91,6 +95,8 @@ export class RustCompilerService {
             fileName: payload.name,
             result
           });
+
+          this.mongoRepo.storeCreatedJob(jobId, result);
 
         } catch (error) {
 

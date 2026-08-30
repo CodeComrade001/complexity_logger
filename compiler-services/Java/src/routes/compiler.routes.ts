@@ -5,6 +5,7 @@ import type {
   CompilerPayload,
 } from "../compiler/compiler.interface.js";
 import { JAVACompilerService } from "../compiler/compiler.service.js";
+import { MongoFileRepository } from "../repositories/MongoFileRepository.js";
 
 interface AnalyzeBody {
   payload: CompilerPayload | CompilerPayload[];
@@ -18,9 +19,10 @@ export async function compilerRoutes(
   app: FastifyInstance
 ): Promise<void> {
   const resultStore = new ResultStore();
+  const mongoose = (app as any).mongoose;
 
-  const compilerService =
-    new JAVACompilerService(resultStore);
+  const mongoRepo = new MongoFileRepository(mongoose);
+  const compilerService = new JAVACompilerService(resultStore, mongoRepo);
 
   /**
    * POST /compiler/analyze
@@ -29,9 +31,7 @@ export async function compilerRoutes(
    * - one compiler payload
    * - multiple compiler payloads
    */
-  app.post<{
-    Body: AnalyzeBody;
-  }>("/compiler/analyze", async (request, reply) => {
+  app.post<{ Body: AnalyzeBody; }>("/compiler/analyze", async (request, reply) => {
     const { payload } = request.body;
 
     if (!payload) {

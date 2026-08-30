@@ -3,6 +3,7 @@ import cors from "@fastify/cors";
 import fastifyMultipart from "@fastify/multipart";
 import fileRoute from "../../module/routes/fileRoute.js";
 import { WorkerClient } from "../../module/worker/workerClient.js";
+import { createMongooseConnection } from "../../infra/db/mongo/index.js";
 
 export async function createApp() {
   const app = fastify({ logger: true });
@@ -22,6 +23,8 @@ export async function createApp() {
       files: 300,
     },
   });
+
+  await createMongooseConnection()
 
   // ---------- GLOBAL SERVICES ----------
   app.decorate("workerClient", new WorkerClient());
