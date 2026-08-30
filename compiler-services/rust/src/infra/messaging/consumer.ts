@@ -6,7 +6,7 @@ export async function startCompilerConsumer() {
   const channel = await getRabbitMQChannel();
 
   await channel.consume(
-    "compiler.js-ts",
+    "compiler.rust",
     async (message) => {
       if (!message) {
         return;
@@ -43,6 +43,6 @@ export async function startCompilerConsumer() {
   );
 
   console.log(
-    "JS/TS compiler consumer started"
+    "RUST compiler consumer started"
   );
 }

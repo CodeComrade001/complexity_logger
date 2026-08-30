@@ -1,4 +1,4 @@
-declare module "tree-sitter-c-sharp" {
+declare module "tree-sitter-go" {
 
   type BaseNode = {
     type: string;

@@ -5,8 +5,8 @@
 // AST node types verified against tree-sitter-go@0.25.0 grammar.
 // ============================================================================
 
-import type { LanguageSignalConfig, SyntaxNode } from "../../shared/signal-factory.js";
-import { createSignalExtractor } from "../../shared/signal-factory.js";
+import type { LanguageSignalConfig, SyntaxNode } from "../shared/signal-factory.js";
+import { createSignalExtractor } from "../shared/signal-factory.js";
 
 // ── Go loop constructs ───────────────────────────────────────────────────────
 // `for_statement` covers ALL Go loops:

@@ -18,16 +18,16 @@ import type {
   AnalysisSummary,
   ComplexityResult,
   fetchUnitPartOfCodeArrayTargets,
-} from "../../shared/interfaces.js";
-import { buildComplexityProfile } from "../../shared/profile-builder.js";
-import { PaidTierReasonGenerator } from "../../shared/reason-generator.js";
+} from "../shared/interfaces.js";
+import { buildComplexityProfile } from "../shared/profile-builder.js";
+import { PaidTierReasonGenerator } from "../shared/reason-generator.js";
 import {
   modelGrowth,
   composeGrowth,
   buildResult,
   buildAnalysisSummary,
-} from "../../shared/growth-model.js";
-import { InputValidator } from "../../shared/complexity-utils.js";
+} from "../shared/growth-model.js";
+import { InputValidator } from "../shared/complexity-utils.js";
 import { extractSignals } from "./python_signals.js";
 
 interface CodeUnit {

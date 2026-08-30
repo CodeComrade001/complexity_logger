@@ -1,6 +1,7 @@
 import Parser from "tree-sitter";
 import { GoAnalyzer } from "./go_modules/go_analyzer.js";
-import { AnalysisSummary } from "../compiler.interface.js";
+import GO from "tree-sitter-go";
+import { AnalysisSummary } from "./shared/interfaces.js";
 
 export interface GO_CompilerInterface {
   compiler: {

@@ -1,5 +1,5 @@
 import CompilerInstanceManager from "../compilerInstanceManager.js";
-import { PythonUploadModel } from "../shared/model/payloadUploadModel.js";
+import { PythonUploadModel } from "./shared/model/payloadUploadModel.js";
 
 export default class Python_Compiler {
   constructor(

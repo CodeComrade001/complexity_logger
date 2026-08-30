@@ -8,7 +8,7 @@ const RABBITMQ_URL =
   "amqp://complexity:complexity_dev_password@localhost:5672";
 
 const EXCHANGE = "compiler.exchange";
-const QUEUE = "compiler.js-ts";
+const QUEUE = "compiler.java";
 
 let connection: ChannelModel | null = null;
 let channel: Channel | null = null;
@@ -33,7 +33,7 @@ export async function getRabbitMQChannel(): Promise<Channel> {
   await channel.bindQueue(
     QUEUE,
     EXCHANGE,
-    "compiler.javascript-typescript"
+    "compiler.java"
   );
 
   return channel;

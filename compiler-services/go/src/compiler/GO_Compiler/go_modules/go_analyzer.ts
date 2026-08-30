@@ -5,23 +5,22 @@
 // ============================================================================
 
 import { createRequire } from "node:module";
-import { join } from "node:path";
 import Parser from "tree-sitter";
 
 import type {
   AnalysisSummary,
   ComplexityResult,
   fetchUnitPartOfCodeArrayTargets,
-} from "../../shared/interfaces.js";
-import { buildComplexityProfile } from "../../shared/profile-builder.js";
-import { PaidTierReasonGenerator } from "../../shared/reason-generator.js";
+} from "../shared/interfaces.js";
+import { buildComplexityProfile } from "../shared/profile-builder.js";
+import { PaidTierReasonGenerator } from "../shared/reason-generator.js";
 import {
   modelGrowth,
   composeGrowth,
   buildResult,
   buildAnalysisSummary,
-} from "../../shared/growth-model.js";
-import { InputValidator } from "../../shared/complexity-utils.js";
+} from "../shared/growth-model.js";
+import { InputValidator } from "../shared/complexity-utils.js";
 import { extractSignals } from "./go_signals.js";
 
 const require = createRequire(import.meta.url);

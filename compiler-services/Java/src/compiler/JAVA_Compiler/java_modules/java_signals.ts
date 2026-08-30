@@ -5,8 +5,8 @@
 // AST node types verified against tree-sitter-java@0.23.5 grammar.
 // ============================================================================
 
-import type { LanguageSignalConfig, SyntaxNode } from "../../shared/signal-factory.js";
-import { createSignalExtractor } from "../../shared/signal-factory.js";
+import type { LanguageSignalConfig, SyntaxNode } from "../shared/signal-factory.js";
+import { createSignalExtractor } from "../shared/signal-factory.js";
 
 // ── Java loop constructs ─────────────────────────────────────────────────────
 const JAVA_LOOP_TYPES = new Set([

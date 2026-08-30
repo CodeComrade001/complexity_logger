@@ -15,8 +15,8 @@
 //    We detect `.index()`, `.count()` calls as linear search signals.
 // ============================================================================
 
-import type { LanguageSignalConfig, SyntaxNode } from "../../shared/signal-factory.js";
-import { createSignalExtractor } from "../../shared/signal-factory.js";
+import type { LanguageSignalConfig, SyntaxNode } from "../shared/signal-factory.js";
+import { createSignalExtractor } from "../shared/signal-factory.js";
 
 // ── Loop constructs ──────────────────────────────────────────────────────────
 const PYTHON_LOOP_TYPES = new Set([
