@@ -19,9 +19,10 @@ export async function compilerRoutes(
   app: FastifyInstance
 ): Promise<void> {
   const resultStore = new ResultStore();
+  const mongoose = (app as any).mongoose; // typed in composition root
 
   const compilerService =
-    new GoCompilerService(resultStore);
+    new GoCompilerService(resultStore, mongoose);
 
   /**
    * POST /compiler/analyze

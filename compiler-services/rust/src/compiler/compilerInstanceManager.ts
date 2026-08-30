@@ -6,7 +6,7 @@ export default class CompilerInstanceManager {
   // C#
   // ============================================================
 
-  public getCsharpCompiler(): RUST_CompilerInterface {
+  public getRustCompiler(): RUST_CompilerInterface {
     if (!this.rustCompiler) {
       console.log(
         "🚀 Initializing CSHARP compiler ONCE per CompilerInstanceManager"

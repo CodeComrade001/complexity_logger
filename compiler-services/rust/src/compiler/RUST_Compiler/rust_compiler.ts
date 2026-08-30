@@ -1,5 +1,5 @@
 import CompilerInstanceManager from "../compilerInstanceManager.js";
-import { RustUploadModel } from "../shared/model/payloadUploadModel.js";
+import { RustUploadModel } from "./shared/model/payloadUploadModel.js";
 
 export default class Rust_Compiler {
   constructor(

@@ -20,8 +20,8 @@
 //  - Binary recursion: `return f(n-1) + f(n-2)` or `f(n-1) + f(n-2)` as expr.
 // ============================================================================
 
-import type { LanguageSignalConfig, SyntaxNode } from "../../shared/signal-factory.js";
-import { createSignalExtractor } from "../../shared/signal-factory.js";
+import type { LanguageSignalConfig, SyntaxNode } from "../shared/signal-factory.js";
+import { createSignalExtractor } from "../shared/signal-factory.js";
 
 // ── Loop constructs ──────────────────────────────────────────────────────────
 const RUST_LOOP_TYPES = new Set([

@@ -1,4 +1,4 @@
-declare module "tree-sitter-c-sharp" {
+declare module "tree-sitter-rust" {
 
   type BaseNode = {
     type: string;

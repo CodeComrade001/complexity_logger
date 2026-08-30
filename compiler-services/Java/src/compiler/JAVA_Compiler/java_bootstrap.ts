@@ -1,6 +1,7 @@
 import Parser from "tree-sitter";
 import { JavaAnalyzer } from "./java_modules/java_analyzer.js";
-import { AnalysisSummary } from "../shared/interfaces.js";
+import { AnalysisSummary } from "./shared/interfaces.js";
+import JAVA from "tree-sitter-java";
 
 export interface JAVA_CompilerInterface {
   compiler: {
@@ -11,7 +12,7 @@ export interface JAVA_CompilerInterface {
 export class JAVA_CreateCompiler {
   public init(): JAVA_CompilerInterface {
     const parser = new Parser();
-    parser.setLanguage(require("tree-sitter-java"));
+    parser.setLanguage(JAVA);
 
     const JAVA_compiler = new JavaAnalyzer(parser);
 

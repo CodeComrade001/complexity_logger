@@ -1,6 +1,7 @@
-import { AnalysisSummary } from "../shared/interfaces.js";
+import { AnalysisSummary } from "./shared/interfaces.js";
 import { RustAnalyzer } from '../RUST_Compiler/rust_modules/rust_analyzer.js';
 import Parser from "tree-sitter";
+import RUST from "tree-sitter-rust";
 
 export interface RUST_CompilerInterface {
   compiler: {
@@ -11,7 +12,7 @@ export interface RUST_CompilerInterface {
 export class RUST_CreateCompiler {
   public init(): RUST_CompilerInterface {
     const parser = new Parser();
-    parser.setLanguage(require("tree-sitter-rust"));
+    parser.setLanguage(RUST);
 
     const RUST_compiler = new RustAnalyzer(parser);
 

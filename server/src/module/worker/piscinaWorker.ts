@@ -4,7 +4,6 @@
 
 console.log("👷 Worker booted");
 
-import { Project } from "ts-morph";
 import { saveResult } from "./storage/fileStorage.js";
 import { Job } from "./worker_types/workerTypes.js";
 
@@ -15,24 +14,6 @@ import { executeGoCompiler } from "./worker_client/goCompilerClient.js";
 import { executeJavaCompiler } from "./worker_client/javaCompilerClient.js";
 import { executePythonCompiler } from "./worker_client/pythonCompilerClient.js";
 import { executeRustCompiler } from "./worker_client/rustCompilerClient.js";
-
-/* ============================================================
-   PROJECT SINGLETON
-============================================================ */
-
-let projectInstance: Project | null = null;
-
-function getProject(): Project {
-  if (!projectInstance) {
-    console.log("🔥 Initializing Project ONCE per worker");
-
-    projectInstance = new Project({
-      useInMemoryFileSystem: true,
-    });
-  }
-
-  return projectInstance;
-}
 
 /* ============================================================
    TASK REGISTRY

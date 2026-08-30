@@ -1,6 +1,7 @@
 import Parser from "tree-sitter";
 import { PythonAnalyzer } from "./python_modules/python_analyzer.js";
-import { AnalysisSummary } from "../shared/interfaces.js";
+import { AnalysisSummary } from "../compiler.interface.js";
+import PYTHON from "tree-sitter-python";
 
 export interface PYTHON_CompilerInterface {
   compiler: {
@@ -13,7 +14,7 @@ export class PYTHON_CreateCompiler {
     const parser = new Parser();
 
     const PYTHON_compiler = new PythonAnalyzer(parser);
-    parser.setLanguage(require("tree-sitter-python"));
+    parser.setLanguage(PYTHON);
 
     return {
       compiler: {

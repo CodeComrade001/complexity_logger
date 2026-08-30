@@ -10,17 +10,21 @@ import {
 } from "../storage/result.store.js";
 
 import { WorkerClient } from "../worker/workerClient.js";
+import { IMongoRepository } from "../ports/IMongoRepository.js";
 
 export class Js_Ts_CompilerService {
   private readonly resultStore: ResultStore;
   private readonly workerClient: WorkerClient;
+  private readonly mongoRepo: IMongoRepository;
 
   constructor(
     resultStore: ResultStore,
-    workerClient: WorkerClient
+    workerClient: WorkerClient,
+    mongoRepo: IMongoRepository
   ) {
     this.resultStore = resultStore;
     this.workerClient = workerClient;
+    this.mongoRepo = mongoRepo;
   }
 
   async submit(
@@ -56,6 +60,7 @@ export class Js_Ts_CompilerService {
     // Create the job BEFORE sending it to the worker.
     this.resultStore.create(job);
 
+    this.mongoRepo.storeCreatedJob(jobId, sanitizedPayloads)
 
     // Send the job to the worker.
     const { success: isCompilerWorkerTrue, data: compilerWorkerData } = await this.workerClient.execute(
@@ -69,6 +74,8 @@ export class Js_Ts_CompilerService {
         data: null,
       };
     }
+
+    this.mongoRepo.storeCreatedJob(jobId, compilerWorkerData)
 
     return {
       success: true,
