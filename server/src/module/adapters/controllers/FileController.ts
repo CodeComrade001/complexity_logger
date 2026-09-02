@@ -39,6 +39,7 @@ export class FileController {
   private get_csharp_FileAnalyzerUsecase: Get_Csharp_FileAnalyzer;
 
   constructor(
+
     postgresRepo: IFileRepository,
     mongoRepo: IMongoRepository,
     workerClient: WorkerClient // ✅ instead of compiler
@@ -48,7 +49,7 @@ export class FileController {
     this.get_python_FileAnalyzerUsecase = new Get_Python_FileAnalyzer(postgresRepo, workerClient);
     this.get_rust_FileAnalyzerUsecase = new Get_Rust_FileAnalyzer(postgresRepo, workerClient);
     this.get_ts_js_FileAnalyzerUsecase = new Get_js_TS_FileAnalyzer(postgresRepo, workerClient);
-    this.get_csharp_FileAnalyzerUsecase = new Get_Csharp_FileAnalyzer(postgresRepo, workerClient);
+    this.get_csharp_FileAnalyzerUsecase = new Get_Csharp_FileAnalyzer(postgresRepo, workerClient, mongoRepo);
   }
 
   public async getCsharpAnalyzer(request: any, reply: any) {

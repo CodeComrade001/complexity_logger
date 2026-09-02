@@ -39,7 +39,8 @@ import {
   FileComplexityData,
 } from "@/types/apiDataInterface";
 import { MetricsGrid } from "@/components/dashboard/MetricCard";
-import { fetchSession } from "@/utils/sessionStorage";
+import { fetchSession, storeSession } from "@/utils/sessionStorage";
+import { useCompilerSocket } from "@/hooks/useCompilerWebSocket";
 
 interface UploadedFile {
   id: string;
@@ -380,6 +381,22 @@ export default function DashboardOverview() {
     setFrameworkDropdownOpen(false);
   };
 
+
+  const handleCompilerCompleted = (data: unknown) => {
+    console.log("Compiler result received:", data);
+
+    storeSession<FileComplexityData>(
+      "code-analysis",
+      data as FileComplexityData
+    );
+
+    setAnalyzedApiResult(data as FileComplexityData);
+
+    notify("Code analysis completed", "success");
+  };
+
+  useCompilerSocket(handleCompilerCompleted);
+
   /*
    * Submit files for analysis.
    *
@@ -398,139 +415,39 @@ export default function DashboardOverview() {
    * POST /repos/java/analyze
    * POST /repos/go/analyze
    */
+
   const submitForAnalysis = async () => {
-    if (!uploadFilesForComplexity.length) {
+    if (!hasFilesToAnalyze()) {
       notify("Please select files before uploading", "error");
       return;
     }
 
     setIsAnalyzing(true);
-    notify("Files submitted for analysis", "info");
 
     try {
-      /*
-       * Group uploaded files by their supported language.
-       */
-      const filesByLanguage: Partial<
-        Record<SupportedLanguage, File[]>
-      > = {};
+      const filesByLanguage = groupFilesByLanguage(
+        uploadFilesForComplexity
+      );
 
-      const unsupportedFiles: string[] = [];
-
-      uploadFilesForComplexity.forEach(({ file }) => {
-        if (!file) {
-          return;
-        }
-
-        const language = getLanguageFromFileName(file.name);
-
-        if (!language) {
-          unsupportedFiles.push(file.name);
-          return;
-        }
-
-        if (!filesByLanguage[language]) {
-          filesByLanguage[language] = [];
-        }
-
-        filesByLanguage[language]!.push(file);
-      });
-
-      /*
-       * This should normally be unnecessary because the file
-       * picker already filters unsupported files, but keeping
-       * this guard makes submitForAnalysis safe on its own.
-       */
-      if (unsupportedFiles.length > 0) {
-        notify(
-          `Unsupported files were skipped: ${unsupportedFiles.join(", ")}`,
-          "error"
-        );
-      }
-
-      const languagesToAnalyze = Object.entries(filesByLanguage).filter(
-        ([, languageFiles]) =>
-          Array.isArray(languageFiles) && languageFiles.length > 0
-      ) as [SupportedLanguage, File[]][];
-
-      if (languagesToAnalyze.length === 0) {
-        notify("No supported files available for analysis", "error");
+      if (!filesByLanguage) {
         return;
       }
 
-      /*
-       * Run each language analyzer.
-       *
-       * Promise.all allows independent language analyzers
-       * to execute concurrently.
-       */
-      const analysisRequests = languagesToAnalyze.map(
-        async ([language, languageFiles]) => {
-          const formData = new FormData();
+      const jobs = await submitLanguageAnalyses(filesByLanguage);
 
-          languageFiles.forEach((file) => {
-            formData.append("files", file);
-          });
-
-          console.log("FormData entries:");
-
-          for (const [key, value] of formData.entries()) {
-            console.log({
-              key,
-              value,
-              name: value instanceof File ? value.name : undefined,
-              size: value instanceof File ? value.size : undefined,
-              type: value instanceof File ? value.type : undefined,
-            });
-          }
-
-          const response = await uploadAndAnalyzeFiles(
-            language,
-            formData
-          );
-
-          return {
-            language,
-            response,
-          };
-        }
-      );
-
-      const results = await Promise.all(analysisRequests);
-
-      console.log(
-        "Turbo Log ~ submitForAnalysis ~ results:",
-        results
-      );
-
-      /*
-       * The current UI expects a single FileComplexityData result.
-       *
-       * Therefore, display the first successful result.
-       *
-       * If the backend eventually returns multiple language
-       * summaries, the state should be changed to a map keyed
-       * by SupportedLanguage.
-       */
-      const successfulResult = results.find(
-        ({ response }) => response.data?.success
-      );
-
-      if (!successfulResult) {
+      if (jobs.length === 0) {
         notify("Files analysis error", "error");
         return;
       }
 
-      setAnalyzedApiResult(successfulResult.response.data);
-
-      const analyzedLanguages = results.map(
-        ({ language }) => LANGUAGE_LABELS[language]
-      );
-
       notify(
-        `Analysis completed for ${analyzedLanguages.join(", ")}`,
+        `Analysis started for ${jobs.length} job${jobs.length > 1 ? "s" : ""
+        }`,
         "success"
       );
+
+
+      console.log("Waiting for compiler completion:", jobs);
     } catch (error) {
       console.error("Upload error:", error);
       notify("Internal Server Error", "error");
@@ -538,6 +455,108 @@ export default function DashboardOverview() {
       setIsAnalyzing(false);
     }
   };
+
+  const hasFilesToAnalyze = () => {
+    return uploadFilesForComplexity.length > 0;
+  };
+
+  const groupFilesByLanguage = (
+    files: typeof uploadFilesForComplexity
+  ): Partial<Record<SupportedLanguage, File[]>> | null => {
+    const filesByLanguage: Partial<
+      Record<SupportedLanguage, File[]>
+    > = {};
+
+    const unsupportedFiles: string[] = [];
+
+    files.forEach(({ file }) => {
+      if (!file) return;
+
+      const language = getLanguageFromFileName(file.name);
+
+      if (!language) {
+        unsupportedFiles.push(file.name);
+        return;
+      }
+
+      filesByLanguage[language] ??= [];
+      filesByLanguage[language]!.push(file);
+    });
+
+    notifyUnsupportedFiles(unsupportedFiles);
+
+    const hasSupportedFiles = Object.values(filesByLanguage).some(
+      (files) => files && files.length > 0
+    );
+
+    if (!hasSupportedFiles) {
+      notify("No supported files available for analysis", "error");
+      return null;
+    }
+
+    return filesByLanguage;
+  };
+
+  const notifyUnsupportedFiles = (files: string[]) => {
+    if (files.length === 0) return;
+
+    notify(
+      `Unsupported files were skipped: ${files.join(", ")}`,
+      "error"
+    );
+  };
+
+  const submitLanguageAnalyses = async (
+    filesByLanguage: Partial<Record<SupportedLanguage, File[]>>
+  ) => {
+    const languages = Object.entries(filesByLanguage).filter(
+      ([, files]) => files && files.length > 0
+    ) as [SupportedLanguage, File[]][];
+
+    const results = await Promise.all(
+      languages.map(([language, files]) =>
+        submitLanguageAnalysis(language, files)
+      )
+    );
+
+    return results.filter(
+      (result): result is { language: SupportedLanguage; jobId: string } =>
+        result !== null
+    );
+  };
+
+  const submitLanguageAnalysis = async (
+    language: SupportedLanguage,
+    files: File[]
+  ) => {
+    const formData = new FormData();
+
+    files.forEach((file) => {
+      formData.append("files", file);
+    });
+
+    const result = await uploadAndAnalyzeFiles(
+      language,
+      formData
+    );
+
+    const { success, jobId } = result.response.data;
+
+    if (!success || !jobId) {
+      notify(
+        `Analysis failed for ${LANGUAGE_LABELS[language]}`,
+        "error"
+      );
+
+      return null;
+    }
+
+    return {
+      language,
+      jobId,
+    };
+  };
+
 
   /*
    * Remove all loaded files.

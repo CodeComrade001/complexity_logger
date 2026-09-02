@@ -1,8 +1,16 @@
 export interface CompilerPayload {
+  event: string;
+  jobId: string;
+  language: string;
+  files: compilerPayloadFiles[];
+}
+
+interface compilerPayloadFiles {
   name: string;
   language: string;
   content: string;
 }
+
 
 export interface CompilerResult {
   success: boolean;

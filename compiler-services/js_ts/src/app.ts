@@ -8,13 +8,15 @@ import { WorkerClient } from "./worker/workerClient.js";
 import { Js_Ts_CompilerService } from "./compiler/compiler.service.js";
 import { startCompilerConsumer } from "./infra/messaging/consumer.js";
 import { createMongooseConnection } from "./infra/db/mongo/index.js";
+import { MongoFileRepository } from "./repositories/MongoFileRepository.js";
+import { JobModel } from "./models/job.model.js";
 
 export async function createApp() {
   const app = Fastify({
     logger: true,
   });
 
-  const mongoose = (app as any).mongoose; // typed in composition root
+  const mongoRepo = new MongoFileRepository(JobModel);
 
   /*
    * Composition root
@@ -22,7 +24,6 @@ export async function createApp() {
 
   await createMongooseConnection()
 
-  await startCompilerConsumer();
 
   const resultStore = new ResultStore();
 
@@ -32,8 +33,9 @@ export async function createApp() {
     new Js_Ts_CompilerService(
       resultStore,
       workerClient,
-      mongoose
+      mongoRepo
     );
+  await startCompilerConsumer(compilerService, mongoRepo);;
 
   const compilerRoutes =
     new CompilerRoutes(compilerService);

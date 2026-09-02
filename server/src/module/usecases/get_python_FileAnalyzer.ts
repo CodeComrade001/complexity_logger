@@ -12,34 +12,18 @@ export class Get_Python_FileAnalyzer {
   }
 
   public async execute(filesToAnalyze: WorkerFile[]) {
-    // const { success, data } = await this.workerClient.execute(
-    //   "payloadDeepScan",
-    //   filesToAnalyze
-    // );
 
-    // if (!success) {
-    //   return {
-    //     success: false,
-    //     data: null,
-    //     message: "Sanitization failed",
-    //   };
-    // }
+    const { jobId } = await this.workerClient.execute("python_compiler", filesToAnalyze);
 
-    const { success: isCompilerWorkerTrue, data: compilerWorkerData } = await this.workerClient.execute("python_compiler", filesToAnalyze);
-
-    const DataFound = await this.workerClient.execute("python_compiler", filesToAnalyze);
-    console.log("Turbo Log  ~ Get_Python_FileAnalyzer ~ execute ~ DataFound:", DataFound);
-
-    if (!isCompilerWorkerTrue) {
+    if (!jobId || jobId === "") {
       return {
         success: false,
-        data: null,
+        message: "Failed to get JobId from worker",
       };
     }
-
     return {
       success: true,
-      data: compilerWorkerData,
+      jobId,
     };
   }
 }

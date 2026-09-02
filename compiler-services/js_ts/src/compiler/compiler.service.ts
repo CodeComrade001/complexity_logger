@@ -1,7 +1,9 @@
 import { randomUUID } from "node:crypto";
 
 import type {
+  Compiler,
   CompilerPayload,
+  CompilerResult,
 } from "./compiler.interface.js";
 
 import {
@@ -11,6 +13,7 @@ import {
 
 import { WorkerClient } from "../worker/workerClient.js";
 import { IMongoRepository } from "../ports/IMongoRepository.js";
+import { JS_TS_CreateCompiler } from "./TS_JS_Compiler/ts_js_bootstrap.js";
 
 export class Js_Ts_CompilerService {
   private readonly resultStore: ResultStore;
@@ -28,24 +31,15 @@ export class Js_Ts_CompilerService {
   }
 
   async submit(
-    payload: CompilerPayload | CompilerPayload[]
+    payload: CompilerPayload
   ) {
-    const payloads = Array.isArray(payload)
-      ? payload
-      : [payload];
 
-    if (payloads.length === 0) {
+    // const payloads = Array.isArray(payload)
+    //   ? payload
+    //   : [payload];
+
+    if (payload.files.length === 0) {
       throw new Error("Payload cannot be empty");
-    }
-
-    const { success, data: sanitizedPayloads } = await this.workerClient.execute("payloadDeepScan", payloads);
-
-    if (!success) {
-      return {
-        success: false,
-        data: null,
-        message: "Sanitization failed",
-      };
     }
 
     const jobId = randomUUID();
@@ -54,66 +48,138 @@ export class Js_Ts_CompilerService {
       jobId,
       status: "queued",
       results: [],
-      createdAt: Date.now(),
+      createdAt: Date.now()
     };
 
-    // Create the job BEFORE sending it to the worker.
     this.resultStore.create(job);
+    const seeStoredJobLogs = await this.mongoRepo.storeCreatedJob(jobId, payload)
+    console.log("Turbo Log  ~ CSharpCompilerService ~ submit ~ seeStoredJobLogs:", seeStoredJobLogs);
 
-    this.mongoRepo.storeCreatedJob(jobId, sanitizedPayloads)
+    const compiler =
+      this.createCompiler();
 
-    // Send the job to the worker.
-    const { success: isCompilerWorkerTrue, data: compilerWorkerData } = await this.workerClient.execute(
-      "ts_js_compiler",
-      sanitizedPayloads
+    return this.process(
+      payload.jobId,
+      jobId,
+      compiler,
+      payload
     );
 
-    if (!isCompilerWorkerTrue) {
-      return {
-        success: false,
-        data: null,
-      };
+  }
+
+  private createCompiler(): Compiler {
+
+    return new JS_TS_CreateCompiler()
+      .init()
+      .compiler;
+  }
+
+  private async process(
+    jobIdKey: string,
+    jobId: string,
+    compiler: Compiler,
+    payloads: CompilerPayload
+  ): Promise<{ jobId: string; results: CompilerResult[] }> {
+    console.dir(payloads, {
+      depth: 1,
+    });
+
+    this.resultStore.update(jobId, {
+      status: "processing"
+    });
+
+    const results: { jobId: string; results: CompilerResult[] } = { jobId, results: [] };
+
+    try {
+
+      for (const payload of payloads.files) {
+
+        try {
+
+          const result =
+            await compiler.execute(
+              payload.content,
+              payload.name
+            );
+
+          results.results.push({
+            success: true,
+            fileName: payload.name,
+            result
+          });
+
+        } catch (error) {
+
+          results.results.push({
+            success: false,
+            fileName: payload.name,
+            error: this.getErrorMessage(error)
+          });
+
+        }
+      }
+
+      this.resultStore.update(jobId, {
+        status: "completed",
+        results: results.results,
+        completedAt: Date.now()
+      });
+
+      return { jobId: jobIdKey, results: results.results }
+
+    } catch (error) {
+
+      this.resultStore.update(jobId, {
+        status: "failed",
+        results: results.results,
+        error: this.getErrorMessage(error),
+        completedAt: Date.now()
+      });
+
+      return { jobId: jobIdKey, results: [] };
     }
-
-    this.mongoRepo.storeCreatedJob(jobId, compilerWorkerData)
-
-    return {
-      success: true,
-      data: compilerWorkerData,
-    };
   }
 
   getResult(
     jobId: string
   ): CompilerJob | undefined {
+
     return this.resultStore.get(jobId);
   }
 
   getStatus() {
-    const jobs = this.resultStore.getAll();
+
+    const jobs =
+      this.resultStore.getAll();
 
     return {
       totalJobs: jobs.length,
 
-      queuedJobs:
-        jobs.filter(
-          (job) => job.status === "queued"
-        ).length,
-
       processingJobs:
         jobs.filter(
-          (job) => job.status === "processing"
+          job => job.status === "processing"
         ).length,
 
       completedJobs:
         jobs.filter(
-          (job) => job.status === "completed"
+          job => job.status === "completed"
         ).length,
 
       failedJobs:
         jobs.filter(
-          (job) => job.status === "failed"
-        ).length,
+          job => job.status === "failed"
+        ).length
     };
+  }
+
+  private getErrorMessage(
+    error: unknown
+  ): string {
+
+    if (error instanceof Error) {
+      return error.message;
+    }
+
+    return String(error);
   }
 }

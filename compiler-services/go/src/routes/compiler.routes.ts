@@ -6,6 +6,9 @@ import { ResultStore } from "../storage/result.store.js";
 import type {
   CompilerPayload,
 } from "../compiler/compiler.interface.js";
+import { startCompilerConsumer } from "../infra/messaging/consumer.js";
+import { MongoFileRepository } from "../repositories/MongoFileRepository.js";
+import { JobModel } from "../models/job.model.js";
 
 interface AnalyzeBody {
   payload: CompilerPayload | CompilerPayload[];
@@ -19,50 +22,15 @@ export async function compilerRoutes(
   app: FastifyInstance
 ): Promise<void> {
   const resultStore = new ResultStore();
-  const mongoose = (app as any).mongoose; // typed in composition root
+
+  const mongoRepo = new MongoFileRepository(JobModel);
 
   const compilerService =
-    new GoCompilerService(resultStore, mongoose);
+    new GoCompilerService(resultStore, mongoRepo);
 
-  /**
-   * POST /compiler/analyze
-   *
-   * Accepts either:
-   * - one compiler payload
-   * - multiple compiler payloads
-   */
-  app.post<{
-    Body: AnalyzeBody;
-  }>("/compiler/analyze", async (request, reply) => {
-    const { payload } = request.body;
+  await startCompilerConsumer(compilerService, mongoRepo);
 
-    if (!payload) {
-      console.error("Turbo Log  ~ compilerRoutes ~ payload is missing");
-      return reply.code(400).send({
-        success: false,
-        message: "payload is required",
-      });
-    }
 
-    try {
-      const jobId = await compilerService.submit(payload);
-      console.log("Turbo Log  ~ compilerRoutes ~ jobId:", jobId);
-
-      return reply.code(202).send({
-        success: true,
-        message: "C# compiler job accepted",
-        jobId,
-      });
-    } catch (error) {
-      return reply.code(400).send({
-        success: false,
-        message:
-          error instanceof Error
-            ? error.message
-            : "Failed to submit compiler job",
-      });
-    }
-  });
 
   /**
    * GET /compiler/result/:jobId

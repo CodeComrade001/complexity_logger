@@ -27,21 +27,20 @@ export class Get_js_TS_FileAnalyzer {
     }
 
     // ✅ ALL heavy work goes to worker
-    const { success: isCompilerWorkerTrue, data: compilerWorkerData } = await this.workerClient.execute(
+    const { jobId } = await this.workerClient.execute(
       "ts_js_compiler",
       data
     );
 
-    if (!isCompilerWorkerTrue) {
+    if (!jobId || jobId === "") {
       return {
         success: false,
-        data: null,
+        message: "Failed to get JobId from worker",
       };
     }
-
     return {
       success: true,
-      data: compilerWorkerData,
+      jobId,
     };
   }
 }
