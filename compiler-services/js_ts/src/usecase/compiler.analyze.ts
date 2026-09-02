@@ -1,7 +1,5 @@
-import { ResultStore } from "../storage/result.store.js";
 import { MongoFileRepository } from "../repositories/MongoFileRepository.js";
-import { JobModel } from "../models/job.model.js";
-import { CSharpCompilerService } from "../compiler/compiler.service.js";
+import { Js_Ts_CompilerService } from "../compiler/compiler.service.js";
 import { CompilerPayload } from "../compiler/compiler.interface.js";
 
 export interface AnalyzeCompilerResult {
@@ -10,9 +8,11 @@ export interface AnalyzeCompilerResult {
   jobIdKey: string;
 }
 
+
+
 export async function analyzeCompiler(
   payload: CompilerPayload,
-  compilerService: CSharpCompilerService,
+  compilerService: Js_Ts_CompilerService,
   mongoRepo: MongoFileRepository,
 ): Promise<AnalyzeCompilerResult> {
   if (!payload) {

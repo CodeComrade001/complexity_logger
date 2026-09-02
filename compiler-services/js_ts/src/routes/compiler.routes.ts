@@ -29,49 +29,6 @@ export class CompilerRoutes {
     app: FastifyInstance
   ): Promise<void> {
 
-    /**
-     * POST /compiler/analyze
-     */
-    app.post<{
-      Body: AnalyzeBody;
-    }>("/compiler/analyze", async (request, reply) => {
-      const { payload } = request.body;
-
-      if (!payload) {
-        console.error(
-          "Turbo Log ~ CompilerRoutes ~ payload is missing"
-        );
-
-        return reply.code(400).send({
-          success: false,
-          message: "payload is required",
-        });
-      }
-
-      try {
-        const jobId =
-          await this.compilerService.submit(payload);
-
-        console.log(
-          "Turbo Log ~ CompilerRoutes ~ jobId:",
-          jobId
-        );
-
-        return reply.code(202).send({
-          success: true,
-          message: "C# compiler job accepted",
-          jobId,
-        });
-      } catch (error) {
-        return reply.code(400).send({
-          success: false,
-          message:
-            error instanceof Error
-              ? error.message
-              : "Failed to submit compiler job",
-        });
-      }
-    });
 
     /**
      * GET /compiler/result/:jobId

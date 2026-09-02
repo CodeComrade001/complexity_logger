@@ -26,7 +26,7 @@ export class Get_Csharp_FileAnalyzer {
     }
     return {
       success: true,
-      data: jobId,
+      jobId,
     };
   }
 }

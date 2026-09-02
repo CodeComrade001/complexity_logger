@@ -6,6 +6,8 @@ export async function executeRustCompiler(
 ): Promise<{ jobId: string }> {
   const jobId = crypto.randomUUID();
 
+  console.log("RUST worker created and message is being published", jobId)
+
   await publishCompilerAnalysis({
     event: "compiler.analysis.requested",
     jobId,

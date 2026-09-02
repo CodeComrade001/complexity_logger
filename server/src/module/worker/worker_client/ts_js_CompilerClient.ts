@@ -6,6 +6,8 @@ export async function executeJS_Ts_Compiler(
 ): Promise<{ jobId: string }> {
   const jobId = crypto.randomUUID();
 
+  console.log("TS/JS worker created and message is being published", jobId)
+
   await publishCompilerAnalysis({
     event: "compiler.analysis.requested",
     jobId,

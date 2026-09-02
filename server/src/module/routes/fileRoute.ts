@@ -43,4 +43,16 @@ export default async function fileRoute(
   fastify.post("/repos/python/analyze", controller.getPythonFileAnalyzer.bind(controller));
   fastify.post("/repos/rust/analyze", controller.getRustFileAnalyzer.bind(controller));
   fastify.post("/repos/js/analyze", controller.get_js_ts_Analyzer.bind(controller));
+  fastify.get(
+    "/ws",
+    { websocket: true },
+    (socket) => {
+      socket.on("message", (message) => {
+        console.log("Turbo Log  ~ fileRoute ~ message:", message);
+        // optional subscription logic
+      });
+
+      console.log("Frontend WebSocket connected");
+    }
+  );
 }

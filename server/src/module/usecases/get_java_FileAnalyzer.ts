@@ -12,32 +12,18 @@ export class Get_Java_FileAnalyzer {
   }
 
   public async execute(filesToAnalyze: WorkerFile[]) {
-    // const { success, data } = await this.workerClient.execute(
-    //   "payloadDeepScan",
-    //   filesToAnalyze
-    // );
 
-    // if (!success) {
-    //   return {
-    //     success: false,
-    //     data: null,
-    //     message: "Sanitization failed",
-    //   };
-    // }
+    const { jobId } = await this.workerClient.execute("java_compiler", filesToAnalyze);
 
-    const { success: isCompilerWorkerTrue, data: compilerWorkerData } =
-      await this.workerClient.execute("java_compiler", filesToAnalyze);
-
-    if (!isCompilerWorkerTrue) {
+    if (!jobId || jobId === "") {
       return {
         success: false,
-        data: null,
+        message: "Failed to get JobId from worker",
       };
     }
-
     return {
       success: true,
-      data: compilerWorkerData,
+      jobId,
     };
   }
 }

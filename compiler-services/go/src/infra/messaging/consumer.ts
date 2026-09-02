@@ -1,8 +1,15 @@
+import { CompilerPayload } from "../../compiler/compiler.interface.js";
+import { GoCompilerService } from "../../compiler/compiler.service.js";
+import { MongoFileRepository } from "../../repositories/MongoFileRepository.js";
+import { analyzeCompiler } from "../../usecase/compiler.analyze.js";
 import {
   getRabbitMQChannel,
 } from "./rabbitmq.js";
 
-export async function startCompilerConsumer() {
+export async function startCompilerConsumer(
+  compilerService: GoCompilerService,
+  mongoRepo: MongoFileRepository,
+) {
   const channel = await getRabbitMQChannel();
 
   await channel.consume(
@@ -13,18 +20,27 @@ export async function startCompilerConsumer() {
       }
 
       try {
-        const payload = JSON.parse(
-          message.content.toString()
+        const payload =
+          JSON.parse(
+            message.content.toString()
+          ) as CompilerPayload;
+
+        const result = await analyzeCompiler(payload, compilerService, mongoRepo);
+        console.log("Turbo Log  ~ startCompilerConsumer ~ result:", result);
+
+        await channel.sendToQueue(
+          "compiler.completed",
+          Buffer.from(
+            JSON.stringify({
+              jobId: result.jobIdKey,
+            })
+          )
         );
 
         console.log(
-          "Received compiler job:",
-          payload
+          "Compiler analysis completed:",
+          result
         );
-
-        /*
-         * Your compiler logic goes here.
-         */
 
         channel.ack(message);
       } catch (error) {

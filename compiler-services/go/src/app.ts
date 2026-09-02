@@ -12,7 +12,7 @@ export async function createApp() {
 
   await createMongooseConnection()
 
-  await startCompilerConsumer();
+
 
 
 

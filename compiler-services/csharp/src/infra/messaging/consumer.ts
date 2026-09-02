@@ -1,10 +1,14 @@
 import { CompilerPayload } from "../../compiler/compiler.interface.js";
+import { CSharpCompilerService } from "../../compiler/compiler.service.js";
+import { MongoFileRepository } from "../../repositories/MongoFileRepository.js";
 import { analyzeCompiler } from "../../usecase/compiler.analyze.js";
 import {
   getRabbitMQChannel,
 } from "./rabbitmq.js";
 
-export async function startCompilerConsumer() {
+export async function startCompilerConsumer(compilerService: CSharpCompilerService,
+  mongoRepo: MongoFileRepository,
+) {
   const channel = await getRabbitMQChannel();
 
   await channel.consume(
@@ -20,7 +24,7 @@ export async function startCompilerConsumer() {
             message.content.toString()
           ) as CompilerPayload;
 
-        const result = await analyzeCompiler(payload);
+        const result = await analyzeCompiler(payload, compilerService, mongoRepo);
         console.log("Turbo Log  ~ startCompilerConsumer ~ result:", result);
 
         await channel.sendToQueue(

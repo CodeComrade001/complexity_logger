@@ -13,8 +13,11 @@ import {
 import { GO_CreateCompiler } from './GO_Compiler/go_bootstrap.js';
 import { IMongoRepository } from '../ports/IMongoRepository.js';
 
+export interface IGoCompilerService {
+  submit(payload: CompilerPayload): Promise<{ jobId: string; results: CompilerResult[] }>
+}
 
-export class GoCompilerService {
+export class GoCompilerService implements IGoCompilerService {
 
   private readonly resultStore: ResultStore;
   private readonly mongoRepo: IMongoRepository;
@@ -26,14 +29,14 @@ export class GoCompilerService {
 
 
   async submit(
-    payload: CompilerPayload | CompilerPayload[]
+    payload: CompilerPayload
   ) {
 
-    const payloads = Array.isArray(payload)
-      ? payload
-      : [payload];
+    // const payloads = Array.isArray(payload)
+    //   ? payload
+    //   : [payload];
 
-    if (payloads.length === 0) {
+    if (payload.files.length === 0) {
       throw new Error("Payload cannot be empty");
     }
 
@@ -47,15 +50,17 @@ export class GoCompilerService {
     };
 
     this.resultStore.create(job);
-    this.mongoRepo.storeCreatedJob(jobId, payloads)
+    const seeStoredJobLogs = await this.mongoRepo.storeCreatedJob(jobId, payload)
+    console.log("Turbo Log  ~ CSharpCompilerService ~ submit ~ seeStoredJobLogs:", seeStoredJobLogs);
 
     const compiler =
       this.createCompiler();
 
     return this.process(
+      payload.jobId,
       jobId,
       compiler,
-      payloads
+      payload
     );
 
   }
@@ -68,20 +73,24 @@ export class GoCompilerService {
   }
 
   private async process(
+    jobIdKey: string,
     jobId: string,
     compiler: Compiler,
-    payloads: CompilerPayload[]
-  ): Promise<CompilerResult[]> {
+    payloads: CompilerPayload
+  ): Promise<{ jobId: string; results: CompilerResult[] }> {
+    console.dir(payloads, {
+      depth: 1,
+    });
 
     this.resultStore.update(jobId, {
       status: "processing"
     });
 
-    const results: CompilerResult[] = [];
+    const results: { jobId: string; results: CompilerResult[] } = { jobId, results: [] };
 
     try {
 
-      for (const payload of payloads) {
+      for (const payload of payloads.files) {
 
         try {
 
@@ -91,17 +100,15 @@ export class GoCompilerService {
               payload.name
             );
 
-          results.push({
+          results.results.push({
             success: true,
             fileName: payload.name,
             result
           });
 
-          this.mongoRepo.storeCreatedJob(jobId, result);
-
         } catch (error) {
 
-          results.push({
+          results.results.push({
             success: false,
             fileName: payload.name,
             error: this.getErrorMessage(error)
@@ -112,22 +119,22 @@ export class GoCompilerService {
 
       this.resultStore.update(jobId, {
         status: "completed",
-        results,
+        results: results.results,
         completedAt: Date.now()
       });
 
-      return results
+      return { jobId: jobIdKey, results: results.results }
 
     } catch (error) {
 
       this.resultStore.update(jobId, {
         status: "failed",
-        results,
+        results: results.results,
         error: this.getErrorMessage(error),
         completedAt: Date.now()
       });
 
-      return []
+      return { jobId: jobIdKey, results: [] };
     }
   }
 

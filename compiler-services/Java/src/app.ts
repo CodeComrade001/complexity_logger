@@ -12,8 +12,6 @@ export async function createApp() {
 
   await createMongooseConnection()
 
-  await startCompilerConsumer();
-
   app.get("/health", async (_request, reply) => {
     return reply.send({
       success: true,

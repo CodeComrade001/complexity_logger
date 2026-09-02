@@ -1,15 +1,9 @@
 import type { FastifyInstance } from "fastify";
 import { ResultStore } from "../storage/result.store.js";
-
-import type {
-  CompilerPayload,
-} from "../compiler/compiler.interface.js";
 import { JAVACompilerService } from "../compiler/compiler.service.js";
 import { MongoFileRepository } from "../repositories/MongoFileRepository.js";
-
-interface AnalyzeBody {
-  payload: CompilerPayload | CompilerPayload[];
-}
+import { JobModel } from "../models/job.model.js";
+import { startCompilerConsumer } from "../infra/messaging/consumer.js";
 
 interface ResultParams {
   jobId: string;
@@ -19,49 +13,11 @@ export async function compilerRoutes(
   app: FastifyInstance
 ): Promise<void> {
   const resultStore = new ResultStore();
-  const mongoose = (app as any).mongoose;
 
-  const mongoRepo = new MongoFileRepository(mongoose);
+  const mongoRepo = new MongoFileRepository(JobModel);
   const compilerService = new JAVACompilerService(resultStore, mongoRepo);
 
-  /**
-   * POST /compiler/analyze
-   *
-   * Accepts either:
-   * - one compiler payload
-   * - multiple compiler payloads
-   */
-  app.post<{ Body: AnalyzeBody; }>("/compiler/analyze", async (request, reply) => {
-    const { payload } = request.body;
-
-    if (!payload) {
-      console.error("Turbo Log  ~ compilerRoutes ~ payload is missing");
-      return reply.code(400).send({
-        success: false,
-        message: "payload is required",
-      });
-    }
-
-    try {
-      const jobId = await compilerService.submit(payload);
-      console.log("Turbo Log  ~ compilerRoutes ~ jobId:", jobId);
-
-      return reply.code(202).send({
-        success: true,
-        message: "C# compiler job accepted",
-        jobId,
-      });
-    } catch (error) {
-      return reply.code(400).send({
-        success: false,
-        message:
-          error instanceof Error
-            ? error.message
-            : "Failed to submit compiler job",
-      });
-    }
-  });
-
+  await startCompilerConsumer(compilerService, mongoRepo);
   /**
    * GET /compiler/result/:jobId
    *

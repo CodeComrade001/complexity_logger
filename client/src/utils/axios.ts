@@ -164,7 +164,7 @@ export const uploadAndAnalyzeFiles = (
   language: SupportedLanguage,
   formData: FormData,
   config?: AxiosRequestConfig
-) => {
+): Promise<{ language: SupportedLanguage; response: { data: { success: boolean, jobId: string } } }> => {
   const endpoint = ANALYZE_ENDPOINTS[language];
 
   return api.post(endpoint, formData, config);

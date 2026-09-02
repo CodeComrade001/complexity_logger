@@ -1,8 +1,7 @@
 import { ResultStore } from "../storage/result.store.js";
 import { MongoFileRepository } from "../repositories/MongoFileRepository.js";
-import { JobModel } from "../models/job.model.js";
-import { CSharpCompilerService } from "../compiler/compiler.service.js";
 import { CompilerPayload } from "../compiler/compiler.interface.js";
+import { RustCompilerService } from "../compiler/compiler.service.js";
 
 export interface AnalyzeCompilerResult {
   success: boolean;
@@ -10,10 +9,13 @@ export interface AnalyzeCompilerResult {
   jobIdKey: string;
 }
 
+
+
 export async function analyzeCompiler(
   payload: CompilerPayload,
-  compilerService: CSharpCompilerService,
+  compilerService: RustCompilerService,
   mongoRepo: MongoFileRepository,
+
 ): Promise<AnalyzeCompilerResult> {
   if (!payload) {
     throw new Error("payload is required");

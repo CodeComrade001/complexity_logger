@@ -9,6 +9,7 @@ import { JobModel } from "../models/job.model.js";
 import type {
   CompilerPayload,
 } from "../compiler/compiler.interface.js";
+import { startCompilerConsumer } from "../infra/messaging/consumer.js";
 
 interface AnalyzeBody {
   payload: CompilerPayload | CompilerPayload[];
@@ -24,8 +25,8 @@ export async function compilerRoutes(
 
   const resultStore = new ResultStore();
 
-  const mongoRepo =
-    new MongoFileRepository(JobModel);
+  const mongoRepo = new MongoFileRepository(JobModel);
+
 
   const compilerService =
     new CSharpCompilerService(
@@ -33,38 +34,8 @@ export async function compilerRoutes(
       mongoRepo
     );
 
-  // app.post<{
-  //   Body: AnalyzeBody;
-  // }>("/compiler/analyze", async (request, reply) => {
 
-  //   const { payload } = request.body;
-
-  //   if (!payload) {
-  //     return reply.code(400).send({
-  //       success: false,
-  //       message: "payload is required",
-  //     });
-  //   }
-
-  //   try {
-  //     const jobId = await compilerService.submit(payload);
-
-  //     return reply.code(202).send({
-  //       success: true,
-  //       message: "C# compiler job accepted",
-  //       jobId,
-  //     });
-
-  //   } catch (error) {
-  //     return reply.code(400).send({
-  //       success: false,
-  //       message:
-  //         error instanceof Error
-  //           ? error.message
-  //           : "Failed to submit compiler job",
-  //     });
-  //   }
-  // });
+  await startCompilerConsumer(compilerService, mongoRepo);
 
   app.get<{
     Params: ResultParams;

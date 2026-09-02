@@ -10,7 +10,6 @@ export async function createApp() {
     logger: true,
   });
 
-  await startCompilerConsumer();
   await createMongooseConnection()
 
   app.get("/health", async (_request, reply) => {

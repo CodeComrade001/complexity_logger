@@ -6,6 +6,8 @@ export async function executeGoCompiler(
 ): Promise<{ jobId: string }> {
   const jobId = crypto.randomUUID();
 
+  console.log("GO worker created and message is being published", jobId)
+
   await publishCompilerAnalysis({
     event: "compiler.analysis.requested",
     jobId,
