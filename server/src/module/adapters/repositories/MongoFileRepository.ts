@@ -1,20 +1,47 @@
 import type { Model } from "mongoose";
+import { JobDocument } from "../../../models/job.model.js";
 import { IMongoRepository } from "../../ports/IMongoRepository.js";
 
-interface JobDocument {
-  _id: string;
-  payload: unknown;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
 export class MongoFileRepository implements IMongoRepository {
-  private readonly jobModel: Model<JobDocument>
+
+  private readonly jobModel: Model<JobDocument>;
 
   constructor(
     jobModel: Model<JobDocument>
   ) {
     this.jobModel = jobModel;
+  }
+  async updateStoredPayload(
+    jobId: string,
+    payload: unknown): Promise<{
+      success: boolean;
+      message: string;
+    }> {
+    try {
+      if (!jobId || jobId.trim().length === 0) {
+        return {
+          success: false,
+          message: "Job ID is required",
+        };
+      }
+
+      await this.jobModel.findByIdAndUpdate(jobId, { payload });
+
+      return {
+        success: true,
+        message: "Payload updated successfully",
+      };
+    } catch (error: unknown) {
+      console.error(
+        "MongoFileRepository.updateStoredPayload:",
+        error
+      );
+
+      return {
+        success: false,
+        message: "Failed to update payload",
+      };
+    }
   }
 
   async storeCreatedJob(
@@ -24,6 +51,7 @@ export class MongoFileRepository implements IMongoRepository {
     success: boolean;
     message: string;
   }> {
+    console.log("Turbo Log  ~ MongoFileRepository ~ storeCreatedJob ~ jobId: for job storage", jobId);
     try {
       if (!jobId || jobId.trim().length === 0) {
         return {
@@ -32,10 +60,11 @@ export class MongoFileRepository implements IMongoRepository {
         };
       }
 
-      await this.jobModel.create({
+      const creating_job = await this.jobModel.create({
         _id: jobId,
         payload,
       });
+      console.log("Turbo Log  ~ MongoFileRepository ~ storeCreatedJob ~ creating_job:", creating_job);
 
       return {
         success: true,

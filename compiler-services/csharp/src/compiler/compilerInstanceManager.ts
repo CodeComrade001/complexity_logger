@@ -13,7 +13,7 @@ export default class CompilerInstanceManager {
   public getCsharpCompiler(): CSHARP_CompilerInterface {
     if (!this.csharpCompiler) {
       console.log(
-        "🚀 Initializing CSHARP compiler ONCE per CompilerInstanceManager"
+        // "🚀 Initializing CSHARP compiler ONCE per CompilerInstanceManager"
       );
 
       this.csharpCompiler =

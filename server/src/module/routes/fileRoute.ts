@@ -2,6 +2,7 @@ import { FileController } from "../adapters/controllers/FileController.js";
 import { PostgresFileRepository } from "../adapters/repositories/PostgresFileRepository.js";
 import { MongoFileRepository } from "../adapters/repositories/MongoFileRepository.js";
 import { FastifyInstance, FastifyPluginOptions } from "fastify";
+import { JobModel } from "../../models/job.model.js";
 
 /**
  * This plugin uses the DI-provided resources on fastify (postgres pool / mongoose model).
@@ -14,11 +15,10 @@ export default async function fileRoute(
   // gather infra from fastify decorators (set at bootstrap)
   const pgPool = (fastify as any).pgPool; // typed in composition root
   const workerClient = (fastify as any).workerClient; // typed in composition root
-  const mongoose = (fastify as any).mongoose; // typed in composition root
 
   // choose repository implementation depending on your infra
   const postgresRepo = new PostgresFileRepository(pgPool);
-  const mongoRepo = new MongoFileRepository(mongoose);
+  const mongoRepo = new MongoFileRepository(JobModel); // JobModel is a mongoose model, set in composition root
 
   const controller = new FileController(postgresRepo, mongoRepo, workerClient);
 

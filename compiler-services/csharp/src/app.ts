@@ -10,6 +10,7 @@ export async function createApp() {
     logger: true,
   });
 
+
   await createMongooseConnection()
 
   await startCompilerConsumer();

@@ -1,23 +1,16 @@
-import { type Model } from "mongoose";
-import { IMongoRepository } from "../ports/IMongoRepository.js";
-
-
-interface JobDocument {
-  _id: string;
-  payload: unknown;
-  createdAt: Date;
-  updatedAt: Date;
-}
+import type { Model } from "mongoose";
+import type { IMongoRepository } from "../ports/IMongoRepository.js";
+import type { JobDocument } from "../models/job.model.js";
 
 export class MongoFileRepository implements IMongoRepository {
-  private readonly jobModel: Model<JobDocument>
+
+  private readonly jobModel: Model<JobDocument>;
 
   constructor(
     jobModel: Model<JobDocument>
   ) {
     this.jobModel = jobModel;
   }
-
   async updateStoredPayload(
     jobId: string,
     payload: unknown): Promise<{
@@ -58,6 +51,7 @@ export class MongoFileRepository implements IMongoRepository {
     success: boolean;
     message: string;
   }> {
+    // console.log("Turbo Log  ~ MongoFileRepository ~ storeCreatedJob ~ jobId: for job storage", jobId);
     try {
       if (!jobId || jobId.trim().length === 0) {
         return {

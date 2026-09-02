@@ -7,6 +7,8 @@ export async function executeCSharpCompiler(
 ): Promise<{ jobId: string }> {
   const jobId = crypto.randomUUID();
 
+  console.log("CSHARP worker created and message is being published", jobId)
+
   await publishCompilerAnalysis({
     event: "compiler.analysis.requested",
     jobId,
