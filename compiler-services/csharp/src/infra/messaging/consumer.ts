@@ -23,6 +23,15 @@ export async function startCompilerConsumer() {
         const result = await analyzeCompiler(payload);
         console.log("Turbo Log  ~ startCompilerConsumer ~ result:", result);
 
+        await channel.sendToQueue(
+          "compiler.completed",
+          Buffer.from(
+            JSON.stringify({
+              jobId: result.jobIdKey,
+            })
+          )
+        );
+
         console.log(
           "Compiler analysis completed:",
           result

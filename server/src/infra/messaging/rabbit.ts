@@ -5,6 +5,7 @@ const RABBITMQ_URL =
   "amqp://complexity:complexity_dev_password@localhost:5672";
 
 export const COMPILER_EXCHANGE = "compiler.exchange";
+const QUEUE = "compiler.completed";
 
 let connection: ChannelModel | null = null;
 let channel: Channel | null = null;
@@ -25,6 +26,11 @@ export async function getRabbitMQChannel(): Promise<Channel> {
       durable: true,
     }
   );
+
+  await channel.assertQueue(QUEUE, {
+    durable: true,
+  });
+
 
   return channel;
 }

@@ -11,6 +11,35 @@ export class MongoFileRepository implements IMongoRepository {
   ) {
     this.jobModel = jobModel;
   }
+
+
+  async findByJobId(jobId: string[]): Promise<{ success: boolean; message: string; data: any; }> {
+    const result = []
+    for (const id of jobId) {
+      if (id === "") { }
+
+      const fetchedJob = this.jobModel.findById(id).lean().exec();
+      if (fetchedJob) {
+        result.push(fetchedJob);
+      }
+    }
+
+    if (result.length === 0) {
+      return {
+        success: false,
+        message: "No jobs found",
+        data: null
+      };
+    }
+
+    return {
+      success: true,
+      message: "Jobs fetched successfully",
+      data: result
+    };
+
+  }
+
   async updateStoredPayload(
     jobId: string,
     payload: unknown): Promise<{

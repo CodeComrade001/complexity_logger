@@ -4,9 +4,13 @@ import fastifyMultipart from "@fastify/multipart";
 import fileRoute from "../../module/routes/fileRoute.js";
 import { WorkerClient } from "../../module/worker/workerClient.js";
 import { createMongooseConnection } from "../../infra/db/mongo/index.js";
+import WebSocket from "ws";
+import fastifyWebsocket from "@fastify/websocket";
+import { startCompilerConsumer } from "../../infra/messaging/consumer.js";
 
 export async function createApp() {
   const app = fastify({ logger: true });
+
 
 
   // ---------- CROSS ORIGIN ----------
@@ -25,10 +29,11 @@ export async function createApp() {
   });
 
   await createMongooseConnection()
-
+  // await startCompilerConsumer()
   // ---------- GLOBAL SERVICES ----------
   app.decorate("workerClient", new WorkerClient());
 
+  await app.register(fastifyWebsocket);
 
 
   // ---------- ROUTES ----------
