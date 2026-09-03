@@ -12,32 +12,103 @@ export class MongoFileRepository implements IMongoRepository {
     this.jobModel = jobModel;
   }
 
+  async getJobs(skip: number, limit: number): Promise<{ success: boolean; message: string; data: any; }> {
+    const getJobsResult: any[] = [];
 
-  async findByJobId(jobId: string[]): Promise<{ success: boolean; message: string; data: any; }> {
-    const result = []
-    for (const id of jobId) {
-      if (id === "") { }
-
-      const fetchedJob = this.jobModel.findById(id).lean().exec();
-      if (fetchedJob) {
-        result.push(fetchedJob);
-      }
-    }
-
-    if (result.length === 0) {
+    if (skip < 0 || limit <= 0) {
       return {
         success: false,
-        message: "No jobs found",
-        data: null
+        message: "Invalid Values Sent for SKIP and LIMIT parameter",
+        data: getJobsResult
       };
     }
 
-    return {
-      success: true,
-      message: "Jobs fetched successfully",
-      data: result
-    };
+    try {
+      const jobs = await this.jobModel
+        .find({})
+        .skip(skip)
+        .limit(limit);
 
+      return {
+        success: true,
+        message: "Jobs fetch successful",
+        data: jobs
+      };
+
+    } catch (error: unknown) {
+      console.log("Turbo Log  ~ MongoFileRepository ~ getJobs ~ error:", error);
+      return {
+        success: false,
+        message: "Jobs fetch failed",
+        data: getJobsResult
+      }
+    }
+
+  }
+
+  async countJobs(): Promise<{
+    success: boolean;
+    message: string;
+    data: number;
+  }> {
+    try {
+      const count = await this.jobModel.countDocuments({
+        "payload.success": true
+      });
+
+      return {
+        success: true,
+        message: "Count fetch successful",
+        data: count
+      };
+    } catch (error: unknown) {
+      console.log(
+        "Turbo Log ~ MongoFileRepository ~ countJobs ~ error:",
+        error
+      );
+
+      return {
+        success: false,
+        message: "Failed to get count",
+        data: 0
+      };
+    }
+  }
+
+
+  async findByJobId(jobId: string[]): Promise<{ success: boolean; message: string; data: any; }> {
+    const result = []
+    try {
+      for (const id of jobId) {
+        if (id === "") { }
+
+        const fetchedJob = this.jobModel.findById(id).lean().exec();
+        if (fetchedJob) {
+          result.push(fetchedJob);
+        }
+      }
+
+      if (result.length === 0) {
+        return {
+          success: false,
+          message: "No jobs found",
+          data: null
+        };
+      }
+
+      return {
+        success: true,
+        message: "Jobs fetched successfully",
+        data: result
+      };
+    } catch (error) {
+      console.log("Turbo Log  ~ MongoFileRepository ~ findByJobId ~ error:", error);
+      return {
+        success: false,
+        message: "Jobs fetched failed",
+        data: result
+      }
+    }
   }
 
   async updateStoredPayload(
@@ -158,13 +229,5 @@ export class MongoFileRepository implements IMongoRepository {
         data: null,
       };
     }
-  }
-
-  async getCompilerResult(): Promise<{
-    status: boolean;
-    message: string;
-    data: any;
-  }> {
-    throw new Error("Method not implemented.");
   }
 }

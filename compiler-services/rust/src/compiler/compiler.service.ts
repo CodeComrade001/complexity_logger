@@ -36,25 +36,23 @@ export class RustCompilerService {
       throw new Error("Payload cannot be empty");
     }
 
-    const jobId = randomUUID();
-
     const job: CompilerJob = {
-      jobId,
+      jobId: payload.executionId,
       status: "queued",
       results: [],
       createdAt: Date.now()
     };
 
     this.resultStore.create(job);
-    const seeStoredJobLogs = await this.mongoRepo.storeCreatedJob(jobId, payload)
+    const seeStoredJobLogs = await this.mongoRepo.storeCreatedJob(payload.requestId, payload)
     console.log("Turbo Log  ~ CSharpCompilerService ~ submit ~ seeStoredJobLogs:", seeStoredJobLogs);
 
     const compiler =
       this.createCompiler();
 
     return this.process(
-      payload.jobId,
-      jobId,
+      payload.requestId,
+      payload.executionId,
       compiler,
       payload
     );
@@ -69,8 +67,8 @@ export class RustCompilerService {
   }
 
   private async process(
-    jobIdKey: string,
-    jobId: string,
+    requestId: string,
+    executionId: string,
     compiler: Compiler,
     payloads: CompilerPayload
   ): Promise<{ jobId: string; results: CompilerResult[] }> {
@@ -78,11 +76,11 @@ export class RustCompilerService {
       depth: 1,
     });
 
-    this.resultStore.update(jobId, {
+    this.resultStore.update(executionId, {
       status: "processing"
     });
 
-    const results: { jobId: string; results: CompilerResult[] } = { jobId, results: [] };
+    const results: { jobId: string; results: CompilerResult[] } = { jobId: executionId, results: [] };
 
     try {
 
@@ -113,32 +111,32 @@ export class RustCompilerService {
         }
       }
 
-      this.resultStore.update(jobId, {
+      this.resultStore.update(executionId, {
         status: "completed",
         results: results.results,
         completedAt: Date.now()
       });
 
-      return { jobId: jobIdKey, results: results.results }
+      return { jobId: executionId, results: results.results }
 
     } catch (error) {
 
-      this.resultStore.update(jobId, {
+      this.resultStore.update(executionId, {
         status: "failed",
         results: results.results,
         error: this.getErrorMessage(error),
         completedAt: Date.now()
       });
 
-      return { jobId: jobIdKey, results: [] };
+      return { jobId: executionId, results: [] };
     }
   }
 
   getResult(
-    jobId: string
+    executionId: string
   ): CompilerJob | undefined {
 
-    return this.resultStore.get(jobId);
+    return this.resultStore.get(executionId);
   }
 
   getStatus() {
