@@ -7,52 +7,73 @@ import { HandleCompletedCompilerJob } from "../../infra/messaging/helpers/handle
 import { CompilerCompletionBatcher } from "../../infra/messaging/helpers/compilerCompletionBatch.js";
 import { startCompilerConsumer } from "../../infra/messaging/consumer.js";
 import { RealtimeNotifier } from "../../realtime/realtimeNotifier.js";
+import { WebSocketController } from "../adapters/controllers/WebSocketController.js";
+import { JobController } from "../adapters/controllers/JobController.js";
 
-/**
- * This plugin uses the DI-provided resources on fastify (postgres pool / mongoose model).
- * The composition root could also create repos and pass them in via options instead.
- */
+
 export default async function fileRoute(
   fastify: FastifyInstance,
   _opts: FastifyPluginOptions
 ) {
-  // gather infra from fastify decorators (set at bootstrap)
+  /*//////////////////////////////////////////////////////////////
+                            MAIN DATABASE 
+    //////////////////////////////////////////////////////////////*/
   const pgPool = (fastify as any).pgPool; // typed in composition root
   const workerClient = (fastify as any).workerClient; // typed in composition root
+
+  /*//////////////////////////////////////////////////////////////
+                           NOTIFICATION SERVICE
+      //////////////////////////////////////////////////////////////*/
   const realtimeNotifier = new RealtimeNotifier();
-  // choose repository implementation depending on your infra
+
+  /*//////////////////////////////////////////////////////////////
+                            DATABASE REPOS
+    //////////////////////////////////////////////////////////////*/
   const postgresRepo = new PostgresFileRepository(pgPool);
-  const mongoRepo = new MongoFileRepository(JobModel); // JobModel is a mongoose model, set in composition root
+  const mongoRepo = new MongoFileRepository(JobModel); // JobModel is a mongoose model, set in composition 
 
-  const controller = new FileController(postgresRepo, mongoRepo, workerClient);
+  /*//////////////////////////////////////////////////////////////
+                            ALL CONTROLLER
+    //////////////////////////////////////////////////////////////*/
+  const webSocketController = new WebSocketController(realtimeNotifier);
+  const fileController = new FileController(postgresRepo, mongoRepo, workerClient);
+  const jobController = new JobController(mongoRepo);
 
-  const handleCompletedCompilerJob =
-    new HandleCompletedCompilerJob(mongoRepo, realtimeNotifier);
+  /*//////////////////////////////////////////////////////////////
+                                UTILS
+    //////////////////////////////////////////////////////////////*/
+  const handleCompletedCompilerJob = new HandleCompletedCompilerJob(mongoRepo, realtimeNotifier);
+  const compilerCompletionBatcher = new CompilerCompletionBatcher(
+    handleCompletedCompilerJob
+  );
 
-  const compilerCompletionBatcher =
-    new CompilerCompletionBatcher(
-      handleCompletedCompilerJob
-    );
-
-
+  /*//////////////////////////////////////////////////////////////
+                  MESSAGING SERVICE : RABBITMQ CONSUMER
+      //////////////////////////////////////////////////////////////*/
   await startCompilerConsumer(compilerCompletionBatcher);
 
-  fastify.post("/repos/csharp/analyze", controller.getCsharpAnalyzer.bind(controller));
-  fastify.post("/repos/go/analyze", controller.getGoFileAnalyzer.bind(controller));
-  fastify.post("/repos/java/analyze", controller.getJavaFileAnalyzer.bind(controller));
-  fastify.post("/repos/python/analyze", controller.getPythonFileAnalyzer.bind(controller));
-  fastify.post("/repos/rust/analyze", controller.getRustFileAnalyzer.bind(controller));
-  fastify.post("/repos/js/analyze", controller.get_js_ts_Analyzer.bind(controller));
+  /*//////////////////////////////////////////////////////////////
+                         ALL COMPILER ROUTES
+    //////////////////////////////////////////////////////////////*/
+  fastify.post("/repos/csharp/analyze", fileController.getCsharpAnalyzer.bind(fileController));
+  fastify.post("/repos/go/analyze", fileController.getGoFileAnalyzer.bind(fileController));
+  fastify.post("/repos/java/analyze", fileController.getJavaFileAnalyzer.bind(fileController));
+  fastify.post("/repos/python/analyze", fileController.getPythonFileAnalyzer.bind(fileController));
+  fastify.post("/repos/rust/analyze", fileController.getRustFileAnalyzer.bind(fileController));
+  fastify.post("/repos/js/analyze", fileController.get_js_ts_Analyzer.bind(fileController));
+
+  /*//////////////////////////////////////////////////////////////
+                             ALL JOBS ROUTES
+      //////////////////////////////////////////////////////////////*/
+  fastify.post("/repos/all-jobs", jobController.getAllJobs.bind(jobController));
+  fastify.get("/repos/all-jobs/:id", jobController.getSingleJob.bind(jobController));
+
+  /*//////////////////////////////////////////////////////////////
+                         ALL WEBSOCKET ROUTES
+    //////////////////////////////////////////////////////////////*/
   fastify.get(
     "/ws",
     { websocket: true },
-    (socket) => {
-      socket.on("message", (message) => {
-        console.log("Turbo Log  ~ fileRoute ~ message:", message);
-        // optional subscription logic
-      });
-
-      console.log("Frontend WebSocket connected");
-    }
+    webSocketController.connect.bind(webSocketController)
   );
 }

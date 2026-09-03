@@ -21,11 +21,7 @@ export class CompilerCompletionBatcher {
     private readonly batchProcessor: IHandleCompletedCompilerJobResponse
   ) { }
 
-  async add(
-    jobId: string,
-    message: ConsumeMessage,
-    channel: Channel
-  ) {
+  async add(jobId: string, message: ConsumeMessage, channel: Channel) {
     this.pending.push({
       jobId,
       message,

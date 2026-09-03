@@ -4,19 +4,21 @@ import { WorkerFile } from "../worker_types/workerTypes.js";
 export async function executePythonCompiler(
   payload: WorkerFile[]
 ): Promise<{ jobId: string }> {
-  const jobId = crypto.randomUUID();
+  const requestId = crypto.randomUUID();
+  const executionId = crypto.randomUUID();
 
-  console.log("PYTHON worker created and message is being published", jobId)
+  console.log("PYTHON worker created and message is being published", executionId)
 
   await publishCompilerAnalysis({
     event: "compiler.analysis.requested",
-    jobId,
+    requestId,
+    executionId,
     language: "python",
     files: payload,
     createdAt: new Date().toISOString(),
   });
 
   return {
-    jobId,
+    jobId: executionId,
   };
 }

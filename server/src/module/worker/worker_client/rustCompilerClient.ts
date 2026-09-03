@@ -4,19 +4,19 @@ import { WorkerFile } from "../worker_types/workerTypes.js";
 export async function executeRustCompiler(
   payload: WorkerFile[]
 ): Promise<{ jobId: string }> {
-  const jobId = crypto.randomUUID();
-
-  console.log("RUST worker created and message is being published", jobId)
+  const requestId = crypto.randomUUID();
+  const executionId = crypto.randomUUID();
 
   await publishCompilerAnalysis({
     event: "compiler.analysis.requested",
-    jobId,
+    requestId,
+    executionId,
     language: "rust",
     files: payload,
     createdAt: new Date().toISOString(),
   });
 
   return {
-    jobId,
+    jobId: executionId,
   };
 }

@@ -1,6 +1,7 @@
 export interface CompilerPayload {
   event: string;
-  jobId: string;
+  requestId: string;
+  executionId: string;
   language: string;
   files: compilerPayloadFiles[];
 }
