@@ -5,7 +5,6 @@ import Landing from "@/pages/landing";
 import Login from "@/pages/auth/login";
 import Signup from "@/pages/auth/signup";
 import DashboardOverview from "@/pages/dashboard/overview";
-import Projects from "@/pages/dashboard/projects";
 import Settings from "@/pages/dashboard/settings";
 import NotFound from "@/pages/not-found";
 import "./index.css"
@@ -13,6 +12,8 @@ import { NotificationProvider } from "./context/useNotification";
 import { ThemeProvider } from "./components/theme-provider";
 import ComplexityResultPage from "./pages/dashboard/fullComplexityResultPage";
 import { Toaster } from "sonner";
+import Reports from "./pages/dashboard/reports";
+import Projects from "./pages/dashboard/projects";
 
 
 function Router() {
@@ -27,7 +28,7 @@ function Router() {
       <Route path="/dashboard/projects" component={Projects} />
       <Route path="/dashboard/complexity-full-result" component={ComplexityResultPage} />
       {/* Fallback reports route to projects for now to prevent 404 on click */}
-      <Route path="/dashboard/reports" component={Projects} />
+      <Route path="/dashboard/reports" component={Reports} />
       <Route path="/dashboard/settings" component={Settings} />
 
       <Route component={NotFound} />

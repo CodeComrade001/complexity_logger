@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AnalyzeFileUpload } from "@/types/apiDataInterface";
+import { AnalyzeFileUpload, FileComplexityData } from "@/types/apiDataInterface";
 import axios, { type AxiosRequestConfig } from "axios";
 
 const baseURL = import.meta.env.VITE_LOCAL_BACKEND_URL || "";
@@ -96,11 +96,17 @@ export const getCurrentUser = (config?: AxiosRequestConfig) => {
 // FILE
 // --------------------
 
-export const getFileById = (
+export const getAllJobs = (
+  config?: AxiosRequestConfig
+) => {
+  return api.get("/file/repos/all-jobs/", config);
+};
+
+export const getJobsById = (
   id: string,
   config?: AxiosRequestConfig
 ) => {
-  return api.get(`/file/${id}`, config);
+  return api.get(`/file/repos/all-jobs/${id}`, config);
 };
 
 export const applyFilePatch = (
@@ -168,6 +174,15 @@ export const uploadAndAnalyzeFiles = (
   const endpoint = ANALYZE_ENDPOINTS[language];
 
   return api.post(endpoint, formData, config);
+};
+
+
+
+// --------------------
+// WEBSOCKET CONNECTION
+// --------------------
+export const fetchCompilerResult = async (jobId: string, config?: AxiosRequestConfig): Promise<FileComplexityData> => {
+  return api.get(`/file/ws/jobs/${jobId}`, config);
 };
 
 // --------------------

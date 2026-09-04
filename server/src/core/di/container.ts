@@ -29,7 +29,6 @@ export async function createApp() {
   });
 
   await createMongooseConnection()
-  // await startCompilerConsumer()
   // ---------- GLOBAL SERVICES ----------
   app.decorate("workerClient", new WorkerClient());
 

@@ -11,7 +11,7 @@ export class WebSocketController {
     socket: WebSocket,
     request: FastifyRequest
   ) {
-    const { jobId } = request.query as {
+    const { jobId } = request.params as {
       jobId?: string;
     };
 

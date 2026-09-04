@@ -72,7 +72,7 @@ export default async function fileRoute(
                          ALL WEBSOCKET ROUTES
     //////////////////////////////////////////////////////////////*/
   fastify.get(
-    "/ws",
+    "/ws/jobs/:jobId",
     { websocket: true },
     webSocketController.connect.bind(webSocketController)
   );
