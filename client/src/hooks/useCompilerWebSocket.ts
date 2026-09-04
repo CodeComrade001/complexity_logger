@@ -1,49 +1,82 @@
 import { useEffect, useRef } from "react";
 
 export const useCompilerSocket = (
-  onCompleted: (data: unknown) => void
+  jobIds: string[],
+  onCompleted: (jobId: string) => void
 ) => {
-  const socketRef = useRef<WebSocket | null>(null);
+  const socketsRef = useRef<Map<string, WebSocket>>(new Map());
 
   useEffect(() => {
-    const socket = new WebSocket("ws://localhost:YOUR_PORT/ws");
+    if (jobIds.length === 0) {
+      return;
+    }
 
-    socketRef.current = socket;
+    const sockets = socketsRef.current;
 
-    socket.onopen = () => {
-      console.log("Compiler WebSocket connected");
-    };
+    jobIds.forEach((jobId) => {
+      if (sockets.has(jobId)) {
+        return;
+      }
 
-    socket.onmessage = (event) => {
-      try {
-        const payload = JSON.parse(event.data);
+      const socket = new WebSocket(
+        `ws://localhost:4000/ws?jobId=${encodeURIComponent(jobId)}`
+      );
 
-        if (payload.event !== "compiler.completed") {
-          return;
+      sockets.set(jobId, socket);
+
+      socket.onopen = () => {
+        console.log(
+          `Compiler WebSocket connected for job ${jobId}`
+        );
+      };
+
+      socket.onmessage = (event) => {
+        try {
+          const payload = JSON.parse(event.data);
+
+          if (
+            payload.event !== "compiler.completed" ||
+            payload.jobId !== jobId
+          ) {
+            return;
+          }
+
+          onCompleted(jobId);
+
+          socket.close();
+          sockets.delete(jobId);
+        } catch (error) {
+          console.error(
+            "Failed to process WebSocket message:",
+            error
+          );
         }
+      };
 
-        onCompleted(payload.data);
-      } catch (error) {
+      socket.onerror = (error) => {
         console.error(
-          "Failed to process WebSocket message:",
+          `Compiler WebSocket error for job ${jobId}:`,
           error
         );
-      }
-    };
+      };
 
-    socket.onerror = (error) => {
-      console.error("Compiler WebSocket error:", error);
-    };
+      socket.onclose = () => {
+        console.log(
+          `Compiler WebSocket disconnected for job ${jobId}`
+        );
 
-    socket.onclose = () => {
-      console.log("Compiler WebSocket disconnected");
-    };
+        sockets.delete(jobId);
+      };
+    });
 
     return () => {
-      socket.close();
-      socketRef.current = null;
-    };
-  }, [onCompleted]);
+      sockets.forEach((socket) => {
+        socket.close();
+      });
 
-  return socketRef;
+      sockets.clear();
+    };
+  }, [jobIds, onCompleted]);
+
+  return socketsRef;
 };

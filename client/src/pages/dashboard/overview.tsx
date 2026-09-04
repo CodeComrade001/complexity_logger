@@ -24,6 +24,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import {
+  fetchCompilerResult,
   getLanguageFromFileName,
   isSupportedFile,
   LANGUAGE_LABELS,
@@ -201,6 +202,7 @@ export default function DashboardOverview() {
   const [preferredLanguage, setPreferredLanguage] =
     useState<SupportedLanguage>("javascript");
 
+  const [jobIds, setJobIds] = useState<string[]>([]);
   /*
    * User-selected preferred framework.
    */
@@ -382,20 +384,35 @@ export default function DashboardOverview() {
   };
 
 
-  const handleCompilerCompleted = (data: unknown) => {
-    console.log("Compiler result received:", data);
+  const handleCompilerCompleted = async (jobId: string) => {
+    try {
+      const result = await fetchCompilerResult(jobId);
+      console.log("Turbo Log  ~ handleCompilerCompleted ~ result:", result);
 
-    storeSession<FileComplexityData>(
-      "code-analysis",
-      data as FileComplexityData
-    );
+      storeSession<FileComplexityData>(
+        `code-analysis:${jobId}`,
+        result
+      );
 
-    setAnalyzedApiResult(data as FileComplexityData);
+      notify("Code analysis completed", "success");
 
-    notify("Code analysis completed", "success");
+      // navigate to report page here
+    } catch (error) {
+      console.error(
+        `Failed to fetch result for job ${jobId}:`,
+        error
+      );
+
+      notify(
+        "Analysis completed, but the result could not be retrieved.",
+        "error"
+      );
+    }
   };
 
-  useCompilerSocket(handleCompilerCompleted);
+  // start websocket connection to listen for compiler result
+  useCompilerSocket(jobIds, handleCompilerCompleted);
+
 
   /*
    * Submit files for analysis.
@@ -435,10 +452,14 @@ export default function DashboardOverview() {
 
       const jobs = await submitLanguageAnalyses(filesByLanguage);
 
+
+
       if (jobs.length === 0) {
         notify("Files analysis error", "error");
         return;
       }
+
+      setJobIds(jobs.map((job) => job.jobId));
 
       notify(
         `Analysis started for ${jobs.length} job${jobs.length > 1 ? "s" : ""
@@ -547,6 +568,16 @@ export default function DashboardOverview() {
         `Analysis failed for ${LANGUAGE_LABELS[language]}`,
         "error"
       );
+
+      //start websocket connection to listen for compiler result
+      // but store all of it in session storage
+      // storeSession<FileComplexityData>("code-analysis", {
+      //   success: false,
+      //   message: `Analysis failed for ${LANGUAGE_LABELS[language]}`,
+      //   details: null,
+      // });
+
+      handleCompilerCompleted(jobId);
 
       return null;
     }
