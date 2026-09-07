@@ -385,6 +385,7 @@ export default function DashboardOverview() {
 
 
   const handleCompilerCompleted = async (jobId: string) => {
+    console.log("Turbo Log  ~ handleCompilerCompleted ~ jobId:", jobId);
     try {
       const result = await fetchCompilerResult(jobId);
       console.log("Turbo Log  ~ handleCompilerCompleted ~ result:", result);

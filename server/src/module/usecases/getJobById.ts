@@ -21,7 +21,8 @@ export class GetJobById {
 
       return {
         success: true,
-        data: job,
+        data: job.data[0].payload,
+        message: "Job fetched successfully",
       };
     } catch (error) {
       console.error("GetJobById error:", error);

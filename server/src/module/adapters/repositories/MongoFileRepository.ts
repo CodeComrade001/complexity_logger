@@ -46,6 +46,74 @@ export class MongoFileRepository implements IMongoRepository {
 
   }
 
+  async getCompletedJobs(skip: number, limit: number): Promise<{ success: boolean; message: string; data: any; }> {
+    const getJobsResult: any[] = [];
+
+    if (skip < 0 || limit <= 0) {
+      return {
+        success: false,
+        message: "Invalid Values Sent for SKIP and LIMIT parameter",
+        data: getJobsResult
+      };
+    }
+
+    try {
+      const jobs = await this.jobModel
+        .find({ "payload.success": true })
+        .skip(skip)
+        .limit(limit);
+
+      return {
+        success: true,
+        message: "Jobs fetch successful",
+        data: jobs
+      };
+
+    } catch (error: unknown) {
+      console.log("Turbo Log  ~ MongoFileRepository ~ getJobs ~ error:", error);
+      return {
+        success: false,
+        message: "Jobs fetch failed",
+        data: getJobsResult
+      }
+    }
+
+  }
+
+  async getJobsRequest(skip: number, limit: number): Promise<{ success: boolean; message: string; data: any; }> {
+    const getJobsResult: any[] = [];
+
+    if (skip < 0 || limit <= 0) {
+      return {
+        success: false,
+        message: "Invalid Values Sent for SKIP and LIMIT parameter",
+        data: getJobsResult
+      };
+    }
+
+    try {
+      const jobs = await this.jobModel
+        .find({ "payload.success": true })
+        .skip(skip)
+        .limit(limit);
+
+      return {
+        success: true,
+        message: "Jobs fetch successful",
+        data: jobs
+      };
+
+    } catch (error: unknown) {
+      console.log("Turbo Log  ~ MongoFileRepository ~ getJobs ~ error:", error);
+      return {
+        success: false,
+        message: "Jobs fetch failed",
+        data: getJobsResult
+      }
+    }
+
+  }
+
   async countJobs(): Promise<{
     success: boolean;
     message: string;
@@ -82,7 +150,7 @@ export class MongoFileRepository implements IMongoRepository {
       for (const id of jobId) {
         if (id === "") { }
 
-        const fetchedJob = this.jobModel.findById(id).lean().exec();
+        const fetchedJob = await this.jobModel.findById(id).lean().exec();
         if (fetchedJob) {
           result.push(fetchedJob);
         }

@@ -18,10 +18,12 @@ export interface FileComplexityReceivedPayload {
    ========================= */
 
 export interface FileComplexityData {
-  data: ComplexityReport[];
+  result: ComplexityReport;
   success: boolean;
   message: string;
+  fileName: string;
 }
+
 
 /* =========================
    REPORT

@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { apiCompilerJob, CompilerJob } from "@/pages/dashboard/reports";
 import { AnalyzeFileUpload, FileComplexityData } from "@/types/apiDataInterface";
 import axios, { type AxiosRequestConfig } from "axios";
 
@@ -96,17 +97,21 @@ export const getCurrentUser = (config?: AxiosRequestConfig) => {
 // FILE
 // --------------------
 
-export const getAllJobs = (
+export const getAllJobs = async (
   config?: AxiosRequestConfig
-) => {
-  return api.get("/file/repos/all-jobs/", config);
+): Promise<{ allJobs: apiCompilerJob[], pagination: { page: number, limit: number, total: number, totalPages: number, hasNextPage: boolean, hasPreviousPage: boolean } }> => {
+
+  const response = await api.get("/file/repos/all-jobs", config);
+  return response.data
 };
 
-export const getJobsById = (
+export const getJobsById = async (
   id: string,
   config?: AxiosRequestConfig
-) => {
-  return api.get(`/file/repos/all-jobs/${id}`, config);
+): Promise<{ data: FileComplexityData[] }> => {
+  const response = await api.get(`/file/repos/all-jobs/${id}`, config);
+
+  return response.data;
 };
 
 export const applyFilePatch = (

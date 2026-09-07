@@ -65,7 +65,7 @@ export default async function fileRoute(
   /*//////////////////////////////////////////////////////////////
                              ALL JOBS ROUTES
       //////////////////////////////////////////////////////////////*/
-  fastify.post("/repos/all-jobs", jobController.getAllJobs.bind(jobController));
+  fastify.get("/repos/all-jobs", jobController.getAllJobs.bind(jobController));
   fastify.get("/repos/all-jobs/:id", jobController.getSingleJob.bind(jobController));
 
   /*//////////////////////////////////////////////////////////////

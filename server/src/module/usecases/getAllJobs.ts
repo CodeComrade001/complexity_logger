@@ -18,15 +18,17 @@ export class GetAllJobs {
     const skip = (safePage - 1) * safeLimit;
 
     const [jobs, countResult] = await Promise.all([
-      this.mongoRepo.getJobs(skip, safeLimit),
+      this.mongoRepo.getCompletedJobs(skip, safeLimit),
       this.mongoRepo.countJobs(),
     ]);
+
+    const { data: allJobs } = jobs
+
 
     const total = countResult.data;
 
     return {
-      success: true,
-      data: jobs,
+      allJobs,
       pagination: {
         page: safePage,
         limit: safeLimit,

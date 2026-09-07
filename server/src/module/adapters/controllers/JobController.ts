@@ -14,6 +14,7 @@ export class JobController {
   }
 
   public async getAllJobs(request: any, reply: any) {
+    console.log("getAllJObs method was called")
     try {
       const page = Math.max(
         Number(request.query?.page) || 1,
@@ -32,6 +33,7 @@ export class JobController {
         page,
         limit,
       });
+      console.log("Turbo Log  ~ JobController ~ getAllJobs ~ result:", result);
 
       return reply.code(200).send(result);
 
@@ -50,6 +52,7 @@ export class JobController {
       const { id } = request.params;
 
       const result = await this.getJobByIdUsecase.execute(id);
+      console.log("Turbo Log  ~ JobController ~ getSingleJob ~ result:", result);
 
       if (!result.success) {
         return reply.code(404).send(result);

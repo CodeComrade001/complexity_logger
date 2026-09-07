@@ -40,7 +40,7 @@ export async function createApp() {
 
   // ---------- ERROR HANDLING ----------
   app.setNotFoundHandler((_req, reply) => {
-    reply.code(404).send({ error: "Not found" });
+    reply.code(404).send({ error: "URL OR METHOD Not found" });
   });
 
   app.setErrorHandler((error: any, _req, reply) => {

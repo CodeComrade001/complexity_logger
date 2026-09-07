@@ -32,7 +32,9 @@ export function fetchSession<T>(
     const decoded = decodeURIComponent(atob(encrypted));
     const json = decoded.replace(secret, "");
 
-    return JSON.parse(json) as T;
+    const seeJson = JSON.parse(json);
+
+    return seeJson as T;
   } catch (err) {
     console.error("Failed to fetch session data", err);
     return null;

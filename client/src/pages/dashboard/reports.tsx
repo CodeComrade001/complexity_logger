@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 import { FileComplexityData } from "@/types/apiDataInterface";
 import { getAllJobs, getJobsById } from "@/utils/axios";
+import { storeSession } from "@/utils/sessionStorage";
+import { navigate } from "wouter/use-browser-location";
 
 
 
@@ -27,12 +29,20 @@ import { getAllJobs, getJobsById } from "@/utils/axios";
  * normalize it in the API layer rather than spreading
  * backend-specific checks throughout the UI.
  */
-interface CompilerJob {
-  jobId: string;
-  result?: FileComplexityData;
+export interface CompilerJob {
+  id: string;
+  // result?: FileComplexityData;
   payload?: FileComplexityData;
   createdAt?: string;
   updatedAt?: string;
+}
+
+export interface apiCompilerJob {
+  _id: string;
+  payload?: FileComplexityData;
+  createdAt?: string;
+  updatedAt?: string;
+  __v?: number;
 }
 
 /* =========================
@@ -68,10 +78,6 @@ function isCompilerJob(value: unknown): value is CompilerJob {
 function extractComplexityData(
   job: CompilerJob,
 ): FileComplexityData | null {
-  if (isFileComplexityData(job.result)) {
-    return job.result;
-  }
-
   if (isFileComplexityData(job.payload)) {
     return job.payload;
   }
@@ -132,29 +138,30 @@ export default function Reports() {
   const { notify } = useNotification();
 
   const [jobs, setJobs] = useState<CompilerJob[]>([]);
+  console.log("Turbo Log  ~ Reports ~ jobs:", jobs);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  /*
-   * Connect your actual getAllJobs() here.
-   */
+
   const loadJobsFromDatabase = useCallback(
     async (): Promise<CompilerJob[]> => {
 
-      // Example:
+      const { allJobs } = await getAllJobs();
+      console.log("Turbo Log  ~ Reports ~ allJobs:", allJobs);
 
-      const response = await getAllJobs();
-
-      if (!Array.isArray(response.data)) {
+      if (!Array.isArray(allJobs)) {
         throw new Error("Invalid jobs response");
       }
 
-      return response.data.filter(isCompilerJob);
+      return allJobs.map((job) => ({
+        id: job._id,
+        payload: job.payload,
+        createdAt: job.createdAt,
+        updatedAt: job.updatedAt,
+      }));;
 
-
-      return [];
     },
     [],
   );
@@ -189,8 +196,8 @@ export default function Reports() {
           setIsLoading(true);
         }
 
-        const databaseJobs =
-          await loadJobsFromDatabase();
+        const databaseJobs = await loadJobsFromDatabase();
+        console.log("Turbo Log  ~ Reports ~ databaseJobs:", databaseJobs);
 
         setJobs(databaseJobs);
         cacheJobs(databaseJobs);
@@ -235,7 +242,7 @@ export default function Reports() {
     }
 
     return jobs.filter((job) =>
-      job.jobId.toLowerCase().includes(search),
+      job.id.toLowerCase().includes(search),
     );
   }, [jobs, searchTerm]);
 
@@ -251,7 +258,7 @@ export default function Reports() {
         return total;
       }
 
-      return total + result.data.length;
+      return total + (result.result?.summary?.itemsAnalyzed ?? 0);
     }, 0);
   }, [jobs]);
 
@@ -259,7 +266,11 @@ export default function Reports() {
     return jobs.filter((job) => {
       const result = extractComplexityData(job);
 
-      return result?.success === true;
+      if (!result) {
+        return false;
+      }
+
+      return result.success === true;
     }).length;
   }, [jobs]);
 
@@ -273,14 +284,24 @@ export default function Reports() {
     await loadJobs(true);
   };
 
-  const handleOpenJob = (jobId: string) => {
+  const handleOpenJob = async (jobId: string) => {
 
-    //  Later:
+    const { data } = await getJobsById(jobId);
 
-    //  navigate(`/projects/${jobId}`);
+    if (data.length === 0) {
+      console.error(`Job with ID ${jobId} not found.`);
+      notify(`Job with ID ${jobId} not found.`, "error");
+      return;
+    }
 
-    getJobsById(jobId);
+    const rawPayload = data;
 
+
+
+
+    storeSession<FileComplexityData[]>(`compiler-job-${jobId}`, rawPayload);
+
+    navigate(`/dashboard/complexity-full-result?jobId=${jobId}`);
 
     console.log("Opening job:", jobId);
   };
@@ -433,13 +454,16 @@ export default function Reports() {
             />
           ) : (
             <div className="space-y-3">
-              {filteredJobs.map((job) => (
-                <JobCard
-                  key={job.jobId}
-                  job={job}
-                  onOpen={handleOpenJob}
-                />
-              ))}
+              {filteredJobs.map((job) => {
+                const jobId = job.id;
+                return (
+                  <JobCard
+                    key={jobId}
+                    job={job}
+                    onOpen={(jobId) => handleOpenJob(jobId)}
+                  />
+                )
+              })}
             </div>
           )}
         </div>
@@ -505,26 +529,18 @@ function JobCard({
 }: JobCardProps) {
   const result = extractComplexityData(job);
 
-  const reports = result?.data ?? [];
+  const reports = result ?? [];
 
-  const filesAnalyzed = reports.length;
+  const filesAnalyzed = result?.result?.summary?.itemsAnalyzed ?? 0;
 
   const averageScore =
     filesAnalyzed > 0
-      ? reports.reduce(
-        (sum, report) =>
-          sum + report.summary.avgScore,
-        0,
-      ) / filesAnalyzed
+      ? result?.result?.summary?.avgScore ?? null
       : null;
 
-  const highRiskCount = reports.reduce(
-    (sum, report) =>
-      sum +
-      report.summary.criticalRiskCount +
-      report.summary.highRiskCount,
-    0,
-  );
+  const highRiskCount =
+    (result?.result?.summary?.criticalRiskCount ?? 0) +
+    (result?.result?.summary?.highRiskCount ?? 0);
 
   const successful = result?.success === true;
 
@@ -552,7 +568,7 @@ function JobCard({
               </div>
 
               <h3 className="truncate font-mono text-sm font-semibold">
-                {job.jobId}
+                {job.id}
               </h3>
 
               {job.createdAt && (
@@ -591,7 +607,7 @@ function JobCard({
           {/* Action */}
           <Button
             variant="secondary"
-            onClick={() => onOpen(job.jobId)}
+            onClick={() => onOpen(job.id)}
             className="shrink-0"
           >
             View Report
